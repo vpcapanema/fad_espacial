@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
-from database import Base
+from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
+
+Base = declarative_base()
 
 class ValidacaoGeometria(Base):
     __tablename__ = "validacao_geometria"

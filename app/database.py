@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# String de conexão com o RDS atualizado
-DATABASE_URL = "postgresql://admin:Malditas131533*@fad-geospatial.c7cu4eq2gc56.us-east-2.rds.amazonaws.com:5432/fad_db"
+# String de conexão com o RDS
+DATABASE_URL = "postgresql://admin:Malditas131533*@fad-geospatial.c7cu4eq2gc56.us-east-2.rds.amazonaws.com:5432/fad-geospatial"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
