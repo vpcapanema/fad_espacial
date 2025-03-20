@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session
 from app.database.session import SessionLocal
 from app.models.arquivos import ArquivoZip
 import io
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
-# 🔹 Definir a função get_db para evitar erro de importação
+# 🔹 Função para obter a sessão do banco de dados
 def get_db():
     db = SessionLocal()
     try:
@@ -14,10 +15,10 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/upload/")
+@router.post("/")
 async def upload_arquivo(arquivo: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
-        # ✅ Verifica se o arquivo é um ZIP antes de processar
+        # ✅ Verifica se o arquivo tem a extensão .zip antes de processar
         if not arquivo.filename.endswith('.zip'):
             raise HTTPException(status_code=400, detail="O arquivo deve ser um ZIP.")
 
@@ -34,10 +35,11 @@ async def upload_arquivo(arquivo: UploadFile = File(...), db: Session = Depends(
         db.commit()
         db.refresh(novo_arquivo)
 
-        return {"mensagem": "Arquivo importado com sucesso!", "sucesso": True}
+        return JSONResponse(content={"mensagem": "Arquivo importado com sucesso!", "sucesso": True})
 
     except HTTPException as e:
         raise e  # Re-lança exceções HTTP já tratadas
+
     except Exception as e:
         db.rollback()  # Desfaz a transação em caso de erro
         raise HTTPException(status_code=500, detail=f"Erro interno ao processar o arquivo: {str(e)}")

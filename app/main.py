@@ -3,18 +3,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+# 🔥 Importando as rotas corretamente
 from app.api.endpoints.upload import router as upload_router
 from app.api.endpoints.validacao_geometria import router as validacao_router
 
 app = FastAPI()
 
-# Configuração do CORS
+# 🔥 Configuração correta do CORS para permitir chamadas do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],  # 🔥 Agora permite chamadas de qualquer origem
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # 🔥 Permite todos os métodos (GET, POST, etc.)
+    allow_headers=["*"],  # 🔥 Permite qualquer cabeçalho
+    expose_headers=["*"],  # 🔥 Garante que os headers sejam expostos corretamente
 )
 
 # Servir arquivos estáticos
@@ -27,6 +29,6 @@ templates = Jinja2Templates(directory="app/templates")
 async def serve_index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# ✅ Importa os módulos de upload e validação corretamente
-app.include_router(upload_router, prefix="/validacao")
+# ✅ Incluindo as rotas corretamente
+app.include_router(upload_router, prefix="/upload")
 app.include_router(validacao_router, prefix="/geometria")
