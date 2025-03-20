@@ -1,253 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ferramenta de Análise Dinamizada (FAD)</title>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Ferramenta de Análise Dinamizada (FAD)</title>
+        
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        
+        <!-- Arquivo de Estilos -->
+        <link rel="stylesheet" href="/static/styles.css">
+    </head>
     
-    <!-- Estilos e Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        .container-box {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 60%;
-            margin: auto;
-        }
-        .section-box {
-            padding: 30px;
-            background-color: #ffffff;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-        }
-        footer {
-            background-color: black;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
 <body>
     <div class="container">
         <header class="py-4">
             <h1 class="fw-bold">Ferramenta de Análise Dinamizada (FAD)</h1>
-            <h2 class="h5">Sistema de Validação e Análise Geoespacial</h2>
+            <h2 class="h5">Sistema de Importação de Arquivos</h2>
         </header>
-        
+
         <!-- Seção de Upload -->
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Upload de Arquivo - FAD</title>
+        <div class="upload-container">
+            <h2>Importação de Arquivo</h2>
+            <p>Envie um arquivo ZIP para ser armazenado no banco.</p>
             
-            <!-- Estilos e Bootstrap -->
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f4f4f4;
-                    text-align: center;
-                    padding: 20px;
-                }
-                .upload-container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 8px;
-                    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-                    width: 50%;
-                    margin: auto;
-                    text-align: center;
-                }
-                .custom-file-input {
-                    display: none;
-                }
-                .custom-file-label {
-                    background-color: #d6d6d6;
-                    border: 1px solid #ced4da;
-                    padding: 8px 12px;
-                    cursor: pointer;
-                    border-radius: 5px;
-                }
-                .file-name-box {
-                    flex-grow: 1;
-                    padding: 8px 12px;
-                    border: 1px solid #ced4da;
-                    background-color: white;
-                    text-align: left;
-                    border-radius: 5px;
-                }
-                .progress {
-                    display: none;
-                    height: 20px;
-                    margin-top: 10px;
-                }
-                .alert {
-                    display: none;
-                    margin-top: 15px;
-                }
-                .upload-row {
-                    display: flex;
-                    gap: 10px;
-                    justify-content: center;
-                    align-items: center;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="upload-container">
-                <h2>Importação de Arquivo</h2>
-                <p>Envie um arquivo ZIP para ser armazenado no banco.</p>
-                
-                <div class="upload-row">
-                    <label for="arquivo" class="custom-file-label">Escolher arquivo</label>
-                    <input type="file" id="arquivo" class="custom-file-input" accept=".zip">
-                    <div class="file-name-box" id="file-name">Nenhum arquivo selecionado</div>
-                    <button class="btn btn-primary" onclick="enviarArquivo()">Enviar</button>
-                </div>
-                
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;"></div>
-                </div>
-                
-                <div id="mensagem" class="alert" role="alert"></div>
+            <div class="upload-row">
+                <label for="arquivo" class="custom-file-label">Escolher arquivo</label>
+                <input type="file" id="arquivo" class="custom-file-input" accept=".zip">
+                <div class="file-name-box" id="file-name">Nenhum arquivo selecionado</div>
+                <button class="btn btn-primary" onclick="enviarArquivo()">Enviar</button>
             </div>
-            
-            <script>
-                document.getElementById("arquivo").addEventListener("change", function() {
-                    let fileName = this.files[0] ? this.files[0].name : "Nenhum arquivo selecionado";
-                    document.getElementById("file-name").innerText = fileName;
-                });
-        
-                function enviarArquivo() {
-                    let input = document.getElementById("arquivo").files[0];
-                    if (!input) {
-                        alert("Selecione um arquivo para enviar.");
-                        return;
-                    }
-        
-                    let formData = new FormData();
-                    formData.append("arquivo", input);
-        
-                    let progressBar = document.querySelector(".progress");
-                    let progressBarInner = document.querySelector(".progress-bar");
-                    let mensagem = document.getElementById("mensagem");
-                    
-                    progressBar.style.display = "block";
-                    progressBarInner.style.width = "0%";
-                    mensagem.style.display = "none";
-                    
-                    fetch("/upload/", {
-                        method: "POST",
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        progressBarInner.style.width = "100%";
-                        setTimeout(() => {
-                            progressBar.style.display = "none";
-                            mensagem.style.display = "block";
-                            if (data.sucesso) {
-                                mensagem.className = "alert alert-success";
-                                mensagem.innerHTML = "Arquivo importado com sucesso! <button class='btn btn-success' onclick='prosseguir()'>Prosseguir</button>";
-                            } else {
-                                mensagem.className = "alert alert-danger";
-                                mensagem.innerHTML = "Falha na importação. Tente novamente! <button class='btn btn-danger' onclick='recarregar()'>Ok</button>";
-                            }
-                        }, 1000);
-                    })
-                    .catch(error => {
-                        progressBar.style.display = "none";
-                        mensagem.style.display = "block";
-                        mensagem.className = "alert alert-danger";
-                        mensagem.innerHTML = "Erro ao enviar arquivo. <button class='btn btn-danger' onclick='recarregar()'>Ok</button>";
-                    });
-                }
-        
-                function prosseguir() {
-                    window.location.href = "/proxima-etapa";
-                }
-        
-                function recarregar() {
-                    location.reload();
-                }
-            </script>
-        </body>
 
-        
-        <!-- Seção de Relatórios -->
-        <section class="section-box">
-            <h2>Relatórios</h2>
-            <p>Os relatórios gerados após a validação serão exibidos aqui.</p>
-        </section>
-        
-        <!-- Seção de Estatísticas -->
-        <section class="section-box">
-            <h2>Estatísticas</h2>
-            <p>Visualize estatísticas sobre as análises realizadas.</p>
-        </section>
-        
-        <!-- Seção de Documentação -->
-        <section class="section-box">
-            <h2>Documentação</h2>
-            <p>Acesse a documentação para entender melhor o funcionamento da FAD.</p>
-        </section>
-        
-        <!-- Seção de Contato -->
-        <section class="section-box">
-            <h2>Contato</h2>
-            <p>Entre em contato para suporte ou dúvidas.</p>
-        </section>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;"></div>
+            </div>
+
+            <div id="mensagem" class="alert" role="alert"></div>
+        </div>
     </div>
-    
-    <footer>
-        <p>&copy; 2025 Ferramenta de Análise Dinamizada - FAD</p>
-    </footer>
-    
-    <script>
-        function enviarArquivo() {
-            let input = document.getElementById("arquivo").files[0];
-            if (!input) {
-                alert("Selecione um arquivo para enviar.");
-                return;
-            }
 
-            let formData = new FormData();
-            formData.append("arquivo", input);
-
-            fetch("/validacao/validar_shapefile/", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("resultado").style.display = "block";
-                document.getElementById("resposta").innerText = JSON.stringify(data, null, 2);
-            })
-            .catch(error => console.error("Erro ao enviar arquivo:", error));
-        }
-    </script>
+    <!-- Importação do arquivo de script externo -->
+    <script src="/static/upload.js"></script>
 </body>
 </html>
