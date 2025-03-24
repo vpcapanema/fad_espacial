@@ -1,111 +1,99 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse, FileResponse
 from app.database.session import get_db
-from app.models.arquivos import ArquivoZip
-from app.models.validacao import ValidacaoGeometria
+from app.models.geometrias import Geometria
 from app.models.trechos_validados import TrechoValidado
-from fastapi.responses import JSONResponse
-import zipfile
-import io
-import geopandas as gpd
-from datetime import datetime
-import tempfile
-import os
+from app.models.validacao import ValidacaoGeometria
+from geoalchemy2.shape import to_shape
 from geoalchemy2 import WKTElement
+from datetime import datetime
+from app.relatorios.relatorio_validacao import gerar_relatorio_validacao
+import geopandas as gpd
+import os
 
 router = APIRouter()
 
 @router.get("/validar")
 def validar_geometria(db: Session = Depends(get_db)):
     try:
-        zip_entry = db.query(ArquivoZip).order_by(ArquivoZip.id.desc()).first()
-        if not zip_entry:
-            raise HTTPException(status_code=404, detail="Nenhum arquivo encontrado para validar.")
+        geometrias = db.query(Geometria).all()
+        if not geometrias:
+            raise HTTPException(status_code=404, detail="Nenhuma geometria encontrada para validar.")
 
-        nome_arquivo = zip_entry.nome_arquivo
-        possui_arquivos_obrigatorios = False
-        geometria_valida = False
-        epsg_detectado = None
-        epsg_correto = False
-        tipo_geometria = None
-        contagem_feicoes = 0
-        erros = []
+        features = []
+        for g in geometrias:
+            geom = to_shape(g.geometria)
+            features.append({"Cod": g.nome, "geometry": geom})
+        gdf = gpd.GeoDataFrame(features, geometry="geometry", crs="EPSG:4674")
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            zip_stream = io.BytesIO(zip_entry.dados)
+        relatorio = []
 
-            with zipfile.ZipFile(zip_stream, "r") as zip_ref:
-                zip_ref.extractall(tmpdir)
-                file_list = zip_ref.namelist()
+        # 1. Presença da coluna Cod
+        cond1 = "Cod" in gdf.columns
+        relatorio.append(("Presença da coluna 'Cod'", cond1))
 
-            required_exts = [".shp", ".shx", ".dbf", ".prj"]
-            possui_arquivos_obrigatorios = all(any(f.endswith(ext) for f in file_list) for ext in required_exts)
+        # 2. Cod não pode ser nulo ou em branco
+        cond2 = not gdf["Cod"].isnull().any() and not (gdf["Cod"].astype(str).str.strip() == "").any() if cond1 else False
+        relatorio.append(("Campo 'Cod' não está em branco ou nulo", cond2))
 
-            if not possui_arquivos_obrigatorios:
-                erros.append("O arquivo .zip está incompleto (falta .shp, .shx, .dbf ou .prj).")
+        # 3. Geometria nula
+        cond3 = not gdf["geometry"].isnull().any()
+        relatorio.append(("Geometria não é nula", cond3))
 
-            shp_path = None
-            for f in os.listdir(tmpdir):
-                if f.endswith(".shp"):
-                    shp_path = os.path.join(tmpdir, f)
-                    break
+        # 4. Dentro do estado de SP
+        sp_bbox = [-53.1103, -25.439, -44.1728, -19.7848]
+        gdf["centroid"] = gdf.geometry.centroid
+        cond4 = gdf["centroid"].apply(lambda p: sp_bbox[0] <= p.x <= sp_bbox[2] and sp_bbox[1] <= p.y <= sp_bbox[3]).all()
+        relatorio.append(("Dentro do limite do Estado de SP", cond4))
 
-            if not shp_path:
-                raise HTTPException(status_code=400, detail="Arquivo .shp não encontrado no ZIP.")
-
-            gdf = gpd.read_file(shp_path)
-            contagem_feicoes = len(gdf)
-
-        if gdf.crs:
-            epsg_detectado = gdf.crs.to_epsg()
-            epsg_correto = epsg_detectado == 4674
-        else:
-            erros.append("Não foi possível identificar o EPSG do shapefile.")
-
-        if not epsg_correto:
-            erros.append("O EPSG detectado não é 4674.")
-
-        if "Cod" not in gdf.columns:
-            erros.append("O campo 'Cod' é obrigatório e não foi encontrado.")
-        elif gdf["Cod"].isnull().any() or (gdf["Cod"].astype(str).str.strip() == "").any():
-            erros.append("Existem feições com o campo 'Cod' em branco ou nulo.")
-
-        if gdf["geometry"].isnull().any():
-            erros.append("Existem feições com geometria nula.")
-        else:
-            tipo_geometria = gdf.geometry.type.mode().iloc[0]
-            if not all(gdf.geometry.type.isin(["LineString", "MultiLineString"])):
-                erros.append("A geometria deve ser do tipo LINESTRING ou MULTILINESTRING.")
-
-        geometria_valida = len(erros) == 0
+        validado = all([c[1] for c in relatorio])
+        epsg_detectado = 4674
+        tipo_geometria = gdf.geometry.type.mode().iloc[0]
+        contagem_feicoes = len(gdf)
 
         validacao = ValidacaoGeometria(
-            nome_arquivo=nome_arquivo,
-            possui_arquivos_obrigatorios=possui_arquivos_obrigatorios,
-            geometria_valida=geometria_valida,
+            nome_arquivo=geometrias[0].nome,
+            possui_arquivos_obrigatorios=True,
+            geometria_valida=validado,
             epsg_detectado=epsg_detectado,
-            epsg_correto=epsg_correto,
+            epsg_correto=True,
             tipo_geometria=tipo_geometria,
             contagem_feicoes=contagem_feicoes,
             data_validacao=datetime.utcnow()
         )
-
         db.add(validacao)
         db.commit()
-        db.refresh(validacao)
 
-        if geometria_valida:
+        gerar_relatorio_validacao(
+            nome_arquivo=validacao.nome_arquivo,
+            criterios=relatorio,
+            caminho_destino="/tmp/relatorio_validacao.pdf",
+            epsg_detectado=epsg_detectado,
+            tipo_geometria=tipo_geometria,
+            contagem_feicoes=contagem_feicoes
+        )
+
+        if validado:
             for _, row in gdf.iterrows():
-                geometria = WKTElement(row.geometry.wkt, srid=4674)
-                trecho = TrechoValidado(codigo=str(row["Cod"]), geometry=geometria)
-                db.add(trecho)
-            db.commit()
-            return JSONResponse(content={"validado": True, "mensagem": "Geometria validada com sucesso!"})
-        else:
-            # Apaga trechos se a validação falhar
-            db.execute("DELETE FROM trechos_validados")
-            db.commit()
-            return JSONResponse(content={"validado": False, "erros": erros})
+                geom = WKTElement(row.geometry.wkt, srid=4674)
+                db.add(TrechoValidado(codigo=str(row["Cod"]), geometry=geom))
+        db.query(Geometria).delete()
+        db.commit()
+
+        return JSONResponse(content={
+            "validado": validado,
+            "mensagem": "Geometria validada com sucesso!" if validado else "A geometria contém erros.",
+            "relatorio_gerado": True
+        })
 
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao validar geometria: {str(e)}")
+
+@router.get("/relatorio")
+def baixar_relatorio_validacao():
+    caminho = "/tmp/relatorio_validacao.pdf"
+    if not os.path.exists(caminho):
+        raise HTTPException(status_code=404, detail="Relatório não encontrado.")
+    return FileResponse(caminho, filename="relatorio_validacao.pdf", media_type="application/pdf")

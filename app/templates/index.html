@@ -152,7 +152,7 @@
     <div class="hero-content">
       <h1>FAD</h1>
       <h2>Ferramenta de Análise Dinamizada</h2>
-      <p>SISTEMA DE INPORTAÇÃO E VALIDAÇÃO DE GEOMETRIAS</p>
+      <p>SISTEMA DE IMPORTAÇÃO E VALIDAÇÃO DE GEOMETRIAS</p>
     </div>
   </header>
 
@@ -198,8 +198,8 @@
 
       <!-- Botões de relatório na página -->
       <div id="reportButtons" class="hidden">
-        <button id="downloadZipReport" class="hidden">Ver Relatório de Importação</button>
-        <button id="downloadZipError" class="hidden">Ver Relatório de Erro</button>
+        <button id="downloadZipReport" class="hidden">Baixar relatório de importação</button>
+        <button id="downloadZipError" class="hidden">Baixar relatório de erro</button>
       </div>
     </section>
 
@@ -229,7 +229,7 @@
       </div>
 
       <div id="validationReportButtons" class="hidden">
-        <button id="downloadValidationReport">Ver Relatório de Validação</button>
+        <button id="downloadValidationReport">Baixar Relatório de Validação</button>
       </div>
 
       <div id="startAnalysisContainer" class="hidden">
@@ -242,7 +242,7 @@
       Acessar plataforma de análise dinamizada
     </a>
   </main>
-
+  
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const fileInput = document.getElementById("fileInput");
@@ -258,7 +258,7 @@
       const reportButtons = document.getElementById("reportButtons");
       const downloadZipReport = document.getElementById("downloadZipReport");
       const downloadZipError = document.getElementById("downloadZipError");
-
+  
       const validationButton = document.getElementById("GeometryValidationButton");
       const validationProgressContainer = document.getElementById("validationProgressContainer");
       const validationProgress = document.getElementById("validationProgress");
@@ -270,27 +270,27 @@
       const validationReportButtons = document.getElementById("validationReportButtons");
       const downloadValidationReport = document.getElementById("downloadValidationReport");
       const accessPlatformButton = document.getElementById("accessPlatformButton");
-
+  
       const API_BASE_URL = "/";
-
+  
       fileInput.addEventListener("change", function () {
         fileNameField.value = fileInput.files.length ? fileInput.files[0].name : "Nenhum arquivo selecionado";
       });
-
+  
       uploadButton.addEventListener("click", function () {
         if (!fileInput.files.length) {
           alert("Por favor, selecione um arquivo.");
           return;
         }
-
+  
         const file = fileInput.files[0];
         const formData = new FormData();
         formData.append("arquivo", file);
-
+  
         progressContainer.classList.remove("hidden");
         uploadProgress.value = 0;
         uploadProgressPercent.textContent = "0%";
-
+  
         fetch(`${API_BASE_URL}upload/`, {
           method: "POST",
           body: formData
@@ -319,7 +319,7 @@
             downloadZipReport.classList.add("hidden");
             reportButtons.classList.remove("hidden");
           });
-
+  
         let progress = 0;
         const interval = setInterval(() => {
           if (progress >= 100) {
@@ -331,30 +331,30 @@
           }
         }, 200);
       });
-
+  
       errorOkButton.addEventListener("click", function () {
         errorMessage.classList.add("hidden");
       });
-
+  
       document.querySelectorAll('.close-button').forEach(button => {
         button.addEventListener('click', () => {
           const dialog = button.closest('.dialog');
-          dialog.classList.add('hidden');
+          dialog.classList.add("hidden");
           if (dialog.id === 'validationResultMessage') {
-            validationReportButtons.classList.remove('hidden');
+            validationReportButtons.classList.remove("hidden");
           }
         });
       });
-
+  
       uploadSuccessOkButton.addEventListener("click", function () {
         resultMessage.classList.add("hidden");
       });
-
+  
       validationButton.addEventListener("click", function () {
         validationProgressContainer.classList.remove("hidden");
         validationProgress.value = 0;
         validationProgressPercent.textContent = "0%";
-
+  
         let progress = 0;
         const interval = setInterval(() => {
           if (progress >= 100) {
@@ -365,7 +365,7 @@
             validationProgressPercent.textContent = `${progress}%`;
           }
         }, 200);
-
+  
         fetch(`${API_BASE_URL}geometria/validar`)
           .then(response => response.json())
           .then(data => {
@@ -386,13 +386,13 @@
             validationResultMessage.classList.remove("hidden");
           });
       });
-
+  
       validationResultOkButton.addEventListener("click", function () {
         validationResultMessage.classList.add("hidden");
         validationReportButtons.classList.remove("hidden");
         accessPlatformButton.classList.remove("hidden");
       });
-
+  
       downloadValidationReport.addEventListener("click", function () {
         fetch(`${API_BASE_URL}geometria/relatorio`)
           .then(response => response.blob())
@@ -405,39 +405,54 @@
             link.remove();
           });
       });
-
+  
       document.getElementById("startAnalysisBtn").addEventListener("click", function () {
         window.location.href = "/conformidade/";
       });
-
+  
       // Função para tornar a caixa de diálogo arrastável
       function makeDraggable(dialog) {
         const header = dialog.querySelector('.dialog-header');
         let isDragging = false;
         let offsetX, offsetY;
-
+  
         header.addEventListener('mousedown', (e) => {
           isDragging = true;
           offsetX = e.clientX - dialog.offsetLeft;
           offsetY = e.clientY - dialog.offsetTop;
         });
-
+  
         document.addEventListener('mousemove', (e) => {
           if (isDragging) {
             dialog.style.left = `${e.clientX - offsetX}px`;
             dialog.style.top = `${e.clientY - offsetY}px`;
           }
         });
-
+  
         document.addEventListener('mouseup', () => {
           isDragging = false;
         });
       }
-
+  
       // Tornar as caixas de diálogo arrastáveis
       makeDraggable(resultMessage);
       makeDraggable(errorMessage);
       makeDraggable(validationResultMessage);
+  
+      // ✅ Novo botão de download do relatório de importação
+      downloadZipReport.addEventListener("click", function () {
+        fetch(`${API_BASE_URL}geometria/relatorio`)
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "relatorio_importacao.pdf";
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+      });
+  
     });
   </script>
 

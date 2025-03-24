@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Interessado</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="upload-container">
+        <h2>Cadastro de Pessoa Física</h2>
+        <form action="/cadastro/pf" method="post">
+            <input type="text" name="cpf" placeholder="CPF (apenas números)" required><br>
+            <input type="text" name="nome" placeholder="Nome Completo" required><br>
+            <input type="email" name="email" placeholder="E-mail" required><br>
+            <input type="tel" name="celular" placeholder="Celular com DDD" required pattern="\(\d{2}\) \d \d{4}-\d{4}"><br>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+
+    <div class="upload-container">
+        <h2>Cadastro de Pessoa Jurídica</h2>
+        <form action="/cadastro/pj" method="post">
+            <input type="text" name="cnpj" placeholder="CNPJ" required><br>
+            <input type="text" name="razao_social" placeholder="Razão Social" required><br>
+            <input type="text" name="nome_fantasia" placeholder="Nome Fantasia"><br>
+            <input type="text" name="rua" placeholder="Rua"><br>
+            <input type="text" name="numero" placeholder="Nº"><br>
+            <input type="text" name="complemento" placeholder="Complemento"><br>
+            <input type="text" name="bairro" placeholder="Bairro"><br>
+            <input type="text" name="cep" placeholder="CEP"><br>
+            <input type="text" name="cidade" placeholder="Cidade"><br>
+            <input type="text" name="uf" placeholder="UF"><br>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+
+    <!-- 🔹 Botão para ir à etapa de importação -->
+    <div id="irParaImportacao" style="margin-top: 40px; text-align: center;">
+        <button onclick="window.location.href='/upload'" style="
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        ">
+            Ir para Importação de Geometria
+        </button>
+    </div>
+
+</body>
+</html>

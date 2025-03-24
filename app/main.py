@@ -1,20 +1,20 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
+from app.core.jinja import templates
 from pathlib import Path
+from fastapi.responses import HTMLResponse
 
-# Importação das rotas corretamente
+# Importações das rotas
 from app.api.endpoints.upload import router as upload_router
 from app.api.endpoints.validacao_geometria import router as validacao_router
 from app.api.endpoints.relatorio import router as relatorio_router
 from app.api.endpoints.ca_endpoint import router as conformidade_router
-
-
+from app.api.endpoints.cd_cadastro import router as cadastro_router  # ✅ NOVO
 
 app = FastAPI()
 
-# 🔥 Configuração do CORS
+# Configuração do CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,28 +24,21 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# 🔥 Servindo arquivos estáticos
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# 🔥 Configuração correta do Jinja2Templates
+# Diretório de templates
 TEMPLATES_DIR = Path(__file__).parent / "templates"
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-# 🔥 Verificar se a pasta templates existe
-if not TEMPLATES_DIR.exists():
-    print(f"⚠️  A pasta de templates não foi encontrada em {TEMPLATES_DIR}")
+# Servir arquivos estáticos da raiz do projeto
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-# ✅ Rota para servir o index.html corretamente
-@app.get("/", response_class=Jinja2Templates.TemplateResponse)
-async def serve_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+# ✅ Página inicial agora leva ao formulário de cadastro
+@app.get("/", response_class=HTMLResponse)
+async def redirect_to_cadastro(request: Request):
+    return templates.TemplateResponse("cd_cadastro_form.html", {"request": request})
 
-# ✅ Incluindo as rotas corretamente
+# Rotas registradas
 app.include_router(upload_router, prefix="/upload")
 app.include_router(validacao_router, prefix="/geometria")
 app.include_router(relatorio_router, prefix="/geometria")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(conformidade_router, prefix="/conformidade")
-
-
-
+app.include_router(cadastro_router)  # ✅ Cadastro incluído sem prefixo
