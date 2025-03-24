@@ -1,76 +1,460 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAD - Importação de Arquivo</title>
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAD - Ferramenta de Análise Dinamizada</title>
+  <style>
+    /* Conteúdo original de styles.css */
+    body {
+      font-family: 'Lato', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+
+    .hero {
+      background: #004080;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .upload-section, .validation-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-label {
+      display: inline-block;
+      background: #004080;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[readonly] {
+      margin-left: 10px;
+      padding: 6px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #006600;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    progress {
+      width: 100%;
+      height: 20px;
+    }
+
+    /* Estilos para as caixas de diálogo */
+    .dialog {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .dialog-header {
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-bottom: 1px solid #ccc;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+    }
+
+    .close-button {
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .dialog-body {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .dialog-body p {
+      margin: 0;
+      padding: 5px 0;
+    }
+
+    .validation-progress {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    /* Estilo do botão grande */
+    .big-button {
+      display: block;
+      width: 80%;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 20px;
+      font-size: 24px;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .big-button:hover {
+      background-color: #003366;
+    }
+  </style>
 </head>
 <body>
-    <h1>FAD</h1>
-    <h2>Ferramenta de Análise Dinamizada</h2>
-    <h3>Sistema de Importação e Validação de Geometria</h3>
 
-    <!-- CONTAINER DE IMPORTAÇÃO -->
-    <div class="upload-container" id="importContainer">
-        <h3>Importe sua Geometria Aqui</h3>
-        <p>Faça o upload do seu arquivo shapefile compactado, em formato .zip.</p>
-        <p>O arquivo shapefile modelo deve ser baixado da página da FAD na internet</p>
+  <header class="hero">
+    <div class="hero-content">
+      <h1>FAD</h1>
+      <h2>Ferramenta de Análise Dinamizada</h2>
+      <p>SISTEMA DE IMPORTAÇÃO E VALIDAÇÃO DE GEOMETRIAS</p>
+    </div>
+  </header>
 
+  <main>
+    <section class="upload-section">
+      <h3 style="text-align: center;">Importe sua Geometria</h3>
+      <p style="text-align: center;">Faça o upload do arquivo .zip contendo o shapefile</p>
+
+      <div style="text-align: center;">
         <input type="file" id="fileInput" hidden>
-        <label for="fileInput" class="file-label">Escolher arquivo</label>
-        <input type="text" id="fileName" value="Selecionar arquivo" readonly>
-        
+        <label for="fileInput" class="file-label">Escolher Arquivo</label>
+        <input type="text" id="fileName" value="Nenhum arquivo selecionado" readonly style="width: 300px;">
         <button id="uploadButton">Enviar</button>
+      </div>
 
-        <div id="progressContainer">
-            <progress id="uploadProgress" value="0" max="100"></progress>
+      <div id="progressContainer" class="hidden" style="margin-top: 10px; width: 100%; text-align: center;">
+        <div style="position: relative; display: inline-block; width: 70%;">
+          <progress id="uploadProgress" value="0" max="100" style="width: 100%; height: 30px;"></progress>
+          <span id="uploadProgressPercent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; color: black;">0%</span>
         </div>
+      </div>
 
-        <div id="resultMessage" class="hidden">
-            <p>Arquivo importado com sucesso. Validar geometria?</p>
-            <div class="button-group">
-                <button id="validateYes">Sim</button>
-                <button id="validateNo">Não</button>
-            </div>
+      <div id="resultMessage" class="dialog hidden">
+        <div class="dialog-header">
+          <p>Arquivo importado com sucesso!</p>
+          <button class="close-button">&times;</button>
         </div>
-
-        <div id="errorMessage" class="hidden">
-            <p>Erro ao importar o arquivo.</p>
-            <button id="errorOkButton">OK</button>
+        <div class="dialog-body">
+          <button id="uploadSuccessOkButton">OK</button>
         </div>
-    </div>
+      </div>
 
-    <!-- CONTAINER DE VALIDAÇÃO -->
-    <div class="validation-container hidden" id="validationContainer">
-        <h3>Validação da Geometria</h3>
-        <p>Estamos validando a geometria do seu arquivo. Por favor, aguarde...</p>
-        <div id="validationProgressContainer">
-            <progress id="validationProgress" value="0" max="100"></progress>
+      <div id="errorMessage" class="dialog hidden">
+        <div class="dialog-header">
+          <p>Erro ao importar o arquivo!</p>
+          <button class="close-button">&times;</button>
         </div>
-    </div>
-
-    <!-- MENSAGEM DE SUCESSO NA VALIDAÇÃO -->
-    <div id="validationSuccess" class="hidden">
-        <p>Geometria validada com sucesso!</p>
-        <button id="validationOkButton">OK</button>
-    </div>
-
-    <!-- MENSAGEM DE ERRO NA VALIDAÇÃO -->
-    <div id="validationFail" class="hidden">
-        <p>Geometria inválida! Verifique seu arquivo e tente novamente.</p>
-        <button id="validationFailOkButton">OK</button>
-    </div>
-
-    <!-- PERGUNTA SOBRE RELATÓRIO DE VALIDAÇÃO -->
-    <div id="relatorioPergunta" class="hidden">
-        <p>Deseja gerar o relatório de validação?</p>
-        <div class="button-group">
-            <button id="relatorioSim">Sim</button>
-            <button id="relatorioNao">Não</button>
+        <div class="dialog-body">
+          <p>Tente novamente!</p>
+          <button id="errorOkButton">OK</button>
         </div>
-    </div>
+      </div>
 
-    <script src="/static/upload.js"></script>
+      <!-- Botões de relatório na página -->
+      <div id="reportButtons" class="hidden">
+        <button id="downloadZipReport" class="hidden">Baixar relatório de importação</button>
+        <button id="downloadZipError" class="hidden">Baixar relatório de erro</button>
+      </div>
+    </section>
+
+    <section class="validation-container">
+      <h3 style="text-align: center;">Validação da Geometria</h3>
+      <div style="text-align: center;">
+        <button id="GeometryValidationButton">Validar geometria</button>
+      </div>
+
+      <div id="validationProgressContainer" class="hidden validation-progress">
+        <p id="progressMessage">Analisando geometria. Por favor, aguarde...</p>
+        <div style="position: relative; display: inline-block; width: 70%;">
+          <progress id="validationProgress" value="0" max="100" style="width: 100%; height: 30px;"></progress>
+          <span id="validationProgressPercent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; color: black;">0%</span>
+        </div>
+      </div>
+
+      <div id="validationResultMessage" class="dialog hidden">
+        <div class="dialog-header">
+          <p id="validationResultTitle"></p>
+          <button class="close-button">&times;</button>
+        </div>
+        <div class="dialog-body">
+          <p id="validationResultText"></p>
+          <button id="validationResultOkButton">OK</button>
+        </div>
+      </div>
+
+      <div id="validationReportButtons" class="hidden">
+        <button id="downloadValidationReport">Baixar Relatório de Validação</button>
+      </div>
+
+      <div id="startAnalysisContainer" class="hidden">
+        <button id="startAnalysisBtn">Iniciar Análise Dinamizada</button>
+      </div>
+    </section>
+
+    <!-- Botão grande para acessar a plataforma de análise dinamizada -->
+    <a href="https://urban-xylophone-4j6qpx6vw9wpcjwpv-8000.app.github.dev/conformidade/" class="big-button hidden" id="accessPlatformButton">
+      Acessar plataforma de análise dinamizada
+    </a>
+  </main>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const fileInput = document.getElementById("fileInput");
+      const fileNameField = document.getElementById("fileName");
+      const uploadButton = document.getElementById("uploadButton");
+      const progressContainer = document.getElementById("progressContainer");
+      const uploadProgress = document.getElementById("uploadProgress");
+      const uploadProgressPercent = document.getElementById("uploadProgressPercent");
+      const resultMessage = document.getElementById("resultMessage");
+      const errorMessage = document.getElementById("errorMessage");
+      const uploadSuccessOkButton = document.getElementById("uploadSuccessOkButton");
+      const errorOkButton = document.getElementById("errorOkButton");
+      const reportButtons = document.getElementById("reportButtons");
+      const downloadZipReport = document.getElementById("downloadZipReport");
+      const downloadZipError = document.getElementById("downloadZipError");
+  
+      const validationButton = document.getElementById("GeometryValidationButton");
+      const validationProgressContainer = document.getElementById("validationProgressContainer");
+      const validationProgress = document.getElementById("validationProgress");
+      const validationProgressPercent = document.getElementById("validationProgressPercent");
+      const validationResultMessage = document.getElementById("validationResultMessage");
+      const validationResultTitle = document.getElementById("validationResultTitle");
+      const validationResultText = document.getElementById("validationResultText");
+      const validationResultOkButton = document.getElementById("validationResultOkButton");
+      const validationReportButtons = document.getElementById("validationReportButtons");
+      const downloadValidationReport = document.getElementById("downloadValidationReport");
+      const accessPlatformButton = document.getElementById("accessPlatformButton");
+  
+      const API_BASE_URL = "/";
+  
+      fileInput.addEventListener("change", function () {
+        fileNameField.value = fileInput.files.length ? fileInput.files[0].name : "Nenhum arquivo selecionado";
+      });
+  
+      uploadButton.addEventListener("click", function () {
+        if (!fileInput.files.length) {
+          alert("Por favor, selecione um arquivo.");
+          return;
+        }
+  
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("arquivo", file);
+  
+        progressContainer.classList.remove("hidden");
+        uploadProgress.value = 0;
+        uploadProgressPercent.textContent = "0%";
+  
+        fetch(`${API_BASE_URL}upload/`, {
+          method: "POST",
+          body: formData
+        })
+          .then(response => response.json())
+          .then(data => {
+            progressContainer.classList.add("hidden");
+            if (data.sucesso) {
+              resultMessage.classList.remove("hidden");
+              errorMessage.classList.add("hidden");
+              downloadZipReport.classList.remove("hidden");
+              downloadZipError.classList.add("hidden");
+            } else {
+              errorMessage.classList.remove("hidden");
+              resultMessage.classList.add("hidden");
+              downloadZipError.classList.remove("hidden");
+              downloadZipReport.classList.add("hidden");
+            }
+            reportButtons.classList.remove("hidden");
+          })
+          .catch(() => {
+            progressContainer.classList.add("hidden");
+            errorMessage.classList.remove("hidden");
+            resultMessage.classList.add("hidden");
+            downloadZipError.classList.remove("hidden");
+            downloadZipReport.classList.add("hidden");
+            reportButtons.classList.remove("hidden");
+          });
+  
+        let progress = 0;
+        const interval = setInterval(() => {
+          if (progress >= 100) {
+            clearInterval(interval);
+          } else {
+            progress += 10;
+            uploadProgress.value = progress;
+            uploadProgressPercent.textContent = `${progress}%`;
+          }
+        }, 200);
+      });
+  
+      errorOkButton.addEventListener("click", function () {
+        errorMessage.classList.add("hidden");
+      });
+  
+      document.querySelectorAll('.close-button').forEach(button => {
+        button.addEventListener('click', () => {
+          const dialog = button.closest('.dialog');
+          dialog.classList.add("hidden");
+          if (dialog.id === 'validationResultMessage') {
+            validationReportButtons.classList.remove("hidden");
+          }
+        });
+      });
+  
+      uploadSuccessOkButton.addEventListener("click", function () {
+        resultMessage.classList.add("hidden");
+      });
+  
+      validationButton.addEventListener("click", function () {
+        validationProgressContainer.classList.remove("hidden");
+        validationProgress.value = 0;
+        validationProgressPercent.textContent = "0%";
+  
+        let progress = 0;
+        const interval = setInterval(() => {
+          if (progress >= 100) {
+            clearInterval(interval);
+          } else {
+            progress += 5;
+            validationProgress.value = progress;
+            validationProgressPercent.textContent = `${progress}%`;
+          }
+        }, 200);
+  
+        fetch(`${API_BASE_URL}geometria/validar`)
+          .then(response => response.json())
+          .then(data => {
+            validationProgressContainer.classList.add("hidden");
+            if (data.validado) {
+              validationResultTitle.textContent = "Validação concluída!";
+              validationResultText.textContent = "Geometria validada com sucesso!";
+            } else {
+              validationResultTitle.textContent = "Erro na validação!";
+              validationResultText.textContent = "Geometria inválida. Verifique o relatório de validação.";
+            }
+            validationResultMessage.classList.remove("hidden");
+          })
+          .catch(() => {
+            validationProgressContainer.classList.add("hidden");
+            validationResultTitle.textContent = "Erro na validação!";
+            validationResultText.textContent = "Ocorreu um erro durante a validação. Tente novamente.";
+            validationResultMessage.classList.remove("hidden");
+          });
+      });
+  
+      validationResultOkButton.addEventListener("click", function () {
+        validationResultMessage.classList.add("hidden");
+        validationReportButtons.classList.remove("hidden");
+        accessPlatformButton.classList.remove("hidden");
+      });
+  
+      downloadValidationReport.addEventListener("click", function () {
+        fetch(`${API_BASE_URL}geometria/relatorio`)
+          .then(response => response.blob())
+          .then(blob => {
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "relatorio_validacao.pdf";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          });
+      });
+  
+      document.getElementById("startAnalysisBtn").addEventListener("click", function () {
+        window.location.href = "/conformidade/";
+      });
+  
+      // Função para tornar a caixa de diálogo arrastável
+      function makeDraggable(dialog) {
+        const header = dialog.querySelector('.dialog-header');
+        let isDragging = false;
+        let offsetX, offsetY;
+  
+        header.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          offsetX = e.clientX - dialog.offsetLeft;
+          offsetY = e.clientY - dialog.offsetTop;
+        });
+  
+        document.addEventListener('mousemove', (e) => {
+          if (isDragging) {
+            dialog.style.left = `${e.clientX - offsetX}px`;
+            dialog.style.top = `${e.clientY - offsetY}px`;
+          }
+        });
+  
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+      }
+  
+      // Tornar as caixas de diálogo arrastáveis
+      makeDraggable(resultMessage);
+      makeDraggable(errorMessage);
+      makeDraggable(validationResultMessage);
+  
+      // ✅ Novo botão de download do relatório de importação
+      downloadZipReport.addEventListener("click", function () {
+        fetch(`${API_BASE_URL}geometria/relatorio`)
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "relatorio_importacao.pdf";
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+      });
+  
+    });
+  </script>
+
 </body>
 </html>

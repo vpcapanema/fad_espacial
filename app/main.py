@@ -24,21 +24,19 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# Diretório de templates
+# Diretórios
 TEMPLATES_DIR = Path(__file__).parent / "templates"
-
-# Servir arquivos estáticos da raiz do projeto
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
-# ✅ Página inicial agora leva ao formulário de cadastro
+# Página inicial (ajuste aqui conforme comportamento desejado)
 @app.get("/", response_class=HTMLResponse)
-async def redirect_to_cadastro(request: Request):
-    return templates.TemplateResponse("cd_cadastro_form.html", {"request": request})
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
 
 # Rotas registradas
 app.include_router(upload_router, prefix="/upload")
 app.include_router(validacao_router, prefix="/geometria")
 app.include_router(relatorio_router, prefix="/geometria")
 app.include_router(conformidade_router, prefix="/conformidade")
-app.include_router(cadastro_router)  # ✅ Cadastro incluído sem prefixo
+app.include_router(cadastro_router)  # Cadastro incluído sem prefixo
