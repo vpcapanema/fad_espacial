@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Conformidade Ambiental</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1, h2 { color: #004080; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #999; padding: 8px; text-align: left; }
+        .restricao { background-color: #ffd6d6; }
+        .risco { background-color: #fff6cc; }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Conformidade Ambiental</h1>
+    <p><strong>Município:</strong> {{ municipio }}</p>
+    <p><strong>Trecho Rodoviário:</strong> {{ trecho }}</p>
+    <p><strong>Data da Análise:</strong> {{ data }}</p>
+
+    <h2>Áreas com Risco</h2>
+    <table>
+        <thead>
+            <tr><th>Nome da Área</th></tr>
+        </thead>
+        <tbody>
+            {% for nome in risco %}
+                <tr class="risco"><td>{{ nome }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Áreas com Restrição</h2>
+    <table>
+        <thead>
+            <tr><th>Nome da Área</th></tr>
+        </thead>
+        <tbody>
+            {% for nome in restricao %}
+                <tr class="restricao"><td>{{ nome }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,130 @@
+.
+├── .env
+├── .gitignore
+├── .pytest_cache
+│   ├── .gitignore
+│   ├── CACHEDIR.TAG
+│   ├── README.md
+│   └── v
+│       └── cache
+│           ├── lastfailed
+│           ├── nodeids
+│           └── stepwise
+├── .vscode
+│   └── settings.json
+├── README.md
+├── app
+│   ├── __init__.py
+│   ├── api
+│   │   ├── dependencies.py
+│   │   └── endpoints
+│   │       ├── ca_endpoint.py
+│   │       ├── relatorio.py
+│   │       ├── upload.py
+│   │       └── validacao_geometria.py
+│   ├── core
+│   ├── database
+│   │   ├── __init__.py
+│   │   ├── migrations
+│   │   └── session.py
+│   ├── main.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── arquivos.py
+│   │   └── validacao.py
+│   ├── modules
+│   │   └── conformidade_ambiental
+│   │       ├── __init__.py
+│   │       ├── ca_laudo.py
+│   │       ├── ca_mapa.py
+│   │       ├── ca_processador.py
+│   │       ├── ca_processamento.py
+│   │       └── ca_shapefile.py
+│   ├── scripts
+│   ├── services
+│   ├── static
+│   │   └── images
+│   ├── templates
+│   │   ├── ca_interface.html
+│   │   ├── ca_laudo_template.html
+│   │   ├── ca_processamento_template.html
+│   │   ├── ca_relatorio_processamento.html
+│   │   ├── index.html
+│   │   └── index_backup.html
+│   ├── test.db
+│   ├── test_upload.py
+│   └── utils
+├── arvore_diretorios.txt
+├── atualizar_ca_modulo.py
+├── atualizar_url_api.py
+├── ca_modulo.zip
+├── corrigir_conexao.py
+├── corrigir_fad.py
+├── gerar_arvore_dir_projeto.py
+├── gerar_testes_shapefile.py
+├── nova_arvore.txt
+├── preparar_ca_modulo.py
+├── relatorio_validacao.pdf
+├── renomear_modulo_ca.py
+├── requirements.txt
+├── run_api.py
+├── setup_database.py
+├── setup_project.py
+├── static
+│   ├── images
+│   │   ├── a321-1.png
+│   │   └── conformidade_ambiental.png
+│   ├── styles.css
+│   ├── styles_backup.css
+│   └── upload.js
+├── test_db.py
+├── teste.sh
+├── testes_shapefile
+│   ├── erro_cod_ausente
+│   │   ├── erro_cod_ausente.cpg
+│   │   ├── erro_cod_ausente.dbf
+│   │   ├── erro_cod_ausente.prj
+│   │   ├── erro_cod_ausente.shp
+│   │   └── erro_cod_ausente.shx
+│   ├── erro_cod_ausente.zip
+│   ├── erro_cod_em_branco
+│   │   ├── erro_cod_em_branco.cpg
+│   │   ├── erro_cod_em_branco.dbf
+│   │   ├── erro_cod_em_branco.prj
+│   │   ├── erro_cod_em_branco.shp
+│   │   └── erro_cod_em_branco.shx
+│   ├── erro_cod_em_branco.zip
+│   ├── erro_epsg_invalido
+│   │   ├── erro_epsg_invalido.cpg
+│   │   ├── erro_epsg_invalido.dbf
+│   │   ├── erro_epsg_invalido.prj
+│   │   ├── erro_epsg_invalido.shp
+│   │   └── erro_epsg_invalido.shx
+│   ├── erro_epsg_invalido.zip
+│   ├── erro_geometria_nula
+│   │   ├── erro_geometria_nula.cpg
+│   │   ├── erro_geometria_nula.dbf
+│   │   ├── erro_geometria_nula.prj
+│   │   ├── erro_geometria_nula.shp
+│   │   └── erro_geometria_nula.shx
+│   ├── erro_geometria_nula.zip
+│   ├── erro_tipo_geometria
+│   │   ├── erro_tipo_geometria.cpg
+│   │   ├── erro_tipo_geometria.dbf
+│   │   ├── erro_tipo_geometria.prj
+│   │   ├── erro_tipo_geometria.shp
+│   │   └── erro_tipo_geometria.shx
+│   ├── erro_tipo_geometria.zip
+│   ├── teste_valido
+│   │   ├── teste_valido.cpg
+│   │   ├── teste_valido.dbf
+│   │   ├── teste_valido.prj
+│   │   ├── teste_valido.shp
+│   │   └── teste_valido.shx
+│   └── teste_valido.zip
+├── tests
+│   ├── integration
+│   └── unit
+└── zipar_ca_modulo.py
+
+32 directories, 95 files

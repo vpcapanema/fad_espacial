@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAD - Importação de Arquivo</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>FAD</h1>
+    <h2>Ferramenta de Análise Dinamizada</h2>
+    <h3>Sistema de Importação e Validação de Geometria</h3>
+
+    <!-- CONTAINER DE IMPORTAÇÃO -->
+    <div class="upload-container" id="importContainer">
+        <h3>Importe sua Geometria Aqui</h3>
+        <p>Faça o upload do seu arquivo shapefile compactado, em formato .zip.</p>
+        <p>O arquivo shapefile modelo deve ser baixado da página da FAD na internet</p>
+
+        <input type="file" id="fileInput" hidden>
+        <label for="fileInput" class="file-label">Escolher arquivo</label>
+        <input type="text" id="fileName" value="Selecionar arquivo" readonly>
+        
+        <button id="uploadButton">Enviar</button>
+
+        <div id="progressContainer">
+            <progress id="uploadProgress" value="0" max="100"></progress>
+        </div>
+
+        <div id="resultMessage" class="hidden">
+            <p>Arquivo importado com sucesso. Validar geometria?</p>
+            <div class="button-group">
+                <button id="validateYes">Sim</button>
+                <button id="validateNo">Não</button>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="hidden">
+            <p>Erro ao importar o arquivo.</p>
+            <button id="errorOkButton">OK</button>
+        </div>
+    </div>
+
+    <!-- CONTAINER DE VALIDAÇÃO -->
+    <div class="validation-container hidden" id="validationContainer">
+        <h3>Validação da Geometria</h3>
+        <p>Estamos validando a geometria do seu arquivo. Por favor, aguarde...</p>
+        <div id="validationProgressContainer">
+            <progress id="validationProgress" value="0" max="100"></progress>
+        </div>
+    </div>
+
+    <!-- MENSAGEM DE SUCESSO NA VALIDAÇÃO -->
+    <div id="validationSuccess" class="hidden">
+        <p>Geometria validada com sucesso!</p>
+        <button id="validationOkButton">OK</button>
+    </div>
+
+    <!-- MENSAGEM DE ERRO NA VALIDAÇÃO -->
+    <div id="validationFail" class="hidden">
+        <p>Geometria inválida! Verifique seu arquivo e tente novamente.</p>
+        <button id="validationFailOkButton">OK</button>
+    </div>
+
+    <!-- PERGUNTA SOBRE RELATÓRIO DE VALIDAÇÃO -->
+    <div id="relatorioPergunta" class="hidden">
+        <p>Deseja gerar o relatório de validação?</p>
+        <div class="button-group">
+            <button id="relatorioSim">Sim</button>
+            <button id="relatorioNao">Não</button>
+        </div>
+    </div>
+
+    <script src="/static/upload.js"></script>
+</body>
+</html>
