@@ -15,7 +15,7 @@
       background-color: #003366;
       color: white;
       padding: 2rem;
-      background-image: url('/static/images/a321-1.png');
+      background-image: url('/static/images/conformidade_ambiental.png');
       background-size: cover;
       background-position: center;
     }
@@ -59,10 +59,19 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       text-align: center;
     }
+    .card-img-container {
+      height: 220px; /* Aumentei apenas a altura do container da imagem */
+      overflow: hidden;
+    }
     .card img {
-      width: 100%;
-      height: 140px;
+      width: 90%;
+      height: 90%;
       object-fit: cover;
+      object-position: center;
+      transition: transform 0.3s ease; /* Adicionei um efeito de hover opcional */
+    }
+    .card:hover img {
+      transform: scale(1.05); /* Efeito de zoom suave ao passar o mouse */
     }
     .card h3 {
       margin: 1rem 0 0.5rem;
@@ -73,7 +82,7 @@
       font-size: 0.95rem;
     }
     .background-section {
-      background-image: url('/static/images/conformidade_ambiental.png');
+      background-image: url('/static/images/a321-1.png');
       background-size: cover;
       background-position: center;
       padding: 4rem 2rem;
@@ -115,6 +124,9 @@
         display: block;
         margin: 1rem auto;
       }
+      .card-img-container {
+        height: 180px; /* Ajuste para mobile */
+      }
     }
   </style>
 </head>
@@ -139,32 +151,44 @@
     <h2 class="section-title">Módulos da Plataforma</h2>
     <div class="card-grid">
       <div class="card">
-        <img src="/static/images/a321-1.png" alt="Cadastro">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_cadastro.png" alt="Módulo de Cadastro">
+        </div>
         <h3>Módulo de Cadastro</h3>
         <p>Registro de pessoas físicas e jurídicas com controle de acesso e gestão de representantes legais.</p>
       </div>
       <div class="card">
-        <img src="/static/images/conformidade_ambiental.png" alt="Validação de Geometrias">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_validacao.png" alt="Módulo de Validação">
+        </div>
         <h3>Importação e Validação de Geometrias</h3>
         <p>Valida arquivos shapefile e sua integridade geoespacial para garantir consistência na análise.</p>
       </div>
       <div class="card">
-        <img src="/static/images/conformidade_ambiental.png" alt="Conformidade Ambiental">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_conformidade_ambiental.png" alt="Conformidade Ambiental">
+        </div>
         <h3>Conformidade Ambiental</h3>
         <p>Cruzamento com camadas de áreas protegidas e geração de laudos técnicos.</p>
       </div>
       <div class="card">
-        <img src="/static/images/a321-1.png" alt="Multicritério">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_multicriterio.png" alt="Multicritério">
+        </div>
         <h3>Favorabilidade Multicritério</h3>
         <p>Análise técnica ponderada com critérios definidos pelo usuário.</p>
       </div>
       <div class="card">
-        <img src="/static/images/a321-1.png" alt="Socioeconômico">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_socioeconomico.png" alt="Socioeconômico">
+        </div>
         <h3>Favorabilidade Socioeconômica</h3>
         <p>Leva em conta dados sociais e econômicos no planejamento viário.</p>
       </div>
       <div class="card">
-        <img src="/static/images/conformidade_ambiental.png" alt="Infraestrutural">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_infraestrutura.png" alt="Infraestrutural">
+        </div>
         <h3>Favorabilidade Infraestrutural</h3>
         <p>Analisa compatibilidade com infraestrutura já existente e planejada.</p>
       </div>

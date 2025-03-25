@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - FAD</title>
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 80px auto;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dialog {
+      margin: 20px auto;
+      max-width: 350px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      color: #333;
+    }
+    .dialog p {
+      margin: 0;
+      font-weight: bold;
+      color: #cc0000;
+    }
+    .login-container h2 {
+      color: #003366;
+      margin-bottom: 1rem;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #006699;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .login-container button:hover {
+      background-color: #005080;
+    }
+    .login-container a {
+      display: block;
+      margin-top: 1rem;
+      color: #006699;
+      text-decoration: none;
+    }
+    .login-container a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Acesso à FAD</h2>
+
+    {% if mensagem %}
+    <div class="dialog">
+      <p>{{ mensagem }}</p>
+    </div>
+    {% endif %}
+
+    <form action="/login" method="post">
+      <input type="email" name="email" placeholder="E-mail institucional" required>
+      <input type="password" name="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+
+    <a href="/cadastro">Criar uma conta</a>
+  </div>
+</body>
+</html>

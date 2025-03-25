@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - FAD</title>
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .dialog {
+      display: none;
+      position: relative;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .dialog-header {
+      font-weight: bold;
+      color: #b30000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dialog-body {
+      padding-top: 0.5rem;
+    }
+    .close-button {
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .ok-button {
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Acesso à FAD</h2>
+
+    <div id="erroLogin" class="dialog">
+      <div class="dialog-header">
+        <span id="erroLoginTexto">Erro</span>
+        <button class="close-button" onclick="document.getElementById('erroLogin').style.display='none'">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <button class="ok-button" onclick="document.getElementById('erroLogin').style.display='none'">OK</button>
+      </div>
+    </div>
+
+    <form action="/login" method="post">
+      <input type="email" name="email" placeholder="E-mail institucional" required><br>
+      <input type="password" name="senha" placeholder="Senha" required><br>
+      <button type="submit">Entrar</button>
+    </form>
+    <a href="/cadastro">Criar uma conta</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+    const erroBox = document.getElementById("erroLogin");
+    const erroTexto = document.getElementById("erroLoginTexto");
+
+    if (status === "401") {
+      erroTexto.textContent = "Credenciais inválidas";
+      erroBox.style.display = "block";
+    } else if (status === "403") {
+      erroTexto.textContent = "Aguardando aprovação do administrador.";
+      erroBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>

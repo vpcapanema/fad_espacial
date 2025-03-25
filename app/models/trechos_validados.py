@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from geoalchemy2 import Geometry
 from datetime import datetime
-from app.database.base import Base
+from app.database.session import Base
 
 
 class TrechoValidado(Base):
