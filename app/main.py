@@ -7,13 +7,20 @@ from starlette.middleware.sessions import SessionMiddleware
 from pathlib import Path
 import os
 
-# Importações das rotas
-from app.api.endpoints.upload import router as upload_router
-from app.api.endpoints.validacao_geometria import router as validacao_router
+# Importações das rotas atualizadas com prefixos
+from app.api.endpoints.iv_upload import router as upload_router
+from app.api.endpoints.iv_validacao_geometria import router as validacao_router
 from app.api.endpoints.relatorio import router as relatorio_router
 from app.api.endpoints.ca_endpoint import router as conformidade_router
 from app.api.endpoints.cd_cadastro import router as cadastro_router
-from app.api.endpoints.cd_autenticacao import router as cd_autenticacao_router  # ✅ mantido apenas este
+from app.api.endpoints.cd_autenticacao import router as cd_autenticacao_router
+from app.api.endpoints.cd_interessado import router as interessado_router
+from app.api.endpoints.pr_projeto import router as projeto_router
+from app.api.endpoints.ca_endpoint import router as interface_router
+
+
+
+
 
 # Inicialização do app FastAPI
 app = FastAPI(
@@ -22,10 +29,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ✅ Adicionando middleware de sessão segura
+# Middleware de sessão segura
 app.add_middleware(SessionMiddleware, secret_key="CHAVE_SECRETA_SUPER_FAD_2025")
 
-# Configuração do CORS para Codespaces
+# CORS para Codespaces
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,20 +42,20 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
-# Configuração de diretórios
+# Diretórios
 BASE_DIR = Path(__file__).parent.parent
 APP_DIR = Path(__file__).parent
 STATIC_DIR = APP_DIR / "static"
 TEMPLATES_DIR = APP_DIR / "templates"
 
-# Configuração dos templates Jinja2
+# Templates Jinja2
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
-# Verifica e cria diretórios estáticos se não existirem
+# Criar pastas estáticas se necessário
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(STATIC_DIR / "images", exist_ok=True)
 
-# Montagem da pasta estática
+# Montar arquivos estáticos
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Página principal
@@ -59,7 +66,7 @@ async def home(request: Request):
         "static_url": "/static/images"
     })
 
-# Rota para verificação do ambiente
+# Rota debug
 @app.get("/debug", response_class=JSONResponse)
 async def debug_info(request: Request):
     return {
@@ -69,17 +76,23 @@ async def debug_info(request: Request):
         "available_images": os.listdir(STATIC_DIR / "images") if os.path.exists(STATIC_DIR / "images") else []
     }
 
-# Rotas da API
+# Inclusão das rotas
 app.include_router(upload_router, prefix="/api/upload", tags=["Upload"])
 app.include_router(validacao_router, prefix="/api/geometria", tags=["Validação"])
 app.include_router(relatorio_router, prefix="/api/relatorios", tags=["Relatórios"])
 app.include_router(conformidade_router, prefix="/api/conformidade", tags=["Conformidade Ambiental"])
-app.include_router(cadastro_router, prefix="/api/cadastro", tags=["Cadastro"])
-app.include_router(cd_autenticacao_router)  # ✅
+app.include_router(cadastro_router)
+app.include_router(cd_autenticacao_router)
+app.include_router(interessado_router)
+app.include_router(projeto_router)
+app.include_router(interface_router)
 
-# Rota para favicon
 
-# Rota para favicon com fallback se não existir
+
+
+
+
+# Rota do favicon
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     path = STATIC_DIR / "images/favicon.ico"

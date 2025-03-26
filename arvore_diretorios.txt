@@ -1,0 +1,482 @@
+.env
+.git/
+├── COMMIT_EDITMSG
+├── FETCH_HEAD
+├── HEAD
+├── branches/
+├── config
+├── description
+├── hooks/
+│   ├── applypatch-msg.sample
+│   ├── commit-msg.sample
+│   ├── fsmonitor-watchman.sample
+│   ├── post-update.sample
+│   ├── pre-applypatch.sample
+│   ├── pre-commit.sample
+│   ├── pre-merge-commit.sample
+│   ├── pre-push.sample
+│   ├── pre-rebase.sample
+│   ├── pre-receive.sample
+│   ├── prepare-commit-msg.sample
+│   ├── push-to-checkout.sample
+│   ├── sendemail-validate.sample
+│   ├── update.sample
+├── index
+├── info/
+│   ├── exclude
+├── lfs/
+│   ├── tmp/
+├── logs/
+│   ├── HEAD
+│   ├── refs/
+│   │   ├── heads/
+│   │   │   ├── main
+│   │   ├── remotes/
+│   │   │   ├── origin/
+│   │   │   │   ├── HEAD
+│   │   │   │   ├── main
+├── objects/
+│   ├── 02/
+│   │   ├── 0b1cd7fcfeba90fdda2a856b1adf9e291c21e4
+│   ├── 03/
+│   │   ├── c2e824af32af811251c967e3404179c278943e
+│   ├── 0b/
+│   │   ├── 3497e9c2f471373320b126a942ef86fd06e51f
+│   ├── 11/
+│   │   ├── 7de55d8ed4d78e28de0e00d76f2a5580000047
+│   ├── 1f/
+│   │   ├── 97f646733c1684381c6f7b0be66ccd31893c49
+│   ├── 21/
+│   │   ├── b483feae3aa3267a43d71c8bd9de1754e0b90b
+│   ├── 32/
+│   │   ├── 06e98fac597abe651d1168f09a2c90a180a029
+│   ├── 39/
+│   │   ├── 79cc3e80449411449c7fd9934d35963ab06b7c
+│   ├── 3b/
+│   │   ├── cdca7fefb4f12b8b7990178c9c919977a9d68d
+│   ├── 3c/
+│   │   ├── 72e1ed24f3fec970495659ef2b44e5798d3db5
+│   ├── 4b/
+│   │   ├── 1b2229cc18807d926b255f0175b3f8eba43ab8
+│   ├── 51/
+│   │   ├── 04792253419f5ffcf1314fc1d2dbc1bcc91a41
+│   ├── 55/
+│   │   ├── fcde4e8610fcc36835fea7feb1d23b9f68f0fb
+│   ├── 5c/
+│   │   ├── 0b75633eb65d56c96ce7061c9aeb8bf021a37d
+│   ├── 5d/
+│   │   ├── 0424b065a04d3be3da21bfd6f705720924eab5
+│   ├── 5f/
+│   │   ├── 3d46cc305b08cc26938f7a8d31e2770537a3d2
+│   ├── 65/
+│   │   ├── b855c6209ae09b966577e103c55d2658bdb79c
+│   ├── 77/
+│   │   ├── 37a3303f3c298c3c63f0264304d445c4752203
+│   ├── 7a/
+│   │   ├── df61d5663c2e89e2be586d9880cf49cebbe394
+│   ├── 7c/
+│   │   ├── 9861e187621f8c4705c24829e0a46f9e95865e
+│   ├── 85/
+│   │   ├── e0a52987a95e0557dfcafb5e9565e93a50a468
+│   ├── 96/
+│   │   ├── 97846b5a7a30363b41c2b8ac3e83c0b8950988
+│   ├── 9b/
+│   │   ├── 96bc8c8db7dcec887280a4024e859e300b28b3
+│   ├── 9e/
+│   │   ├── 38ed41b793e7145ff9fc62aedd0b806620451d
+│   ├── b1/
+│   │   ├── 734ca6bec07c4af0f463078374c77e36deda08
+│   ├── b9/
+│   │   ├── 71a907b9316a18379b998e28faded2e5628109
+│   ├── bf/
+│   │   ├── bfafa53ad463906b66ea1a342ee966d97b3b85
+│   ├── c7/
+│   │   ├── aa345ff5c291d4536a870a1f74ac7178d087f8
+│   ├── c8/
+│   │   ├── b09008dfc5a9605e618cee39d76619c454ed2c
+│   ├── d0/
+│   │   ├── 3acc595e3e2ac6061efa0d7141852510d23f8a
+│   ├── e4/
+│   │   ├── 0470c6479ad91ef25bab6d21dcc6f345ba82ad
+│   ├── e5/
+│   │   ├── 0a8597451a17cfd3821b5c37fa694821c91b99
+│   ├── e8/
+│   │   ├── bf56c9384a8995ca5297d18b529c9189078890
+│   ├── eb/
+│   │   ├── aba46e813ab86b37a00cf2ac17745eced3ac57
+│   ├── f6/
+│   │   ├── c47f3a0ea6cfbda8ef2beaed6ee5b9102ddd89
+│   ├── f9/
+│   │   ├── 1eaa703a5e08b18775d8030d717b74c44b8648
+│   │   ├── 368b3a6531b4d55ad6cbf17ed46490044563c3
+│   ├── info/
+│   ├── pack/
+│   │   ├── pack-6550b8bab121071c558948f23d8c26ce1e8f02fd.idx
+│   │   ├── pack-6550b8bab121071c558948f23d8c26ce1e8f02fd.pack
+│   │   ├── pack-6550b8bab121071c558948f23d8c26ce1e8f02fd.rev
+│   │   ├── pack-95830d8f60fca62763c3af3719c67ca2753ea37f.idx
+│   │   ├── pack-95830d8f60fca62763c3af3719c67ca2753ea37f.pack
+│   │   ├── pack-95830d8f60fca62763c3af3719c67ca2753ea37f.rev
+├── packed-refs
+├── refs/
+│   ├── heads/
+│   │   ├── main
+│   ├── remotes/
+│   │   ├── origin/
+│   │   │   ├── HEAD
+│   │   │   ├── main
+│   ├── tags/
+.gitignore
+README.md
+app/
+├── __init__.py
+├── __pycache__/
+│   ├── __init__.cpython-312.pyc
+│   ├── database.cpython-312.pyc
+│   ├── main.cpython-312.pyc
+│   ├── models.cpython-312.pyc
+│   ├── modulo_validacao.cpython-312.pyc
+│   ├── test_upload.cpython-312-pytest-8.3.5.pyc
+├── api/
+│   ├── __pycache__/
+│   │   ├── dependencies.cpython-312.pyc
+│   ├── dependencies.py
+│   ├── endpoints/
+│   │   ├── __pycache__/
+│   │   │   ├── ca_endpoint.cpython-312.pyc
+│   │   │   ├── cd_autenticacao.cpython-312.pyc
+│   │   │   ├── cd_cadastro.cpython-312.pyc
+│   │   │   ├── conformidade_ambiental.cpython-312.pyc
+│   │   │   ├── relatorio.cpython-312.pyc
+│   │   │   ├── upload.cpython-312.pyc
+│   │   │   ├── validacao_geometria.cpython-312.pyc
+│   │   ├── ca_endpoint.py
+│   │   ├── cd_autenticacao.py
+│   │   ├── cd_cadastro.py
+│   │   ├── relatorio.py
+│   │   ├── upload.py
+│   │   ├── validacao_geometria.py
+├── core/
+│   ├── __pycache__/
+│   │   ├── jinja.cpython-312.pyc
+│   ├── jinja.py
+├── database/
+│   ├── __init__.py
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── base.cpython-312.pyc
+│   │   ├── session.cpython-312.pyc
+│   ├── base.py
+│   ├── session.py
+├── main.py
+├── models/
+│   ├── __init__.py
+│   ├── __pycache__/
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── arquivos.cpython-312.pyc
+│   │   ├── cd_usuario.cpython-312.pyc
+│   │   ├── geometria.cpython-312.pyc
+│   │   ├── geometrias.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── trechos_validados.cpython-312.pyc
+│   │   ├── validacao.cpython-312.pyc
+│   ├── arquivos.py
+│   ├── cd_interessado.py
+│   ├── cd_usuario.py
+│   ├── geometrias.py
+│   ├── trechos_validados.py
+│   ├── validacao.py
+├── models.py
+├── modules/
+│   ├── conformidade_ambiental/
+│   │   ├── __init__.py
+│   │   ├── __pycache__/
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   ├── ca_laudo.cpython-312.pyc
+│   │   │   ├── ca_laudo_sintetico.cpython-312.pyc
+│   │   │   ├── ca_processador.cpython-312.pyc
+│   │   │   ├── ca_processamento.cpython-312.pyc
+│   │   │   ├── ca_shapefile.cpython-312.pyc
+│   │   │   ├── processador.cpython-312.pyc
+│   │   │   ├── relatorio.cpython-312.pyc
+│   │   ├── ca_laudo.py
+│   │   ├── ca_laudo_sintetico.py
+│   │   ├── ca_mapa.py
+│   │   ├── ca_processador.py
+│   │   ├── ca_processamento.py
+│   │   ├── ca_shapefile.py
+├── relatorios/
+│   ├── __pycache__/
+│   │   ├── relatorio_upload.cpython-312.pyc
+│   │   ├── relatorio_validacao.cpython-312.pyc
+│   ├── relatorio_upload.py
+│   ├── relatorio_validacao.py
+├── static/
+│   ├── images/
+│   │   ├── a321-1.png
+│   │   ├── conformidade_ambiental.png
+│   │   ├── favicon.ico
+│   │   ├── modulo_cadastro.png
+│   │   ├── modulo_conformidade_ambiental.png
+│   │   ├── modulo_infraestrutura.png
+│   │   ├── modulo_multicriterio.png
+│   │   ├── modulo_socioeconomico.png
+│   │   ├── modulo_validacao.png
+├── templates/
+│   ├── ca_interface.html
+│   ├── ca_laudo_sintetico_template.html
+│   ├── ca_laudo_template.html
+│   ├── ca_processamento_template.html
+│   ├── ca_relatorio_processamento.html
+│   ├── cd_cadastro.html
+│   ├── cd_cadastro_form.html
+│   ├── cd_login.html
+│   ├── cd_painel_master.html
+│   ├── cd_painel_usuario.html
+│   ├── home.html
+│   ├── home_backup.html
+│   ├── index.html
+│   ├── index_backup.html
+├── test.db
+├── test_upload.py
+├── venv/
+│   ├── bin/
+│   │   ├── Activate.ps1
+│   │   ├── activate
+│   │   ├── activate.csh
+│   │   ├── activate.fish
+│   │   ├── f2py
+│   │   ├── fastapi
+│   │   ├── fio
+│   │   ├── numpy-config
+│   │   ├── pip
+│   │   ├── pip3
+│   │   ├── pip3.12
+│   │   ├── pyproj
+│   │   ├── python
+│   │   ├── python3
+│   │   ├── python3.12
+│   │   ├── uvicorn
+│   ├── include/
+│   │   ├── site/
+│   │   │   ├── python3.12/
+│   │   │   │   ├── greenlet/
+│   ├── lib/
+│   │   ├── python3.12/
+│   │   │   ├── site-packages/
+│   │   │   │   ├── MarkupSafe-3.0.2.dist-info/
+│   │   │   │   ├── __pycache__/
+│   │   │   │   ├── annotated_types/
+│   │   │   │   ├── annotated_types-0.7.0.dist-info/
+│   │   │   │   ├── anyio/
+│   │   │   │   ├── anyio-4.9.0.dist-info/
+│   │   │   │   ├── attr/
+│   │   │   │   ├── attrs/
+│   │   │   │   ├── attrs-25.3.0.dist-info/
+│   │   │   │   ├── certifi/
+│   │   │   │   ├── certifi-2025.1.31.dist-info/
+│   │   │   │   ├── click/
+│   │   │   │   ├── click-8.1.8.dist-info/
+│   │   │   │   ├── click_plugins/
+│   │   │   │   ├── click_plugins-1.1.1.dist-info/
+│   │   │   │   ├── cligj/
+│   │   │   │   ├── cligj-0.7.2.dist-info/
+│   │   │   │   ├── dateutil/
+│   │   │   │   ├── fastapi/
+│   │   │   │   ├── fastapi-0.115.11.dist-info/
+│   │   │   │   ├── fiona/
+│   │   │   │   ├── fiona-1.10.1.dist-info/
+│   │   │   │   ├── fiona.libs/
+│   │   │   │   ├── geopandas/
+│   │   │   │   ├── geopandas-1.0.1.dist-info/
+│   │   │   │   ├── greenlet/
+│   │   │   │   ├── greenlet-3.1.1.dist-info/
+│   │   │   │   ├── h11/
+│   │   │   │   ├── h11-0.14.0.dist-info/
+│   │   │   │   ├── idna/
+│   │   │   │   ├── idna-3.10.dist-info/
+│   │   │   │   ├── jinja2/
+│   │   │   │   ├── jinja2-3.1.6.dist-info/
+│   │   │   │   ├── markupsafe/
+│   │   │   │   ├── multipart/
+│   │   │   │   ├── numpy/
+│   │   │   │   ├── numpy-2.2.4.dist-info/
+│   │   │   │   ├── numpy.libs/
+│   │   │   │   ├── packaging/
+│   │   │   │   ├── packaging-24.2.dist-info/
+│   │   │   │   ├── pandas/
+│   │   │   │   ├── pandas-2.2.3.dist-info/
+│   │   │   │   ├── pip/
+│   │   │   │   ├── pip-25.0.1.dist-info/
+│   │   │   │   ├── psycopg2/
+│   │   │   │   ├── psycopg2_binary-2.9.10.dist-info/
+│   │   │   │   ├── psycopg2_binary.libs/
+│   │   │   │   ├── pydantic/
+│   │   │   │   ├── pydantic-2.10.6.dist-info/
+│   │   │   │   ├── pydantic_core/
+│   │   │   │   ├── pydantic_core-2.27.2.dist-info/
+│   │   │   │   ├── pyogrio/
+│   │   │   │   ├── pyogrio-0.10.0.dist-info/
+│   │   │   │   ├── pyogrio.libs/
+│   │   │   │   ├── pyproj/
+│   │   │   │   ├── pyproj-3.7.1.dist-info/
+│   │   │   │   ├── pyproj.libs/
+│   │   │   │   ├── python_dateutil-2.9.0.post0.dist-info/
+│   │   │   │   ├── python_multipart/
+│   │   │   │   ├── python_multipart-0.0.20.dist-info/
+│   │   │   │   ├── pytz/
+│   │   │   │   ├── pytz-2025.1.dist-info/
+│   │   │   │   ├── shapely/
+│   │   │   │   ├── shapely-2.0.7.dist-info/
+│   │   │   │   ├── shapely.libs/
+│   │   │   │   ├── six-1.17.0.dist-info/
+│   │   │   │   ├── six.py
+│   │   │   │   ├── sniffio/
+│   │   │   │   ├── sniffio-1.3.1.dist-info/
+│   │   │   │   ├── sqlalchemy/
+│   │   │   │   ├── sqlalchemy-2.0.39.dist-info/
+│   │   │   │   ├── starlette/
+│   │   │   │   ├── starlette-0.46.1.dist-info/
+│   │   │   │   ├── typing_extensions-4.12.2.dist-info/
+│   │   │   │   ├── typing_extensions.py
+│   │   │   │   ├── tzdata/
+│   │   │   │   ├── tzdata-2025.1.dist-info/
+│   │   │   │   ├── uvicorn/
+│   │   │   │   ├── uvicorn-0.34.0.dist-info/
+│   │   │   │   ├── zipfile36-0.1.3.dist-info/
+│   │   │   │   ├── zipfile36.py
+│   ├── lib64/
+│   │   ├── python3.12/
+│   │   │   ├── site-packages/
+│   │   │   │   ├── MarkupSafe-3.0.2.dist-info/
+│   │   │   │   ├── __pycache__/
+│   │   │   │   ├── annotated_types/
+│   │   │   │   ├── annotated_types-0.7.0.dist-info/
+│   │   │   │   ├── anyio/
+│   │   │   │   ├── anyio-4.9.0.dist-info/
+│   │   │   │   ├── attr/
+│   │   │   │   ├── attrs/
+│   │   │   │   ├── attrs-25.3.0.dist-info/
+│   │   │   │   ├── certifi/
+│   │   │   │   ├── certifi-2025.1.31.dist-info/
+│   │   │   │   ├── click/
+│   │   │   │   ├── click-8.1.8.dist-info/
+│   │   │   │   ├── click_plugins/
+│   │   │   │   ├── click_plugins-1.1.1.dist-info/
+│   │   │   │   ├── cligj/
+│   │   │   │   ├── cligj-0.7.2.dist-info/
+│   │   │   │   ├── dateutil/
+│   │   │   │   ├── fastapi/
+│   │   │   │   ├── fastapi-0.115.11.dist-info/
+│   │   │   │   ├── fiona/
+│   │   │   │   ├── fiona-1.10.1.dist-info/
+│   │   │   │   ├── fiona.libs/
+│   │   │   │   ├── geopandas/
+│   │   │   │   ├── geopandas-1.0.1.dist-info/
+│   │   │   │   ├── greenlet/
+│   │   │   │   ├── greenlet-3.1.1.dist-info/
+│   │   │   │   ├── h11/
+│   │   │   │   ├── h11-0.14.0.dist-info/
+│   │   │   │   ├── idna/
+│   │   │   │   ├── idna-3.10.dist-info/
+│   │   │   │   ├── jinja2/
+│   │   │   │   ├── jinja2-3.1.6.dist-info/
+│   │   │   │   ├── markupsafe/
+│   │   │   │   ├── multipart/
+│   │   │   │   ├── numpy/
+│   │   │   │   ├── numpy-2.2.4.dist-info/
+│   │   │   │   ├── numpy.libs/
+│   │   │   │   ├── packaging/
+│   │   │   │   ├── packaging-24.2.dist-info/
+│   │   │   │   ├── pandas/
+│   │   │   │   ├── pandas-2.2.3.dist-info/
+│   │   │   │   ├── pip/
+│   │   │   │   ├── pip-25.0.1.dist-info/
+│   │   │   │   ├── psycopg2/
+│   │   │   │   ├── psycopg2_binary-2.9.10.dist-info/
+│   │   │   │   ├── psycopg2_binary.libs/
+│   │   │   │   ├── pydantic/
+│   │   │   │   ├── pydantic-2.10.6.dist-info/
+│   │   │   │   ├── pydantic_core/
+│   │   │   │   ├── pydantic_core-2.27.2.dist-info/
+│   │   │   │   ├── pyogrio/
+│   │   │   │   ├── pyogrio-0.10.0.dist-info/
+│   │   │   │   ├── pyogrio.libs/
+│   │   │   │   ├── pyproj/
+│   │   │   │   ├── pyproj-3.7.1.dist-info/
+│   │   │   │   ├── pyproj.libs/
+│   │   │   │   ├── python_dateutil-2.9.0.post0.dist-info/
+│   │   │   │   ├── python_multipart/
+│   │   │   │   ├── python_multipart-0.0.20.dist-info/
+│   │   │   │   ├── pytz/
+│   │   │   │   ├── pytz-2025.1.dist-info/
+│   │   │   │   ├── shapely/
+│   │   │   │   ├── shapely-2.0.7.dist-info/
+│   │   │   │   ├── shapely.libs/
+│   │   │   │   ├── six-1.17.0.dist-info/
+│   │   │   │   ├── six.py
+│   │   │   │   ├── sniffio/
+│   │   │   │   ├── sniffio-1.3.1.dist-info/
+│   │   │   │   ├── sqlalchemy/
+│   │   │   │   ├── sqlalchemy-2.0.39.dist-info/
+│   │   │   │   ├── starlette/
+│   │   │   │   ├── starlette-0.46.1.dist-info/
+│   │   │   │   ├── typing_extensions-4.12.2.dist-info/
+│   │   │   │   ├── typing_extensions.py
+│   │   │   │   ├── tzdata/
+│   │   │   │   ├── tzdata-2025.1.dist-info/
+│   │   │   │   ├── uvicorn/
+│   │   │   │   ├── uvicorn-0.34.0.dist-info/
+│   │   │   │   ├── zipfile36-0.1.3.dist-info/
+│   │   │   │   ├── zipfile36.py
+│   ├── pyvenv.cfg
+backups/
+├── cd_autenticacao_backup_20250325_141438.py
+├── cd_cadastro_backup_20250325_141712.html
+├── cd_login_backup_20250325_141438.html
+├── cd_login_backup_20250325_141712.html
+├── cd_login_backup_20250325_181808.html
+nova_arvore.txt
+requirements.txt
+static/
+├── images/
+│   ├── a321-1.png
+│   ├── conformidade_ambiental.png
+testes_shapefile/
+├── erro_cod_ausente/
+│   ├── erro_cod_ausente.cpg
+│   ├── erro_cod_ausente.dbf
+│   ├── erro_cod_ausente.prj
+│   ├── erro_cod_ausente.shp
+│   ├── erro_cod_ausente.shx
+├── erro_cod_em_branco/
+│   ├── erro_cod_em_branco.cpg
+│   ├── erro_cod_em_branco.dbf
+│   ├── erro_cod_em_branco.prj
+│   ├── erro_cod_em_branco.shp
+│   ├── erro_cod_em_branco.shx
+├── erro_epsg_invalido/
+│   ├── erro_epsg_invalido.cpg
+│   ├── erro_epsg_invalido.dbf
+│   ├── erro_epsg_invalido.prj
+│   ├── erro_epsg_invalido.shp
+│   ├── erro_epsg_invalido.shx
+├── erro_geometria_nula/
+│   ├── erro_geometria_nula.cpg
+│   ├── erro_geometria_nula.dbf
+│   ├── erro_geometria_nula.prj
+│   ├── erro_geometria_nula.shp
+│   ├── erro_geometria_nula.shx
+├── erro_tipo_geometria/
+│   ├── erro_tipo_geometria.cpg
+│   ├── erro_tipo_geometria.dbf
+│   ├── erro_tipo_geometria.prj
+│   ├── erro_tipo_geometria.shp
+│   ├── erro_tipo_geometria.shx
+├── teste_valido/
+│   ├── teste_valido.cpg
+│   ├── teste_valido.dbf
+│   ├── teste_valido.prj
+│   ├── teste_valido.shp
+│   ├── teste_valido.shx
+tree.py

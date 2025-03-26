@@ -1,38 +1,60 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request, Form, HTTPException, status, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 from app.core.jinja import templates
+from app.database.session import SessionLocal
+from app.models.cd_usuario import CD_Usuario
 
 router = APIRouter()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Dependência de sessão de banco
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Interface HTML
 @router.get("/cadastro", response_class=HTMLResponse)
 async def form_cadastro(request: Request):
-    return templates.TemplateResponse("cd_cadastro_form.html", {"request": request})
+    return templates.TemplateResponse("cd_cadastro.html", {"request": request})
 
-@router.post("/cadastro/pf")
-async def cadastrar_pf(
-    cpf: str = Form(...),
+# Cadastro de novo usuário
+@router.post("/registrar")
+def registrar_usuario(
+    request: Request,
     nome: str = Form(...),
+    cpf: str = Form(...),
     email: str = Form(...),
-    celular: str = Form(...)
+    senha: str = Form(...),
+    tipo_usuario: str = Form(...),
+    db: Session = Depends(get_db)
 ):
-    # Validação e persistência virão depois
-    if not cpf or not nome or not email or not celular:
-        return JSONResponse(content={"sucesso": False})
-    return JSONResponse(content={"sucesso": True})
+    # Verifica se CPF já existe
+    usuario_existente = db.query(CD_Usuario).filter(CD_Usuario.cpf == cpf).first()
+    if usuario_existente:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Já existe um usuário cadastrado com este CPF."
+        )
 
-@router.post("/cadastro/pj")
-async def cadastrar_pj(
-    cnpj: str = Form(...),
-    razao_social: str = Form(...),
-    nome_fantasia: str = Form(...),
-    rua: str = Form(...),
-    numero: str = Form(...),
-    complemento: str = Form(...),
-    bairro: str = Form(...),
-    cep: str = Form(...),
-    cidade: str = Form(...),
-    uf: str = Form(...)
-):
-    if not cnpj or not razao_social:
-        return JSONResponse(content={"sucesso": False})
-    return JSONResponse(content={"sucesso": True})
+    # Cria hash seguro da senha
+    senha_hash = pwd_context.hash(senha)
+
+    novo_usuario = CD_Usuario(
+        nome=nome,
+        cpf=cpf,
+        email=email,
+        senha_hash=senha_hash,
+        tipo=tipo_usuario,
+        aprovado=False
+    )
+
+    db.add(novo_usuario)
+    db.commit()
+    db.refresh(novo_usuario)
+
+    return {"mensagem": "Cadastro realizado com sucesso. Aguardando aprovação do administrador."}

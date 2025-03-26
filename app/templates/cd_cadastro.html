@@ -20,6 +20,7 @@
     }
 
     .cadastro-container input,
+    .cadastro-container select,
     .cadastro-container button {
       width: 100%;
       padding: 0.75rem;
@@ -116,10 +117,16 @@
 
   <div class="cadastro-container">
     <h2>Cadastro de Usuário</h2>
-    <form id="cadastroForm">
+    <form id="cadastroForm" action="/registrar" method="post">
       <input type="text" name="nome" placeholder="Nome completo" required>
+      <input type="text" name="cpf" placeholder="CPF" required>
       <input type="email" name="email" placeholder="E-mail institucional" required>
       <input type="password" name="senha" placeholder="Senha" required>
+      <select name="tipo_usuario" required>
+        <option value="" disabled selected>Tipo de usuário</option>
+        <option value="usuario">Comum</option>
+        <option value="master">Master</option>
+      </select>
       <button type="submit">Cadastrar</button>
     </form>
     <a href="/login">Já tenho conta</a>
@@ -133,6 +140,18 @@
     </div>
     <div class="dialog-body">
       <button class="ok-button" onclick="document.getElementById('erroCadastro').style.display='none'; location.reload();">OK</button>
+    </div>
+  </div>
+
+  <!-- Caixa de sucesso -->
+  <div id="sucessoCadastro" class="dialog hidden">
+    <div class="dialog-header" style="background: #d0f5d0; border-bottom: 1px solid #0b6600;">
+      <span id="sucessoCadastroTexto" style="color: #0b6600;">Cadastro realizado com sucesso!</span>
+      <button class="close-button" style="background: #0b6600;" onclick="document.getElementById('sucessoCadastro').style.display='none'; window.location.href='/login';">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p>Seu cadastro foi enviado e está aguardando aprovação.</p>
+      <button class="ok-button" onclick="document.getElementById('sucessoCadastro').style.display='none'; window.location.href='/login';">OK</button>
     </div>
   </div>
 
@@ -151,33 +170,33 @@
     const erroBox = document.getElementById("erroCadastro");
     const erroTexto = document.getElementById("erroCadastroTexto");
     const carregandoBox = document.getElementById("caixaCarregandoCadastro");
+    const sucessoBox = document.getElementById("sucessoCadastro");
 
     form.addEventListener("submit", async function(event) {
       event.preventDefault();
       erroBox.classList.add("hidden");
+      sucessoBox.classList.add("hidden");
       carregandoBox.classList.remove("hidden");
 
       const formData = new FormData(form);
-      form.reset();
+      const urlParams = new URLSearchParams([...formData]);
 
       try {
-        const response = await fetch("/cadastro", {
+        const response = await fetch(form.action, {
           method: "POST",
-          body: formData
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: urlParams
         });
 
         carregandoBox.classList.add("hidden");
 
-        if (response.status === 200 || response.redirected) {
-          window.location.href = response.url;
+        if (response.ok) {
+          sucessoBox.classList.remove("hidden");
         } else {
-          if (response.status === 400) {
-            erroTexto.textContent = "Email já cadastrado.";
-          } else if (response.status === 404) {
-            erroTexto.textContent = "Usuário não encontrado.";
-          } else {
-            erroTexto.textContent = "Erro inesperado. Código: " + response.status;
-          }
+          const data = await response.json();
+          erroTexto.textContent = data.detail || "Erro inesperado.";
           erroBox.classList.remove("hidden");
         }
 

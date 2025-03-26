@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAD - Ferramenta de Análise Dinamizada</title>
+  <style>
+    /* Estilos globais */
+    body {
+      font-family: 'Lato', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    /* Cabeçalho com fundo azul e texto centralizado */
+    .hero {
+      background: #004080;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      font-size: 1.2em;
+    }
+
+    /* Estilo do formulário */
+    #conformidadeForm {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    fieldset {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    legend {
+      font-weight: bold;
+      color: #004080;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #006600;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    /* Estilo dos resultados */
+    #resultados {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Informações do arquivo */
+    #infoArquivo {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #004080;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cabeçalho com fundo azul e texto centralizado -->
+  <header class="hero">
+    <h1>FAD</h1>
+    <h2>Ferramenta de Análise Dinamizada</h2>
+    <p>MÓDULO DE ANÁLISE DE CONFORMIDADE AMBIENTAL</p>
+    
+  </header>
+
+  <section class="Apresetação da Ferramenta">
+    <h3 style="text-align: center;">Análise dinamizada de conformidade ambiental</h3>
+    <p style="text-align: center;">Esta ferramenta verifica a conformidade ambiental por meio da intersecção do trecho rodoviário estudado com áreas protegidas e suas respectivas zonas de amortecimento.</p>
+  </section>
+  <!-- Informações do arquivo -->
+  <div id="infoArquivo">
+    Carregando nome do arquivo...
+  </div>
+
+  <!-- Formulário de conformidade -->
+  <form id="conformidadeForm">
+    <fieldset>
+      <legend>Camadas para cruzamento:</legend>
+      <label><input type="checkbox" name="camadas" value="Todas" id="todasCheckbox"> Todas</label><br>
+      <label><input type="checkbox" name="camadas" value="UCs Estaduais de Proteção Integral"> UCs Estaduais de Proteção Integral</label><br>
+      <label><input type="checkbox" name="camadas" value="UCs Estaduais de Uso Sustentável"> UCs Estaduais de Uso Sustentável</label><br>
+      <label><input type="checkbox" name="camadas" value="UCs Federais de Proteção Integral"> UCs Federais de Proteção Integral</label><br>
+      <label><input type="checkbox" name="camadas" value="UCs Federais de Uso Sustentável"> UCs Federais de Uso Sustentável</label><br>
+      <label><input type="checkbox" name="camadas" value="Áreas quilombolas"> Áreas quilombolas</label><br>
+      <label><input type="checkbox" name="camadas" value="Terras Indígenas"> Terras Indígenas</label>
+    </fieldset>
+
+    <label for="tipo_laudo">Tipo de Laudo:</label>
+    <select name="tipo_laudo" id="tipo_laudo">
+      <option value="analitico">Laudo Analítico</option>
+      <option value="sintetico">Laudo Sintético</option>
+    </select><br><br>
+
+    <button type="submit">Executar Análise de Conformidade</button>
+  </form>
+
+  <!-- Resultados da análise -->
+  <div id="resultados"></div>
+
+  <script>
+    // Lógica das caixinhas
+    const todas = document.getElementById("todasCheckbox");
+    const caixas = document.querySelectorAll("input[type='checkbox'][name='camadas']");
+
+    caixas.forEach(caixa => {
+      caixa.addEventListener("change", () => {
+        if (caixa.value === "Todas" && caixa.checked) {
+          caixas.forEach(c => {
+            if (c !== caixa) c.checked = true;
+          });
+        } else if (caixa.value !== "Todas") {
+          todas.checked = [...caixas].filter(c => c !== todas && c.checked).length === caixas.length - 1;
+          if (!caixa.checked) todas.checked = false;
+        }
+      });
+    });
+
+    // Envio do formulário
+    document.getElementById("conformidadeForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const camadasSelecionadas = [...document.querySelectorAll("input[name='camadas']:checked")].map(cb => cb.value);
+      const tipoLaudo = document.getElementById("tipo_laudo").value;
+
+      const response = await fetch("/conformidade/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ camadas: camadasSelecionadas, tipo_laudo: tipoLaudo })
+      });
+
+      const html = await response.text();
+      document.getElementById("resultados").innerHTML = html;
+    });
+
+    // Buscar nome do arquivo validado
+    fetch("/conformidade/arquivo-atual")
+      .then(res => res.json())
+      .then(data => {
+        const info = document.getElementById("infoArquivo");
+        info.textContent = "Arquivo atual para análise: " + data.arquivo;
+      })
+      .catch(() => {
+        document.getElementById("infoArquivo").textContent = "Erro ao carregar nome do arquivo.";
+      });
+  </script>
+</body>
+</html>
