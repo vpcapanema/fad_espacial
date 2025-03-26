@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>FAD - Ferramenta de Análise Dinamizada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 2rem;
+      background-image: url('/static/images/conformidade_ambiental.png');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+    }
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.5rem); /* Tamanho dinâmico */
+      max-width: 80%;
+      line-height: 1.2;
+    }
+    .intro-button {
+      position: absolute;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #006699;
+      color: white;
+      padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem); /* Padding dinâmico */
+      border: none;
+      border-radius: 8px;
+      font-size: clamp(0.9rem, 2vw, 1rem); /* Fonte dinâmica */
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .intro-button:hover {
+      background-color: #005080;
+    }
+    section {
+      padding: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 4vw, 2rem); /* Título dinâmico */
+      margin-bottom: 1rem;
+      color: #003366;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .card-img-container {
+      height: 220px;
+      overflow: hidden;
+    }
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .card h3 {
+      margin: 1rem 0 0.5rem;
+      color: #003366;
+      font-size: clamp(1rem, 2vw, 1.2rem); /* Título do card dinâmico */
+    }
+    .card p {
+      padding: 0 1rem 1rem;
+      font-size: clamp(0.85rem, 1.5vw, 0.95rem); /* Texto do card dinâmico */
+    }
+    .background-section {
+      background-image: url('/static/images/a321-1.png');
+      background-size: cover;
+      background-position: center;
+      padding: 4rem 2rem;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+    footer {
+      background-color: #003366;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .btn-acesso-final {
+      display: inline-block;
+      margin-top: 2rem;
+      background-color: #009933;
+      color: white;
+      padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+      border: none;
+      border-radius: 8px;
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      text-decoration: none;
+    }
+    .btn-acesso-final:hover {
+      background-color: #007a29;
+    }
+    @media (max-width: 900px) {
+      .card-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      header {
+        padding-bottom: 5rem; /* Espaço para o botão */
+      }
+      .intro-button {
+        position: absolute;
+        bottom: 1.5rem;
+        top: auto;
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+    @media (max-width: 600px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      header h1 {
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .intro-button {
+        position: relative;
+        left: auto;
+        right: auto;
+        top: auto;
+        bottom: auto;
+        transform: none;
+        margin: 1rem auto 0;
+        width: 80%;
+        white-space: normal;
+      }
+      .card-img-container {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FAD - Ferramenta de Análise Dinamizada</h1>
+    <a href="/login" class="intro-button">Acesse a plataforma</a>
+  </header>
+
+  <!-- O restante do seu conteúdo permanece igual -->
+  <section>
+    <h2 class="section-title">O que é a FAD?</h2>
+    <p>A <strong>FAD</strong> é uma plataforma desenvolvida com tecnologias 100% open-source, dedicada à análise técnica e ambiental de dados geoespaciais, com foco em trechos rodoviários no Estado de São Paulo.</p>
+  </section>
+
+  <section class="background-section">
+    <h2 class="section-title">Arcabouço Teórico-Conceitual</h2>
+    <p>A FAD foi idealizada com base nos princípios de governança digital, ciência aberta, reprodutibilidade e análise espacial orientada a banco de dados. Utiliza exclusivamente ferramentas open-source como <strong>PostGIS, GeoServer, FastAPI, React, QGIS e PostgreSQL</strong>, garantindo total transparência, escalabilidade e independência tecnológica.</p>
+  </section>
+
+  <section>
+    <h2 class="section-title">Módulos da Plataforma</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_cadastro.png" alt="Módulo de Cadastro">
+        </div>
+        <h3>Módulo de Cadastro</h3>
+        <p>Registro de pessoas físicas e jurídicas com controle de acesso e gestão de representantes legais.</p>
+      </div>
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_validacao.png" alt="Módulo de Validação">
+        </div>
+        <h3>Importação e Validação de Geometrias</h3>
+        <p>Valida arquivos shapefile e sua integridade geoespacial para garantir consistência na análise.</p>
+      </div>
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_conformidade_ambiental.png" alt="Conformidade Ambiental">
+        </div>
+        <h3>Conformidade Ambiental</h3>
+        <p>Cruzamento com camadas de áreas protegidas e geração de laudos técnicos.</p>
+      </div>
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_multicriterio.png" alt="Multicritério">
+        </div>
+        <h3>Favorabilidade Multicritério</h3>
+        <p>Análise técnica ponderada com critérios definidos pelo usuário.</p>
+      </div>
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_socioeconomico.png" alt="Socioeconômico">
+        </div>
+        <h3>Favorabilidade Socioeconômica</h3>
+        <p>Leva em conta dados sociais e econômicos no planejamento viário.</p>
+      </div>
+      <div class="card">
+        <div class="card-img-container">
+          <img src="/static/images/modulo_infraestrutura.png" alt="Infraestrutural">
+        </div>
+        <h3>Favorabilidade Infraestrutural</h3>
+        <p>Analisa compatibilidade com infraestrutura já existente e planejada.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="section-title">Contato</h2>
+    <p>Esta seção conterá os dados dos responsáveis pela FAD. Para dúvidas técnicas, entre em contato.</p>
+  </section>
+
+  <footer>
+    <p>© 2025 - FAD | VPC-GEOSER</p>
+    <a href="/login" class="btn-acesso-final">Acesse a plataforma</a>
+  </footer>
+</body>
+</html>

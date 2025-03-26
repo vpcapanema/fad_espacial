@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Escolha de Acesso - FAD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5faff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .escolha-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .escolha-container h2 {
+      color: #003366;
+      margin-bottom: 1.5rem;
+    }
+
+    .escolha-container button {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: #006699;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .escolha-container button:hover {
+      background-color: #004d80;
+    }
+
+    .dialog {
+      margin: 20px auto;
+      max-width: 400px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .dialog-header {
+      padding: 10px;
+      background: #f1f1f1;
+      border-bottom: 1px solid #ccc;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dialog-body {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .close-button {
+      background: #cc0000;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .ok-button {
+      margin-top: 10px;
+      padding: 8px 20px;
+      background: #009933;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="escolha-container">
+    <h2>Bem-vindo, {{ usuario.nome }}</h2>
+    <button onclick="acessarPainel()">Acessar Painel do Usuário</button>
+    <button onclick="window.location.href='/projeto/cadastrar'">Acessar FAD</button>
+  </div>
+
+  <!-- Caixa de erro -->
+  <div id="erroEscolha" class="dialog">
+    <div class="dialog-header">
+      <span>Erro</span>
+      <button class="close-button" onclick="document.getElementById('erroEscolha').style.display='none';">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p id="erroMensagem">Erro ao redirecionar.</p>
+      <button class="ok-button" onclick="document.getElementById('erroEscolha').style.display='none';">OK</button>
+    </div>
+  </div>
+
+  <script>
+    function acessarPainel() {
+      fetch('/painel')
+        .then(response => {
+          if (response.redirected) {
+            window.location.href = response.url;
+          } else if (response.status === 200) {
+            window.location.href = "/painel";
+          } else {
+            throw new Error("Erro inesperado ao acessar o painel.");
+          }
+        })
+        .catch(error => {
+          document.getElementById("erroMensagem").innerText = error.message;
+          document.getElementById("erroEscolha").style.display = "block";
+        });
+    }
+  </script>
+
+</body>
+</html>

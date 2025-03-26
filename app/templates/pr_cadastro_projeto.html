@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Projeto - FAD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef5f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .form-container {
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      background-color: #006633;
+      color: white;
+      padding: 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .modulos-container {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+
+    .modulos-container h4 {
+      color: #003366;
+      margin-bottom: 10px;
+    }
+
+    .modulo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .resumo {
+      background-color: #e6f5e6;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .resumo p {
+      margin: 5px 0;
+    }
+
+    .resumo button {
+      background-color: #004080;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Cadastrar Projeto</h2>
+    <form id="formProjeto" method="POST" action="/projeto/salvar">
+      <label for="nome">Nome do Projeto:</label>
+      <input type="text" name="nome" required>
+
+      <!-- Pessoa Jurídica -->
+      <label>Interessado (Pessoa Jurídica):</label>
+      <select id="opcaoPJ" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar PJ já cadastrada</option>
+        <option value="cadastrar">Cadastrar nova PJ</option>
+      </select>
+
+      <div id="boxPJ" class="hidden">
+        <select id="pjSelect" required>
+          <option value="">Selecione uma PJ</option>
+          {% for pj in pjs %}
+            <option value="{{ pj.id }}">{{ pj.razao_social }} ({{ pj.cnpj }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarPJ()">Confirmar</button>
+      </div>
+
+      <div id="resumoPJ" class="resumo hidden">
+        <p><strong>✅</strong> <span id="pjResumoTexto"></span></p>
+        <button type="button" onclick="editarPJ()">✏️ Editar</button>
+        <input type="hidden" name="interessado_id" id="pjInputFinal">
+      </div>
+
+      <!-- Pessoa Física -->
+      <label>Representante Legal (Pessoa Física):</label>
+      <select id="opcaoPF" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar PF já cadastrada</option>
+        <option value="cadastrar">Cadastrar nova PF</option>
+      </select>
+
+      <div id="boxPF" class="hidden">
+        <select id="pfSelect" required>
+          <option value="">Selecione uma PF</option>
+          {% for pf in pfs %}
+            <option value="{{ pf.id }}">{{ pf.nome }} ({{ pf.cpf }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarPF()">Confirmar</button>
+      </div>
+
+      <div id="resumoPF" class="resumo hidden">
+        <p><strong>✅</strong> <span id="pfResumoTexto"></span></p>
+        <button type="button" onclick="editarPF()">✏️ Editar</button>
+        <input type="hidden" name="representante_id" id="pfInputFinal">
+      </div>
+
+      <!-- Trecho -->
+      <label>Trecho:</label>
+      <select id="opcaoTrecho" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar trecho já cadastrado</option>
+        <option value="cadastrar">Cadastrar novo trecho</option>
+      </select>
+
+      <div id="boxTrecho" class="hidden">
+        <select id="trechoSelect" required>
+          <option value="">Selecione um trecho</option>
+          {% for t in trechos %}
+            <option value="{{ t.id }}">{{ t.codigo }} - {{ t.denominacao }} ({{ t.municipio }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarTrecho()">Confirmar</button>
+      </div>
+
+      <div id="resumoTrecho" class="resumo hidden">
+        <p><strong>✅</strong> <span id="trechoResumoTexto"></span></p>
+        <button type="button" onclick="editarTrecho()">✏️ Editar</button>
+        <input type="hidden" name="trecho_id" id="trechoInputFinal">
+      </div>
+
+      <!-- Módulos -->
+      <div class="modulos-container">
+        <h4>Quais análises deseja executar?</h4>
+        <div class="modulo"><input type="checkbox" id="todos"> <label for="todos">Todas</label></div>
+        <div class="modulo"><input type="checkbox" name="modulos" value="1" class="mod"> <label>Conformidade Ambiental</label></div>
+        <div class="modulo"><input type="checkbox" name="modulos" value="2" class="mod"> <label>Favorabilidade Multicritério</label></div>
+        <div class="modulo"><input type="checkbox" name="modulos" value="3" class="mod"> <label>Favorabilidade Socioeconômica</label></div>
+        <div class="modulo"><input type="checkbox" name="modulos" value="4" class="mod"> <label>Favorabilidade Infraestrutural</label></div>
+      </div>
+
+      <button type="submit" id="btnSalvar" disabled>Salvar e Prosseguir</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("formProjeto");
+    const btn = document.getElementById("btnSalvar");
+
+    // Seções obrigatórias para checagem de ativação do botão
+    const pjInputFinal = document.getElementById("pjInputFinal");
+    const pfInputFinal = document.getElementById("pfInputFinal");
+    const trechoInputFinal = document.getElementById("trechoInputFinal");
+
+    function checkBotao() {
+      btn.disabled = !(pjInputFinal.value && pfInputFinal.value && trechoInputFinal.value);
+    }
+
+    // === Pessoa Jurídica
+    document.getElementById("opcaoPJ").addEventListener("change", function () {
+      if (this.value === "associar") {
+        document.getElementById("boxPJ").classList.remove("hidden");
+        document.getElementById("resumoPJ").classList.add("hidden");
+      } else if (this.value === "cadastrar") {
+        window.location.href = "/cadastro/interessado/pj";
+      }
+    });
+
+    function confirmarPJ() {
+      const select = document.getElementById("pjSelect");
+      const id = select.value;
+      const texto = select.options[select.selectedIndex].text;
+      if (id) {
+        document.getElementById("pjResumoTexto").textContent = texto;
+        pjInputFinal.value = id;
+        document.getElementById("boxPJ").classList.add("hidden");
+        document.getElementById("resumoPJ").classList.remove("hidden");
+        checkBotao();
+      }
+    }
+
+    function editarPJ() {
+      pjInputFinal.value = "";
+      document.getElementById("boxPJ").classList.remove("hidden");
+      document.getElementById("resumoPJ").classList.add("hidden");
+      checkBotao();
+    }
+
+    // === Pessoa Física
+    document.getElementById("opcaoPF").addEventListener("change", function () {
+      if (this.value === "associar") {
+        document.getElementById("boxPF").classList.remove("hidden");
+        document.getElementById("resumoPF").classList.add("hidden");
+      } else if (this.value === "cadastrar") {
+        window.location.href = "/cadastro/interessado/pf";
+      }
+    });
+
+    function confirmarPF() {
+      const select = document.getElementById("pfSelect");
+      const id = select.value;
+      const texto = select.options[select.selectedIndex].text;
+      if (id) {
+        document.getElementById("pfResumoTexto").textContent = texto;
+        pfInputFinal.value = id;
+        document.getElementById("boxPF").classList.add("hidden");
+        document.getElementById("resumoPF").classList.remove("hidden");
+        checkBotao();
+      }
+    }
+
+    function editarPF() {
+      pfInputFinal.value = "";
+      document.getElementById("boxPF").classList.remove("hidden");
+      document.getElementById("resumoPF").classList.add("hidden");
+      checkBotao();
+    }
+
+    // === Trecho
+    document.getElementById("opcaoTrecho").addEventListener("change", function () {
+      if (this.value === "associar") {
+        document.getElementById("boxTrecho").classList.remove("hidden");
+        document.getElementById("resumoTrecho").classList.add("hidden");
+      } else if (this.value === "cadastrar") {
+        window.location.href = "/cadastro/interessado/trecho";
+      }
+    });
+
+    function confirmarTrecho() {
+      const select = document.getElementById("trechoSelect");
+      const id = select.value;
+      const texto = select.options[select.selectedIndex].text;
+      if (id) {
+        document.getElementById("trechoResumoTexto").textContent = texto;
+        trechoInputFinal.value = id;
+        document.getElementById("boxTrecho").classList.add("hidden");
+        document.getElementById("resumoTrecho").classList.remove("hidden");
+        checkBotao();
+      }
+    }
+
+    function editarTrecho() {
+      trechoInputFinal.value = "";
+      document.getElementById("boxTrecho").classList.remove("hidden");
+      document.getElementById("resumoTrecho").classList.add("hidden");
+      checkBotao();
+    }
+
+    // Marcar todos os módulos
+    document.getElementById("todos").addEventListener("change", function () {
+      const todos = document.querySelectorAll(".mod");
+      todos.forEach(cb => cb.checked = this.checked);
+    });
+
+    form.addEventListener("submit", function (e) {
+      const modulos = Array.from(form.querySelectorAll('input[name="modulos"]:checked')).map(cb => cb.value);
+      if (modulos.length === 0) {
+        e.preventDefault();
+        alert("Selecione pelo menos um módulo da FAD.");
+      } else {
+        const inputHidden = document.createElement("input");
+        inputHidden.type = "hidden";
+        inputHidden.name = "modulos";
+        inputHidden.value = modulos.join(",");
+        form.appendChild(inputHidden);
+      }
+    });
+  </script>
+
+</body>
+</html>

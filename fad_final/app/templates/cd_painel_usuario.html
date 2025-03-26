@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Usuário - FAD</title>
+  <style>
+    .painel-container {
+      max-width: 800px; margin: 60px auto; background: white;
+      padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;
+    }
+    h2 { color: #003366; margin-bottom: 1rem; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.75rem; border-bottom: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <div class="painel-container">
+    <h2>Bem-vindo(a), {{ usuario.nome }}</h2>
+    <h3>Seus Projetos na FAD</h3>
+    {% if projetos %}
+      <ul>
+      {% for projeto in projetos %}
+        <li>{{ projeto.nome }} - {{ projeto.data }}</li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Você ainda não possui projetos cadastrados.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

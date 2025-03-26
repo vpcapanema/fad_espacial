@@ -131,7 +131,7 @@
     </div>
   </div>
 
-  <!-- Caixa de carregamento (inserida dinamicamente) -->
+  <!-- Caixa de carregamento -->
   <div id="caixaCarregando" class="dialog hidden">
     <div class="dialog-header">
       <span>Autenticando...</span>
@@ -153,17 +153,17 @@
       carregandoBox.classList.remove("hidden");
 
       const formData = new FormData(form);
-      form.reset();
+      const encodedData = new URLSearchParams(formData);
 
       try {
         const response = await fetch("/login", {
           method: "POST",
-          body: formData
+          body: encodedData
         });
 
         carregandoBox.classList.add("hidden");
 
-        if (response.status === 200 || response.redirected) {
+        if (response.ok || response.redirected) {
           window.location.href = response.url;
         } else {
           if (response.status === 401) {

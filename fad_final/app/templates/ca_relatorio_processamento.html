@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Técnico de Processamento</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h1 { color: #004080; font-size: 18pt; }
+        h2 { margin-top: 30px; }
+        p { font-size: 12pt; }
+        ul { font-size: 12pt; }
+    </style>
+</head>
+<body>
+    <h1>Relatório Técnico de Processamento</h1>
+
+    <h2>Informações do Trecho</h2>
+    <p><strong>Arquivo:</strong> {{ nome_arquivo }}</p>
+    <p><strong>Município:</strong> {{ municipio }}</p>
+    <p><strong>Trecho:</strong> {{ trecho_nome }}</p>
+    <p><strong>Data da Análise:</strong> {{ data }}</p>
+
+    <h2>Parâmetros Utilizados</h2>
+    <ul>
+        <li><strong>SRID:</strong> {{ srid }}</li>
+        <li><strong>Buffer:</strong> {{ buffer_km }}</li>
+        <li><strong>Zona de Amortecimento:</strong> Sim (anel com 10 km)</li>
+        <li><strong>Sobreposição espacial:</strong> ST_Intersects com ST_Transform</li>
+    </ul>
+
+    <h2>Camadas Cruzadas</h2>
+    <ul>
+        {% for camada in camadas %}
+            <li>{{ camada }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Horário de Geração</h2>
+    <p>{{ horario }}</p>
+
+    <footer>
+        <p style="font-size:10pt;">Relatório gerado automaticamente pela FAD - Ferramenta de Análise Dinamizada</p>
+    </footer>
+</body>
+</html>
