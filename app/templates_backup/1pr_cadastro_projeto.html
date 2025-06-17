@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastrar Projeto - FAD</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef5f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .form-container {
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #003366;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      background-color: #006633;
+      color: white;
+      padding: 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .resumo {
+      background-color: #e6f5e6;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .resumo p {
+      margin: 5px 0;
+    }
+
+    .resumo button {
+      background-color: #004080;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Cadastrar Projeto</h2>
+    <form method="POST" action="/projeto/salvar">
+      <label for="nome">Nome do Projeto:</label>
+      <input type="text" name="nome" required>
+
+      <!-- Pessoa Jurídica -->
+      <label>Interessado (Pessoa Jurídica):</label>
+      <select id="opcaoPJ" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar PJ já cadastrada</option>
+        <option value="cadastrar">Cadastrar nova PJ</option>
+      </select>
+
+      <div id="boxPJ" class="hidden">
+        <select id="pjSelect" required>
+          <option value="">Selecione uma PJ</option>
+          {% for pj in pjs %}
+            <option value="{{ pj.id_pj }}">{{ pj.razao_social }} ({{ pj.cnpj }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarPJ()">Confirmar</button>
+      </div>
+
+      <div id="resumoPJ" class="resumo hidden">
+        <p><strong>✅</strong> <span id="pjResumoTexto"></span></p>
+        <button type="button" onclick="editarPJ()">✏️ Editar</button>
+        <input type="hidden" name="interessado_id" id="pjInputFinal" required>
+      </div>
+      <!-- Pessoa Física -->
+      <label>Representante Legal (Pessoa Física):</label>
+      <select id="opcaoPF" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar PF já cadastrada</option>
+        <option value="cadastrar">Cadastrar nova PF</option>
+      </select>
+
+      <div id="boxPF" class="hidden">
+        <select id="pfSelect" required>
+          <option value="">Selecione uma PF</option>
+          {% for pf in pfs %}
+            <option value="{{ pf.id_pf }}">{{ pf.nome }} ({{ pf.cpf }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarPF()">Confirmar</button>
+      </div>
+
+      <div id="resumoPF" class="resumo hidden">
+        <p><strong>✅</strong> <span id="pfResumoTexto"></span></p>
+        <button type="button" onclick="editarPF()">✏️ Editar</button>
+        <input type="hidden" name="representante_id" id="pfInputFinal" required>
+      </div>
+
+      <!-- Trecho -->
+      <label>Trecho:</label>
+      <select id="opcaoTrecho" required>
+        <option value="">Selecione...</option>
+        <option value="associar">Associar trecho já cadastrado</option>
+        <option value="cadastrar">Cadastrar novo trecho</option>
+      </select>
+
+      <div id="boxTrecho" class="hidden">
+        <select id="trechoSelect" required>
+          <option value="">Selecione um trecho</option>
+          {% for t in trechos %}
+            <option value="{{ t.id }}">{{ t.codigo }} - {{ t.denominacao }} ({{ t.municipio }})</option>
+          {% endfor %}
+        </select>
+        <button type="button" onclick="confirmarTrecho()">Confirmar</button>
+      </div>
+
+      <div id="resumoTrecho" class="resumo hidden">
+        <p><strong>✅</strong> <span id="trechoResumoTexto"></span></p>
+        <button type="button" onclick="editarTrecho()">✏️ Editar</button>
+        <input type="hidden" name="trecho_id" id="trechoInputFinal" required>
+      </div>
+
+      <button type="submit">Gravar Projeto</button>
+    </form>
+  </div>
+  <script>
+    const redir = (selector, boxId, route) => {
+      document.getElementById(selector).addEventListener("change", function () {
+        const box = document.getElementById(boxId);
+        if (this.value === "cadastrar") {
+          window.open(route, "_blank");
+        } else if (this.value === "associar") {
+          box.classList.remove("hidden");
+        } else {
+          box.classList.add("hidden");
+        }
+      });
+    };
+  
+    redir("opcaoPJ", "boxPJ", "/cadastro-interessado-pj");
+    redir("opcaoPF", "boxPF", "/cadastro-interessado-pf");
+    redir("opcaoTrecho", "boxTrecho", "/cadastro-interessado-trecho");
+  
+    function confirmarPJ() {
+      const select = document.getElementById("pjSelect");
+      document.getElementById("pjResumoTexto").textContent = select.options[select.selectedIndex].textContent;
+      document.getElementById("pjInputFinal").value = select.value;
+      document.getElementById("boxPJ").classList.add("hidden");
+      document.getElementById("resumoPJ").classList.remove("hidden");
+    }
+    
+  
+    function editarPJ() {
+      document.getElementById("resumoPJ").classList.add("hidden");
+      document.getElementById("boxPJ").classList.remove("hidden");
+      document.getElementById("pjSelect").value = "";
+    }
+  
+    function confirmarPF() {
+      const select = document.getElementById("pfSelect");
+      document.getElementById("pfResumoTexto").textContent = select.options[select.selectedIndex].textContent;
+      document.getElementById("pfInputFinal").value = select.value;
+      document.getElementById("boxPF").classList.add("hidden");
+      document.getElementById("resumoPF").classList.remove("hidden");
+    }
+  
+    function editarPF() {
+      document.getElementById("resumoPF").classList.add("hidden");
+      document.getElementById("boxPF").classList.remove("hidden");
+      document.getElementById("pfSelect").value = "";
+    }
+  
+    function confirmarTrecho() {
+      const select = document.getElementById("trechoSelect");
+      document.getElementById("trechoResumoTexto").textContent = select.options[select.selectedIndex].textContent;
+      document.getElementById("trechoInputFinal").value = select.value;
+      document.getElementById("boxTrecho").classList.add("hidden");
+      document.getElementById("resumoTrecho").classList.remove("hidden");
+    }
+  
+    function editarTrecho() {
+      document.getElementById("resumoTrecho").classList.add("hidden");
+      document.getElementById("boxTrecho").classList.remove("hidden");
+      document.getElementById("trechoSelect").value = "";
+    }
+  </script>
+<!-- ================== UPLOAD DE GEOMETRIA ================== -->
+<div class="form-container" style="margin-top: 30px;">
+  <h2>Importar Geometria</h2>
+  <p>Selecione um arquivo .zip contendo o shapefile.</p>
+
+  <input type="file" id="fileInput" hidden>
+  <div style="display: flex; gap: 10px; align-items: center;">
+    <label for="fileInput" class="file-label">Escolher Arquivo</label>
+    <input type="text" id="fileName" value="Selecionar arquivo" readonly style="flex: 1;">
+  </div>
+  <button id="uploadButton" style="width: auto;">Enviar</button>
+
+  <div id="progressContainer" style="display: none; margin-top: 10px;">
+    <progress id="uploadProgress" value="0" max="100"></progress>
+  </div>
+
+  <div id="resultMessage" class="hidden" style="margin-top: 15px; color: green;">
+    ✔️ Arquivo enviado com sucesso!
+  </div>
+
+  <div id="errorMessage" class="hidden" style="margin-top: 15px; color: red;">
+    ❌ Erro ao importar o arquivo.
+    <br>
+    <a id="btnRelatorioUpload" href="#" download style="display: none; color: #004080; font-weight: bold;">📄 Baixar relatório</a>
+  </div>
+
+  <button id="validateButton" class="hidden" style="margin-top: 20px;">Validar Geometria</button>
+  <div id="validationResult" class="hidden" style="margin-top: 15px;"></div>
+
+  <a id="btnRelatorioValidacao" href="#" class="hidden" target="_blank">
+    <button type="button" style="margin-top: 10px; background-color: #004080;">Baixar relatório de validação</button>
+  </a>
+</div>
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const fileNameField = document.getElementById("fileName");
+  const uploadButton = document.getElementById("uploadButton");
+  const progressContainer = document.getElementById("progressContainer");
+  const uploadProgress = document.getElementById("uploadProgress");
+  const resultMessage = document.getElementById("resultMessage");
+  const errorMessage = document.getElementById("errorMessage");
+  const validateButton = document.getElementById("validateButton");
+  const validationResult = document.getElementById("validationResult");
+  const btnRelatorioValidacao = document.getElementById("btnRelatorioValidacao");
+  const btnRelatorioUpload = document.getElementById("btnRelatorioUpload");
+  const btnSalvarContinuar = document.getElementById("btnSalvarContinuar");
+  const API_BASE_URL = "http://127.0.0.1:8000";
+  let uploadInProgress = false;
+
+  fileInput.addEventListener("change", () => {
+    fileNameField.value = fileInput.files.length ? fileInput.files[0].name : "Selecionar arquivo";
+    uploadButton.disabled = !fileInput.files.length || uploadInProgress;
+  });
+
+  uploadButton.addEventListener("click", async () => {
+    if (!fileInput.files.length) return;
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("arquivo", file);
+    uploadInProgress = true;
+    uploadButton.disabled = true;
+    progressContainer.style.display = "block";
+    uploadProgress.value = 0;
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/`, { method: "POST", body: formData });
+      const data = await response.json();
+      progressContainer.style.display = "none";
+      if (data.sucesso) {
+        resultMessage.classList.remove("hidden");
+        errorMessage.classList.add("hidden");
+        validateButton.classList.remove("hidden");
+        btnRelatorioUpload.style.display = "none";
+      } else {
+        resultMessage.classList.add("hidden");
+        errorMessage.classList.remove("hidden");
+        errorMessage.innerHTML = data.erros ? `❌ Erros:<ul>${data.erros.map(e => `<li>${e}</li>`).join("")}</ul>` : "❌ Erro desconhecido";
+        btnRelatorioUpload.href = data.relatorio || "#";
+        btnRelatorioUpload.style.display = data.relatorio ? "inline-block" : "none";
+      }
+    } catch (err) {
+      progressContainer.style.display = "none";
+      errorMessage.classList.remove("hidden");
+      errorMessage.innerText = "❌ Falha na comunicação com o servidor";
+    } finally {
+      uploadInProgress = false;
+      uploadButton.disabled = false;
+    }
+  });
+
+  validateButton.addEventListener("click", async () => {
+    validationResult.innerText = "Validando...";
+    validationResult.classList.remove("hidden");
+    try {
+      const response = await fetch(`${API_BASE_URL}/geometria/validar`);
+      const data = await response.json();
+      if (data.validado) {
+        validationResult.innerText = "✔️ Geometria válida";
+        validationResult.style.color = "green";
+      } else {
+        validationResult.innerHTML = data.erros ? `❌ Problemas:<ul>${data.erros.map(e => `<li>${e}</li>`).join("")}</ul>` : "❌ Geometria inválida";
+        validationResult.style.color = "red";
+      }
+      if (data.relatorio) {
+        btnRelatorioValidacao.href = data.relatorio;
+        btnRelatorioValidacao.classList.remove("hidden");
+      }
+      verificarFinalizacao();
+    } catch (err) {
+      validationResult.innerText = "❌ Falha na validação";
+      validationResult.style.color = "red";
+    }
+  });
+
+  function verificarFinalizacao() {
+    const pfOk = document.getElementById("pfInputFinal")?.value;
+    const pjOk = document.getElementById("pjInputFinal")?.value;
+    const trechoOk = document.getElementById("trechoInputFinal")?.value;
+    const validacao = document.getElementById("validationResult")?.innerText.includes("Geometria válida");
+    const moduloOk = document.querySelectorAll("input[name='modulos']:checked").length > 0;
+
+    const pronto = pfOk && pjOk && trechoOk && validacao && moduloOk;
+    btnSalvarContinuar.disabled = !pronto;
+    btnSalvarContinuar.style.backgroundColor = pronto ? "#006633" : "#ccc";
+  }
+
+  document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("change", verificarFinalizacao);
+  });
+</script>
+  
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const atualizarLista = async (url, selectId, label) => {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const select = document.getElementById(selectId);
+      select.innerHTML = `<option value="">Selecione ${label}</option>`;
+      data.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.nome || item.razao_social || item.codigo;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      alert(`Erro ao atualizar a lista de ${label}`);
+    }
+  };
+
+  document.getElementById("atualizarPJBtn").addEventListener("click", () => {
+    atualizarLista("/cadastro/pjs/json", "pjSelect", "uma PJ");
+  });
+
+  document.getElementById("atualizarPFBtn").addEventListener("click", () => {
+    atualizarLista("/cadastro/pfs/json", "pfSelect", "uma PF");
+  });
+
+  document.getElementById("atualizarTrechoBtn").addEventListener("click", () => {
+    atualizarLista("/cadastro/trechos/json", "trechoSelect", "um trecho");
+  });
+});
+</script>
+
+
+

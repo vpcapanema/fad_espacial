@@ -6,7 +6,7 @@ from datetime import datetime
 import re
 from fastapi.templating import Jinja2Templates
 
-router = APIRouter(tags=['Cadastro de Trecho Rodoviário'])
+router = APIRouter(prefix="/api/cd", tags=['Cadastro de Trecho Rodoviário'])
 templates = Jinja2Templates(directory="app/templates")
 
 def capitalizar_nome(s):
@@ -165,4 +165,4 @@ def obter_trecho_por_id(trecho_id: int, db: Session = Depends(get_db)):
 
 @router.get("/cadastrar-trecho-rodoviario")
 def cadastrar_trecho_rodoviario_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_trecho.html", {"request": request})
+    return templates.TemplateResponse("cd_trecho.html", {"request": request})

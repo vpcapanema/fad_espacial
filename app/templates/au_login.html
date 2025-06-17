@@ -240,13 +240,11 @@
       erroBox.classList.add("hidden");
       feedbackErro.classList.add("hidden");
       carregandoBox.classList.remove("hidden");
-
       const formData = new FormData(form);
       const encodedData = new URLSearchParams();
       formData.forEach((value, key) => {
         encodedData.append(key, value);
       });
-
       try {
         const response = await fetch("/login", {
           method: "POST",
@@ -257,46 +255,29 @@
         });
         carregandoBox.classList.add("hidden");
         if (response.ok) {
-          // Espera JSON com redirect
           const data = await response.json();
           if (data.redirect) {
-            window.location.href = data.redirect;
+            window.location.href = data.redirect; // Alterado de window.open
           } else {
             feedbackErro.textContent = "Login realizado, mas sem redirecionamento.";
             feedbackErro.classList.remove("hidden");
-          }        } else {
-          const errorData = await response.json().catch(() => ({}));
-          let msg = "";
-          if (response.status === 401) {
-            if (errorData.detail === "email") {
-              msg = "E-mail não cadastrado.";
-            } else if (errorData.detail === "senha") {
-              msg = "Senha incorreta.";
-            } else if (errorData.detail === "tipo") {
-              msg = "Tipo de acesso incorreto.";
-            } else {
-              msg = "Credenciais inválidas.";
-            }
-          } else if (response.status === 403) {
-            if (errorData.detail === "status") {
-              msg = "Acesso negado: status do usuário = " + (errorData.motivo || "desconhecido") + ".";
-            } else if (errorData.detail === "ativo") {
-              msg = "Acesso negado: usuário inativo.";
-            } else {
-              msg = "Acesso negado por motivo desconhecido.";
-            }
-          } else if (errorData.detail === "SessionMiddleware não configurado") {
-            msg = "Erro interno: SessionMiddleware não configurado.";
-          } else {
-            msg = "Erro inesperado. Código: " + response.status;
           }
-          feedbackErro.textContent = msg;
-          feedbackErro.classList.remove("hidden");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          let msg = errorData.message || "Erro inesperado. Código: " + response.status;
+          erroTexto.textContent = msg;
+          erroBox.classList.remove("hidden");
+          erroBox.querySelector('.ok-button').onclick = function() {
+            window.location.reload();
+          };
         }
       } catch (e) {
         carregandoBox.classList.add("hidden");
-        feedbackErro.textContent = "Erro de conexão com o servidor.";
-        feedbackErro.classList.remove("hidden");
+        erroTexto.textContent = "Erro de conexão com o servidor.";
+        erroBox.classList.remove("hidden");
+        erroBox.querySelector('.ok-button').onclick = function() {
+          window.location.reload();
+        };
       }
     });
 
@@ -304,6 +285,35 @@
       const senhaInput = document.getElementById("senhaInput");
       senhaInput.type = senhaInput.type === "password" ? "text" : "password";
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const emailInput = document.querySelector('input[name="email"]');
+      const tipoSelect = document.getElementById('tipo');
+      emailInput.addEventListener('blur', async function() {
+        const email = emailInput.value.trim();
+        if (!email) return;
+        tipoSelect.innerHTML = '<option>Carregando...</option>';
+        try {
+          const formData = new FormData();
+          formData.append('email', email);
+          const resp = await fetch('/login/tipos-acesso', { method: 'POST', body: formData });
+          const tipos = await resp.json();
+          tipoSelect.innerHTML = '';
+          if (tipos.length === 0) {
+            tipoSelect.innerHTML = '<option value="">Nenhum acesso encontrado</option>';
+          } else {
+            tipos.forEach(t => {
+              const opt = document.createElement('option');
+              opt.value = t.value;
+              opt.textContent = t.label;
+              tipoSelect.appendChild(opt);
+            });
+          }
+        } catch (e) {
+          tipoSelect.innerHTML = '<option value="">Erro ao buscar tipos</option>';
+        }
+      });
+    });
   </script>
 
   <script src="/static/js/componentes/fad_header.js"></script>

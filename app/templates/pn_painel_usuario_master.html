@@ -1,3 +1,4 @@
+<!-- ✅ Template atualizado para usar fad_header.html padronizado -->
 <!DOCTYPE html>
 
 <html lang="pt-br">
@@ -39,6 +40,62 @@
   color: #003366;
   border-color: #003366;
 }
+.tipo-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.tipo-master {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.tipo-coordenador {
+  background-color: #f57c00;
+  color: white;
+}
+
+.tipo-analista {
+  background-color: #43a047;
+  color: white;
+}
+
+/* Estilos específicos para botões de ação nas tabelas de usuários */
+.btn-aprovar {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: white;
+}
+
+.btn-aprovar:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
+.btn-reprovar {
+  background-color: #f44336;
+  border-color: #f44336;
+  color: white;
+}
+
+.btn-reprovar:hover {
+  background-color: #da190b;
+  border-color: #da190b;
+}
+
+.btn-ativar {
+  background-color: #2196f3;
+  border-color: #2196f3;
+  color: white;
+}
+
+.btn-ativar:hover {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
 </style>
 <script>
     // Funções utilitárias para formatação
@@ -74,11 +131,8 @@
       if (isNaN(data.getTime())) return dataStr;
       const pad = n => n.toString().padStart(2, '0');
       return `${pad(data.getDate())}/${pad(data.getMonth()+1)}/${pad(data.getFullYear())} ${pad(data.getHours())}:${pad(data.getMinutes())}:${pad(data.getSeconds())}`;
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      // Carregar Usuários Comuns
-      fetch("/painel-analista/usuarios")
+    }    document.addEventListener("DOMContentLoaded", () => {      // Carregar Analistas
+      fetch("/painel-master/dados/analistas")
         .then(res => res.json())
         .then(usuarios => {
           const tabelaUsuarios = document.getElementById("tabela-usuarios");
@@ -105,23 +159,20 @@
               <td>${usuario.regional_coordenadoria || ''}</td>
               <td>${usuario.regional_setor || ''}</td>
               <td>${formatarDataHora(usuario.criado_em) || ''}</td>
-              <td>${formatarDataHora(usuario.aprovado_em) || ''}</td>
-              <td>${usuario.aprovador_id || ''}</td>
+              <td>${formatarDataHora(usuario.aprovado_em) || ''}</td>              <td>${usuario.aprovador_id || ''}</td>
               <td><span class="status-badge ${usuario.status === 'aprovado' ? 'status-aprovado' : usuario.status === 'reprovado' ? 'status-reprovado' : 'status-aguardando'}">${usuario.status}</span></td>
               <td><span class="ativo-badge ${usuario.ativo ? 'ativo-sim' : 'ativo-nao'}">${usuario.ativo ? 'Sim' : 'Não'}</span></td>
               <td>
-                <button class="btn-icone" title="Gerenciar Cadastro" onclick="gerenciarCadastro(${usuario.id})"><i class="fa-solid fa-id-card"></i></button>
-                <button class="btn-icone" title="Gerenciar Acesso" onclick="gerenciarAcesso(${usuario.id})"><i class="fa-solid fa-key"></i></button>
-                <button class="btn-icone" title="Ativar" onclick="ativarUsuario(${usuario.id})"><i class="fa-solid fa-user-check"></i></button>
+                <button class="btn-icone btn-aprovar" title="Aprovar" onclick="aprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-check"></i></button>
+                <button class="btn-icone btn-reprovar" title="Reprovar" onclick="reprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-xmark"></i></button>
+                <button class="btn-icone btn-ativar" title="${usuario.ativo ? 'Desativar' : 'Ativar'}" onclick="toggleAtivarUsuario(${usuario.id}, ${usuario.ativo})"><i class="fa-solid ${usuario.ativo ? 'fa-user-slash' : 'fa-user-check'}"></i></button>
               </td>
             `;
             tabelaUsuarios.appendChild(linha);
           });
         })
-        .catch(error => console.error("Erro ao carregar usuários:", error));
-
-      // Carregar Coordenadores
-      fetch("/painel-coordenador/usuarios")
+        .catch(error => console.error("Erro ao carregar usuários:", error));      // Carregar Coordenadores
+      fetch("/painel-master/dados/coordenadores")
         .then(res => res.json())
         .then(admins => {
           const tabelaAdmins = document.getElementById("tabela-admins");
@@ -149,19 +200,77 @@
               <td>${usuario.regional_setor || ''}</td>
               <td>${formatarDataHora(usuario.criado_em) || ''}</td>
               <td>${formatarDataHora(usuario.aprovado_em) || ''}</td>
-              <td>${usuario.aprovador_id || ''}</td>
-              <td><span class="status-badge ${usuario.status === 'aprovado' ? 'status-aprovado' : usuario.status === 'reprovado' ? 'status-reprovado' : 'status-aguardando'}">${usuario.status}</span></td>
+              <td>${usuario.aprovador_id || ''}</td>              <td><span class="status-badge ${usuario.status === 'aprovado' ? 'status-aprovado' : usuario.status === 'reprovado' ? 'status-reprovado' : 'status-aguardando'}">${usuario.status}</span></td>
               <td><span class="ativo-badge ${usuario.ativo ? 'ativo-sim' : 'ativo-nao'}">${usuario.ativo ? 'Sim' : 'Não'}</span></td>
               <td>
-                <button class="btn-icone" title="Aprovar" onclick="aprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-check"></i></button>
-                <button class="btn-icone" title="Reprovar" onclick="reprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-xmark"></i></button>
-                <button class="btn-icone" title="Ativar" onclick="ativarUsuario(${usuario.id})"><i class="fa-solid fa-user-check"></i></button>
+                <button class="btn-icone btn-aprovar" title="Aprovar" onclick="aprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-check"></i></button>
+                <button class="btn-icone btn-reprovar" title="Reprovar" onclick="reprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-xmark"></i></button>
+                <button class="btn-icone btn-ativar" title="${usuario.ativo ? 'Desativar' : 'Ativar'}" onclick="toggleAtivarUsuario(${usuario.id}, ${usuario.ativo})"><i class="fa-solid ${usuario.ativo ? 'fa-user-slash' : 'fa-user-check'}"></i></button>
               </td>
             `;
             tabelaAdmins.appendChild(linha);
           });
+        })        .catch(error => console.error("Erro ao carregar coordenadores:", error));// Carregar Todos os Usuários
+      fetch("/painel-master/dados/todos-usuarios")
+        .then(res => res.json())
+        .then(usuarios => {
+          const tabelaTodosUsuarios = document.getElementById("tabela-todos-usuarios");
+          tabelaTodosUsuarios.innerHTML = "";
+          usuarios.forEach(usuario => {
+            const linha = document.createElement("tr");
+              // Determinar o tipo de usuário baseado nas informações disponíveis
+            let tipoUsuario = 'Analista';
+            if (usuario.tipo) {
+              switch(usuario.tipo.toLowerCase()) {
+                case 'master':
+                  tipoUsuario = 'Master';
+                  break;
+                case 'coordenador':
+                  tipoUsuario = 'Coordenador';
+                  break;
+                case 'analista':
+                default:
+                  tipoUsuario = 'Analista';
+                  break;
+              }
+            }
+            
+            linha.innerHTML = `
+              <td>${usuario.id}</td>
+              <td>${usuario.nome}</td>
+              <td>${formatarCPF(usuario.cpf)}</td>
+              <td>${formatarEmail(usuario.email)}</td>
+              <td>${formatarTelefone(usuario.telefone) || ''}</td>
+              <td>${usuario.pessoa_fisica_id || ''}</td>
+              <td>${usuario.instituicao || ''}</td>
+              <td>${usuario.tipo_lotacao || ''}</td>
+              <td>${formatarEmail(usuario.email_institucional) || ''}</td>
+              <td>${formatarTelefone(usuario.telefone_institucional) || ''}</td>
+              <td>${usuario.ramal || ''}</td>
+              <td>${usuario.sede_hierarquia || ''}</td>
+              <td>${usuario.sede_coordenadoria || ''}</td>
+              <td>${usuario.sede_setor || ''}</td>
+              <td>${usuario.sede_assistencia || ''}</td>
+              <td>${usuario.regional_nome || ''}</td>
+              <td>${usuario.regional_coordenadoria || ''}</td>
+              <td>${usuario.regional_setor || ''}</td>
+              <td>${formatarDataHora(usuario.criado_em) || ''}</td>
+              <td>${formatarDataHora(usuario.aprovado_em) || ''}</td>
+              <td>${usuario.aprovador_id || ''}</td>              <td><span class="tipo-badge tipo-${tipoUsuario.toLowerCase()}">${tipoUsuario}</span></td>
+              <td><span class="status-badge ${usuario.status === 'aprovado' ? 'status-aprovado' : usuario.status === 'reprovado' ? 'status-reprovado' : 'status-aguardando'}">${usuario.status}</span></td>
+              <td><span class="ativo-badge ${usuario.ativo ? 'ativo-sim' : 'ativo-nao'}">${usuario.ativo ? 'Sim' : 'Não'}</span></td>
+              <td>
+                <button class="btn-icone btn-aprovar" title="Aprovar" onclick="aprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-check"></i></button>
+                <button class="btn-icone btn-reprovar" title="Reprovar" onclick="reprovarUsuario(${usuario.id})"><i class="fa-solid fa-circle-xmark"></i></button>
+                <button class="btn-icone btn-ativar" title="${usuario.ativo ? 'Desativar' : 'Ativar'}" onclick="toggleAtivarUsuario(${usuario.id}, ${usuario.ativo})"><i class="fa-solid ${usuario.ativo ? 'fa-user-slash' : 'fa-user-check'}"></i></button>
+              </td>
+            `;
+            tabelaTodosUsuarios.appendChild(linha);
+          });
         })
-        .catch(error => console.error("Erro ao carregar coordenadores:", error));      // Carregar Projetos do Painel Master
+        .catch(error => console.error("Erro ao carregar todos os usuários:", error));
+
+      // Carregar Projetos do Painel Master
       fetch("/painel/projetos")
         .then(res => res.json())
         .then(projetos => {
@@ -235,45 +344,376 @@
     document.getElementById("acao-gerenciar").onclick = () => {
   if (projetoSelecionadoId) alert(`⚙️ Gerenciar projeto ID ${projetoSelecionadoId}`);
   else alert("Selecione um projeto primeiro.");
-};
-
-    function gerenciarCadastro(id) {
-      alert(`Abrir editor de cadastro do usuário ID ${id}`);
-    }
-
-    function gerenciarAcesso(id) {
-      alert(`Abrir painel de acesso do usuário ID ${id}`);
-    }
-
+};    // === FUNÇÕES DE AÇÕES DOS USUÁRIOS (COORDENADORES, ANALISTAS, TODOS USUÁRIOS) ===
+    
     function aprovarUsuario(id) {
-      fetch(`/painel-coordenador/usuarios/aprovar/${id}`, { method: "POST" })
+      if (!confirm("Deseja realmente APROVAR este usuário?")) return;
+      
+      fetch(`/painel-master/acao/aprovar-usuario/${id}`, { method: "POST" })
         .then(res => res.json())
-        .then(() => {
-          alert("Coordenador aprovado com sucesso!");
-          location.reload();
+        .then(data => {
+          alert(data.detail || "Usuário aprovado com sucesso!");
+          location.reload(); // Recarrega a página para atualizar as tabelas
         })
-        .catch(() => alert("Erro ao aprovar o coordenador."));
+        .catch(error => {
+          console.error("Erro ao aprovar usuário:", error);
+          alert("Erro ao aprovar o usuário. Tente novamente.");
+        });
     }
 
     function reprovarUsuario(id) {
-      fetch(`/painel-coordenador/usuarios/reprovar/${id}`, { method: "POST" })
+      if (!confirm("Deseja realmente REPROVAR este usuário?")) return;
+      
+      fetch(`/painel-master/acao/reprovar-usuario/${id}`, { method: "POST" })
         .then(res => res.json())
-        .then(() => {
-          alert("Coordenador reprovado com sucesso!");
-          location.reload();
+        .then(data => {
+          alert(data.detail || "Usuário reprovado com sucesso!");
+          location.reload(); // Recarrega a página para atualizar as tabelas
         })
-        .catch(() => alert("Erro ao reprovar o coordenador."));
+        .catch(error => {
+          console.error("Erro ao reprovar usuário:", error);
+          alert("Erro ao reprovar o usuário. Tente novamente.");
+        });
     }
 
-    function ativarUsuario(id) {
-      fetch(`/painel-master/ativar/${id}`, { method: "POST" })
+    function toggleAtivarUsuario(id, statusAtual) {
+      const acao = statusAtual ? "desativar" : "ativar";
+      const acao_texto = statusAtual ? "DESATIVAR" : "ATIVAR";
+      
+      if (!confirm(`Deseja realmente ${acao_texto} este usuário?`)) return;
+      
+      const endpoint = statusAtual ? 
+        `/painel-master/acao/desativar-usuario/${id}` : 
+        `/painel-master/acao/ativar-usuario/${id}`;
+      
+      fetch(endpoint, { method: "POST" })
         .then(res => res.json())
-        .then(() => {
-          alert("Usuário ativado com sucesso!");
-          location.reload();
+        .then(data => {
+          alert(data.detail || `Usuário ${acao}do com sucesso!`);
+          location.reload(); // Recarrega a página para atualizar as tabelas
         })
-        .catch(() => alert("Erro ao ativar o usuário."));
+        .catch(error => {
+          console.error(`Erro ao ${acao} usuário:`, error);
+          alert(`Erro ao ${acao} o usuário. Tente novamente.`);
+        });
+    }    // === FUNÇÕES PARA PESSOAS FÍSICAS E JURÍDICAS ===
+    
+    function auditoriaPF(id) {
+      fetch(`/painel-master/auditoria/pessoa-fisica/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.detail) {
+            alert(`Erro: ${data.detail}`);
+            return;
+          }
+          
+          // Criar popup de auditoria
+          mostrarPopupAuditoria(data.pessoa_fisica, data.auditoria, 'Pessoa Física');
+        })
+        .catch(error => {
+          console.error('Erro ao buscar auditoria:', error);
+          alert('Erro ao carregar dados de auditoria.');
+        });
     }
+    
+    function exportarPF(id) {
+      mostrarPopupExportacao(id, 'pessoa-fisica');
+    }
+    
+    function auditoriaPJ(id) {
+      fetch(`/painel-master/auditoria/pessoa-juridica/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.detail) {
+            alert(`Erro: ${data.detail}`);
+            return;
+          }
+          
+          // Criar popup de auditoria
+          mostrarPopupAuditoria(data.pessoa_juridica, data.auditoria, 'Pessoa Jurídica');
+        })
+        .catch(error => {
+          console.error('Erro ao buscar auditoria:', error);
+          alert('Erro ao carregar dados de auditoria.');
+        });
+    }
+    
+    function exportarPJ(id) {
+      mostrarPopupExportacao(id, 'pessoa-juridica');
+    }
+
+    // === FUNÇÕES PARA POPUPS ===
+    
+    function mostrarPopupAuditoria(entidade, auditoria, tipo) {
+      const popup = document.createElement('div');
+      popup.id = 'popup-auditoria';
+      popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      
+      const conteudo = document.createElement('div');
+      conteudo.style.cssText = `
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+      `;
+      
+      conteudo.innerHTML = `
+        <h3>📊 Auditoria - ${tipo}</h3>
+        <p><strong>ID:</strong> ${entidade.id}</p>
+        <p><strong>Nome:</strong> ${entidade.nome || entidade.razao_social}</p>
+        <p><strong>CPF/CNPJ:</strong> ${entidade.cpf || entidade.cnpj}</p>
+        
+        <h4>Histórico de Auditoria:</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f0f0f0;">
+              <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Ação</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Usuário</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Data</th>
+              <th style="border: 1px solid #ddd; padding: 8px;">Detalhes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${auditoria.map(item => `
+              <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">${item.id}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${item.acao}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${item.usuario}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${item.data}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">${item.detalhes}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        
+        <div style="text-align: center; margin-top: 20px;">
+          <button onclick="fecharPopup()" style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">Fechar</button>
+        </div>
+      `;
+      
+      popup.appendChild(conteudo);
+      document.body.appendChild(popup);
+    }
+    
+    function mostrarPopupExportacao(id, tipo) {
+      const popup = document.createElement('div');
+      popup.id = 'popup-exportacao';
+      popup.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      `;
+      
+      const conteudo = document.createElement('div');
+      conteudo.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        text-align: center;
+        min-width: 300px;
+      `;
+      
+      conteudo.innerHTML = `
+        <h3>📥 Exportar Dados</h3>
+        <p>Selecione o formato de exportação:</p>
+        
+        <div style="margin: 20px 0;">
+          <button onclick="executarExportacao(${id}, '${tipo}', 'csv')" 
+                  style="margin: 10px; padding: 15px 25px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            📄 CSV
+          </button>
+          <button onclick="executarExportacao(${id}, '${tipo}', 'excel')" 
+                  style="margin: 10px; padding: 15px 25px; background: #2e7d32; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+            📊 Excel
+          </button>
+        </div>
+        
+        <button onclick="fecharPopup()" 
+                style="padding: 10px 20px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+          Cancelar
+        </button>
+      `;
+      
+      popup.appendChild(conteudo);
+      document.body.appendChild(popup);
+    }
+    
+    function executarExportacao(id, tipo, formato) {
+      fecharPopup();
+      
+      fetch(`/painel-master/exportar/${tipo}/${id}/${formato}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.sucesso) {
+            // Simular download do arquivo
+            const blob = new Blob([JSON.stringify(data.dados, null, 2)], {
+              type: formato === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            });
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = data.nome_arquivo;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert(`✅ Arquivo ${data.nome_arquivo} exportado com sucesso!`);
+          } else {
+            alert(`Erro: ${data.detail}`);
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao exportar:', error);
+          alert('Erro ao exportar dados.');
+        });
+    }
+    
+    function fecharPopup() {
+      const popup = document.getElementById('popup-auditoria') || document.getElementById('popup-exportacao');
+      if (popup) {
+        document.body.removeChild(popup);
+      }
+    }
+
+    // === FUNÇÕES PARA BOTÕES DE PESSOAS FÍSICAS ===
+    
+    function adicionarPF() {
+      alert("➕ Adicionar Pessoa Física\n\nFuncionalidade em desenvolvimento.\nEm breve será possível adicionar novos registros.");
+    }
+    
+    function editarPF() {
+      alert("✏️ Editar Pessoa Física\n\nFuncionalidade em desenvolvimento.\nSelecione um registro da tabela e use este botão para editar.");
+    }
+    
+    function salvarPF() {
+      alert("💾 Salvar Pessoa Física\n\nFuncionalidade em desenvolvimento.\nEm breve será possível salvar alterações.");
+    }
+    
+    function apagarPF() {
+      alert("🗑️ Apagar Pessoa Física\n\nFuncionalidade em desenvolvimento.\nSelecione um registro da tabela e use este botão para apagar.");
+    }
+
+    // === FUNÇÕES PARA BOTÕES DE PESSOAS JURÍDICAS ===
+    
+    function adicionarPJ() {
+      alert("➕ Adicionar Pessoa Jurídica\n\nFuncionalidade em desenvolvimento.\nEm breve será possível adicionar novos registros.");
+    }
+    
+    function editarPJ() {
+      alert("✏️ Editar Pessoa Jurídica\n\nFuncionalidade em desenvolvimento.\nSelecione um registro da tabela e use este botão para editar.");
+    }
+    
+    function salvarPJ() {
+      alert("💾 Salvar Pessoa Jurídica\n\nFuncionalidade em desenvolvimento.\nEm breve será possível salvar alterações.");
+    }    
+    function apagarPJ() {
+      alert("🗑️ Apagar Pessoa Jurídica\n\nFuncionalidade em desenvolvimento.\nSelecione um registro da tabela e use este botão para apagar.");
+    }
+
+    // Funções para gerenciar trechos
+    function editarTrecho(id) {
+      alert(`Editar Trecho ID ${id} - Funcionalidade em desenvolvimento`);
+    }
+
+    function visualizarTrecho(id) {
+      alert(`Visualizar Trecho ID ${id} - Funcionalidade em desenvolvimento`);
+    }
+
+    // Funções para controlar navegação das tabelas de elementos rodoviários
+function mostrarTabela(tipo) {
+  // Ocultar todas as tabelas
+  document.querySelectorAll('.tabela-elemento').forEach(el => el.style.display = 'none');
+  
+  // Remover classe selecionado de todos os botões
+  document.querySelectorAll('#container-elementos-rodoviarios .btn-icone').forEach(btn => {
+    if (btn.onclick && btn.onclick.toString().includes('mostrarTabela')) {
+      btn.classList.remove('selecionado');
+    }
+  });
+  
+  // Mostrar tabela selecionada
+  document.getElementById(`tabela-container-${tipo}`).style.display = 'block';
+  
+  // Adicionar classe selecionado ao botão correspondente
+  document.getElementById(`btn-${tipo}`).classList.add('selecionado');
+}
+
+// Funções para gerenciar elementos rodoviários
+function editarTrechoRodoviario(id) {
+  alert(`Editar Trecho Rodoviário ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function visualizarTrechoRodoviario(id) {
+  alert(`Visualizar Trecho Rodoviário ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function editarRodovia(id) {
+  alert(`Editar Rodovia ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function visualizarRodovia(id) {
+  alert(`Visualizar Rodovia ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function editarDispositivo(id) {
+  alert(`Editar Dispositivo ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function visualizarDispositivo(id) {
+  alert(`Visualizar Dispositivo ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function editarObraArte(id) {
+  alert(`Editar Obra de Arte ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+function visualizarObraArte(id) {
+  alert(`Visualizar Obra de Arte ID ${id} - Funcionalidade em desenvolvimento`);
+}
+
+// Funções para ações gerais dos elementos
+function adicionarElemento() {
+  const tipoAtivo = document.querySelector('.tabela-elemento[style*="block"]').id.replace('tabela-container-', '');
+  alert(`Adicionar ${tipoAtivo.replace('-', ' ')} - Funcionalidade em desenvolvimento`);
+}
+
+function editarElemento() {
+  const tipoAtivo = document.querySelector('.tabela-elemento[style*="block"]').id.replace('tabela-container-', '');
+  alert(`Editar ${tipoAtivo.replace('-', ' ')} - Funcionalidade em desenvolvimento`);
+}
+
+function salvarElemento() {
+  const tipoAtivo = document.querySelector('.tabela-elemento[style*="block"]').id.replace('tabela-container-', '');
+  alert(`Salvar ${tipoAtivo.replace('-', ' ')} - Funcionalidade em desenvolvimento`);
+}
+
+function apagarElemento() {
+  const tipoAtivo = document.querySelector('.tabela-elemento[style*="block"]').id.replace('tabela-container-', '');
+  alert(`Apagar ${tipoAtivo.replace('-', ' ')} - Funcionalidade em desenvolvimento`);
+}
   </script>
 <style>
     html, body {
@@ -436,35 +876,77 @@
       display: block;
       width: 100%;
       max-width: 1600px;
-      margin: 0 auto;
+      margin: 0 auto; /* Centraliza se a tela for maior que max-width */
       background: white;
       padding: 2rem;
-      border-radius: 0;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 0; /* Mantido, mas os cards terão o seu */
+      box-shadow: 0 0 15px rgba(0,0,0,0.1); /* Sombra geral do container, se necessário */
     }
 
-    h2 {
+    /* Novo container para os cards */
+    .cards-column-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Espaço entre os cards */
+      padding: 20px; /* Espaçamento ao redor da coluna de cards */
+      max-width: 1600px; /* Mantém a largura máxima consistente */
+      margin: 0 auto; /* Centraliza a coluna de cards */
+    }
+
+    /* Estilo para cada card individual */
+    .info-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      /* O width será 100% do cards-column-container */
+      overflow: hidden; /* Garante que o conteúdo não vaze do card */
+    }
+
+    .info-card h2 {
       color: #003366;
       text-align: center;
-      font-size: 22px;
-    }
-
-    table {
+      font-size: 20px; /* Ajustado para card */
+      margin-top: 0; /* Remove margem superior do h2 dentro do card */
+      margin-bottom: 20px;
+    }    /* Scroll individual para cada tabela dentro dos cards */
+    .tabela-scroll {
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      max-height: 600px; /* Altura máxima para scroll vertical */
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      justify-content: flex-start; /* Alinha à esquerda */
     }
 
-    th, td {
+    /* Garante que as tabelas tenham largura mínima mas não saiam do container */
+    .tabela-scroll table {
+      min-width: 800px;
+      width: max-content;
+      border-collapse: collapse;
+      margin: 0; /* Remove centralização da tabela */
+    }
+
+    /* Remove qualquer overflow dos containers pai */
+    .cards-column-container {
+      overflow: visible;
+    }    th, td {
       padding: 10px;
       border: 1px solid #ccc;
-      text-align: center;
       font-size: 14px;
     }
 
     th {
       background-color: #003366;
       color: white;
+      text-align: center;
+    }
+
+    td {
+      text-align: left;
     }
 
     .btn-acao {
@@ -488,7 +970,6 @@
   color: #003366 !important;
   border: 2px solid #003366 !important;
   }
-
   </style>
 <style>
    html, body {
@@ -497,6 +978,7 @@
       height: 100%;
       font-family: 'Segoe UI', sans-serif;
       background-color: #f0f2f5;
+      overflow-x: hidden; /* Remove scroll horizontal da página */
       overflow-y: auto;
     }
 
@@ -511,49 +993,44 @@
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
 
-    h2 {
+    /* Novo container para os cards */
+    .cards-column-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Espaço entre os cards */
+      padding: 20px; /* Espaçamento ao redor da coluna de cards */
+      max-width: 1600px; /* Mantém a largura máxima consistente */
+      margin: 0 auto; /* Centraliza a coluna de cards */
+    }
+
+    /* Estilo para cada card individual */
+    .info-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      /* O width será 100% do cards-column-container */
+      overflow: hidden; /* Garante que o conteúdo não vaze do card */
+    }
+
+    .info-card h2 {
       color: #003366;
       text-align: center;
-      font-size: 16px;
+      font-size: 20px; /* Ajustado para card */
+      margin-top: 0; /* Remove margem superior do h2 dentro do card */
+      margin-bottom: 20px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-      font-size: 9px;
-    }
-
-    th {
-      background-color: #003366;
-      color: white;
-    }
-
+    /* Scroll individual para cada tabela dentro dos cards */
     .tabela-scroll {
-      overflow-x: auto;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
+      max-height: 600px; /* Altura máxima para scroll vertical */
       width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    .tabela-scroll table {
-      min-width: 1600px;
-    }
-
-    .projeto-selecionado {
-      background-color: #cbe4f9 !important;
-      font-weight: bold;
-      color: #003366 !important;
-      border: 2px solid #003366 !important;
-    }
-
-    #voltar-topo {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }    #voltar-topo {
       position: fixed;
       bottom: 30px;
       right: 30px;
@@ -705,62 +1182,49 @@ button[onclick^="alternarGrupo"].ativo {
   color: #222;
 }
 </style>
+<style>
+.tabela-elemento {
+  margin-top: 20px;
+}
+
+.tabela-elemento h3 {
+  color: #003366;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+#container-elementos-rodoviarios .btn-icone {
+  margin: 0 5px;
+  padding: 8px 12px;
+  font-size: 0.9em;
+}
+
+#container-elementos-rodoviarios .btn-icone.selecionado {
+  background-color: #003366;
+  color: white;
+}
+</style>
 </head>
 <body>
 <!-- Cabeçalho institucional FAD -->
-<header class="fad-header">
-  <div class="logout" style="position:absolute;top:10px;right:20px;z-index:10;">
-    <form action="/login/logout" method="post">
-      <button type="submit">Sair</button>
-    </form>
-  </div>
-  <div style="text-align:center;">
-    <img src="/static/images/fad_logo_banco_completo1.png"
-         alt="FAD - Ferramenta de Análise Dinamizada"
-         class="logo-fad"
-         style="margin: 0 auto; display: block; cursor:pointer;"
-         onclick="window.location.href='/'">
-  </div>
-</header>
+{% include "componentes/fad_header.html" %}
 
 <div style="text-align:center; margin-top: 24px; margin-bottom: 0;">
   <div class="painel-master-titulo" style="font-family: 'Segoe UI', sans-serif; font-size: 25px; color: #003366; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0;">PAINEL MASTER</div>
   <div class="boas-vindas">
-  <h2>
-    Bem-vindo(a), {{ usuario.nome.split(' ')[0] }}
-  </h2>
-  <h3 id="data-hoje" style="font-family: 'Segoe UI', sans-serif; font-size: 18px; color: #333; margin-bottom: 15px;"></h3>
-</div>
+    <h2>
+      Bem-vindo(a), {{ usuario.nome.split(' ')[0] }}
+    </h2>
+    <h3 id="data-hoje" style="font-family: 'Segoe UI', sans-serif; font-size: 18px; color: #333; margin-bottom: 15px;"></h3>
+  </div>
 </div>
 
-<!-- Bloco de status de sessão -->
-<div id="session-status" style="background:#e3f2fd;color:#003366;padding:10px 0;text-align:center;font-size:17px;font-weight:bold;letter-spacing:0.5px;">
+<!-- Bloco de status de sessão removido -->
+<!-- <div id="session-status" style="background:#e3f2fd;color:#003366;padding:10px 0;text-align:center;font-size:17px;font-weight:bold;letter-spacing:0.5px;">
   Usuário logado: {{ usuario.nome }} |
   Tempo restante da sessão: <span id="session-timer"></span>
-</div>
-
-<script>
-window.addEventListener("DOMContentLoaded", function() {
-  var tempoRestante = parseInt("{{ tempo_restante|default(0) }}");
-  var timerEl = document.getElementById('session-timer');
-  function formatarTempo(segundos) {
-    var min = Math.floor(segundos/60);
-    var seg = segundos%60;
-    return (min < 10 ? '0' : '') + min + ':' + (seg < 10 ? '0' : '') + seg;
-  }
-  function atualizarTimer() {
-    if (tempoRestante <= 0) {
-      timerEl.textContent = '00:00';
-      window.location.href = '/login';
-      return;
-    }
-    timerEl.textContent = formatarTempo(tempoRestante);
-    tempoRestante--;
-    setTimeout(atualizarTimer, 1000);
-  }
-  if (timerEl) atualizarTimer();
-});
-</script>
+</div> -->
 
 <div class="menu-horizontal">
 <ul class="menu-principal">
@@ -797,333 +1261,477 @@ window.addEventListener("DOMContentLoaded", function() {
 </ul>
 </li>
 <li class="link-scroll"><a href="#container-admin">Coordenadores</a></li>
-<li class="link-scroll"><a href="#container-usuarios">Usuários</a></li>
+<li class="link-scroll"><a href="#container-usuarios">Analistas</a></li>
+<li class="link-scroll"><a href="#container-todos-usuarios">Todos Usuários</a></li>
 <li class="link-scroll"><a href="#container-projetos">Projetos</a></li>
+<li class="link-scroll"><a href="#container-elementos-rodoviarios">Elementos Rodoviários</a></li>
 <li><a href="/meus-dados" style="font-weight:bold;color:#003366;">Meus Dados</a></li>
 </ul>
 </div>
-<div class="painel-container" id="container-admin">
-  <h2>Coordenadores</h2>
-  <div id="abas-admins" style="text-align:center;margin:20px 0;">
-    <button id="btn-mostrar-tudo-admins" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
-    <button id="btn-grupo-profissionais-admins" class="btn-icone" title="Profissionais"><i class="fa-solid fa-user-tie"></i></button>
-    <button id="btn-grupo-sistema-admins" class="btn-icone" title="Sistema"><i class="fa-solid fa-gears"></i></button>
-    <button id="btn-ocultar-tudo-admins" class="btn-icone" title="Ocultar Tudo"><i class="fa-solid fa-eye-slash"></i></button>
-  </div>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th colspan="6" style="background:#e3f2fd; color:#003366; font-weight:bold;">Dados Pessoais</th>
-          <th colspan="13" class="grupo-header grupo-profissionais-admins" id="grupo-profissionais-admins" style="background:#e8f5e9; color:#003366; font-weight:bold;">Profissionais</th>
-          <th colspan="5" class="grupo-header grupo-sistema-admins" id="grupo-sistema-admins" style="background:#fff8e1; color:#003366; font-weight:bold;">Sistema</th>
-        </tr>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Pessoa Física ID</th>
-          <th>Instituição</th>
-          <th>Tipo Lotação</th>
-          <th>Email Institucional</th>
-          <th>Telefone Institucional</th>
-          <th>Ramal</th>
-          <th>Sede Hierarquia</th>
-          <th>Sede Coordenadoria</th>
-          <th>Sede Setor</th>
-          <th>Sede Assistência</th>
-          <th>Regional Nome</th>
-          <th>Regional Coordenadoria</th>
-          <th>Regional Setor</th>
-          <th>Criado em</th>
-          <th>Aprovado em</th>
-          <th>Aprovador ID</th>
-          <th>Status</th>
-          <th>Ativo</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-admins"></tbody>
-    </table>
-  </div>
-  <!-- Removidos botões editar, salvar, apagar -->
-</div>
 
-<div class="painel-container" id="container-usuarios">
-  <h2>Usuários Comuns</h2>
-  <div id="abas-usuarios" style="text-align:center;margin:20px 0;">
-    <button id="btn-mostrar-tudo-usuarios" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
-    <button id="btn-grupo-profissionais-usuarios" class="btn-icone" title="Profissionais"><i class="fa-solid fa-user-tie"></i></button>
-    <button id="btn-grupo-sistema-usuarios" class="btn-icone" title="Sistema"><i class="fa-solid fa-gears"></i></button>
-    <button id="btn-ocultar-tudo-usuarios" class="btn-icone" title="Ocultar Tudo"><i class="fa-solid fa-eye-slash"></i></button>
-  </div>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th colspan="6" style="background:#e3f2fd; color:#003366; font-weight:bold;">Dados Pessoais</th>
-          <th colspan="13" class="grupo-header grupo-profissionais-usuarios" id="grupo-profissionais-usuarios" style="background:#e8f5e9; color:#003366; font-weight:bold;">Profissionais</th>
-          <th colspan="5" class="grupo-header grupo-sistema-usuarios" id="grupo-sistema-usuarios" style="background:#fff8e1; color:#003366; font-weight:bold;">Sistema</th>
-        </tr>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Pessoa Física ID</th>
-          <th>Instituição</th>
-          <th>Tipo Lotação</th>
-          <th>Email Institucional</th>
-          <th>Telefone Institucional</th>
-          <th>Ramal</th>
-          <th>Sede Hierarquia</th>
-          <th>Sede Coordenadoria</th>
-          <th>Sede Setor</th>
-          <th>Sede Assistência</th>
-          <th>Regional Nome</th>
-          <th>Regional Coordenadoria</th>
-          <th>Regional Setor</th>
-          <th>Criado em</th>
-          <th>Aprovado em</th>
-          <th>Aprovador ID</th>
-          <th>Status</th>
-          <th>Ativo</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-usuarios"></tbody>
-    </table>
-  </div>
-  <!-- Removidos botões editar, salvar, apagar -->
-</div>
+<!-- NOVO CONTAINER PARA OS CARDS -->
+<div class="cards-column-container">
 
-<div class="painel-container" id="container-projetos">
-  <h2>Projetos</h2>
-  <div id="abas-projetos" style="text-align:center;margin:20px 0;">
-    <button id="btn-mostrar-tudo-projetos" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
-    <button id="btn-grupo-geometria" onclick="alternarGrupoProjetos('geometria')" class="btn-icone" title="Geometria"><i class="fa-solid fa-draw-polygon"></i></button>
-    <button id="btn-grupo-ca" onclick="alternarGrupoProjetos('ca')" class="btn-icone" title="Conformidade Ambiental (CA)"><i class="fa-solid fa-leaf"></i></button>
-    <button id="btn-grupo-ifm" onclick="alternarGrupoProjetos('ifm')" class="btn-icone" title="Multicritério (IFM)"><i class="fa-solid fa-layer-group"></i></button>
-    <button id="btn-grupo-ifs" onclick="alternarGrupoProjetos('ifs')" class="btn-icone" title="Socioeconômico (IFS)"><i class="fa-solid fa-users"></i></button>
-    <button id="btn-grupo-iqi" onclick="alternarGrupoProjetos('iqi')" class="btn-icone" title="Infraestrutural (IQI)"><i class="fa-solid fa-industry"></i></button>
-    <button id="btn-esconder-tudo-projetos" class="btn-icone" title="Esconder Tudo"><i class="fa-solid fa-eye-slash"></i></button>
+  <div class="info-card" id="container-admin">
+    <h2>Coordenadores</h2>
+    <div id="abas-admins" style="text-align:center;margin:20px 0;">
+      <button id="btn-mostrar-tudo-admins" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
+      <button id="btn-grupo-profissionais-admins" class="btn-icone" title="Profissionais"><i class="fa-solid fa-user-tie"></i></button>
+      <button id="btn-grupo-sistema-admins" class="btn-icone" title="Sistema"><i class="fa-solid fa-gears"></i></button>
+      <button id="btn-ocultar-tudo-admins" class="btn-icone" title="Ocultar Tudo"><i class="fa-solid fa-eye-slash"></i></button>
+    </div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="6" style="background:#e3f2fd; color:#003366; font-weight:bold;">Dados Pessoais</th>
+            <th colspan="13" class="grupo-header grupo-profissionais-admins" id="grupo-profissionais-admins" style="background:#e8f5e9; color:#003366; font-weight:bold;">Profissionais</th>
+            <th colspan="5" class="grupo-header grupo-sistema-admins" id="grupo-sistema-admins" style="background:#fff8e1; color:#003366; font-weight:bold;">Sistema</th>
+          </tr>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Pessoa Física ID</th>
+            <th>Instituição</th>
+            <th>Tipo Lotação</th>
+            <th>Email Institucional</th>
+            <th>Telefone Institucional</th>
+            <th>Ramal</th>
+            <th>Sede Hierarquia</th>
+            <th>Sede Coordenadoria</th>
+            <th>Sede Setor</th>
+            <th>Sede Assistência</th>
+            <th>Regional Nome</th>
+            <th>Regional Coordenadoria</th>
+            <th>Regional Setor</th>
+            <th>Criado em</th>
+            <th>Aprovado em</th>
+            <th>Aprovador ID</th>
+            <th>Status</th>
+            <th>Ativo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-admins"></tbody>
+      </table>
+    </div>
+    <!-- Removidos botões editar, salvar, apagar -->
   </div>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th colspan="15" style="background-color: #003366; color: white;">
+
+  <div class="info-card" id="container-usuarios">
+    <h2>Analistas</h2>
+    <div id="abas-usuarios" style="text-align:center;margin:20px 0;">
+      <button id="btn-mostrar-tudo-usuarios" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
+      <button id="btn-grupo-profissionais-usuarios" class="btn-icone" title="Profissionais"><i class="fa-solid fa-user-tie"></i></button>
+      <button id="btn-grupo-sistema-usuarios" class="btn-icone" title="Sistema"><i class="fa-solid fa-gears"></i></button>
+      <button id="btn-ocultar-tudo-usuarios" class="btn-icone" title="Ocultar Tudo"><i class="fa-solid fa-eye-slash"></i></button>
+    </div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="6" style="background:#e3f2fd; color:#003366; font-weight:bold;">Dados Pessoais</th>
+            <th colspan="13" class="grupo-header grupo-profissionais-usuarios" id="grupo-profissionais-usuarios" style="background:#e8f5e9; color:#003366; font-weight:bold;">Profissionais</th>
+            <th colspan="5" class="grupo-header grupo-sistema-usuarios" id="grupo-sistema-usuarios" style="background:#fff8e1; color:#003366; font-weight:bold;">Sistema</th>
+          </tr>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Pessoa Física ID</th>
+            <th>Instituição</th>
+            <th>Tipo Lotação</th>
+            <th>Email Institucional</th>
+            <th>Telefone Institucional</th>
+            <th>Ramal</th>
+            <th>Sede Hierarquia</th>
+            <th>Sede Coordenadoria</th>
+            <th>Sede Setor</th>
+            <th>Sede Assistência</th>
+            <th>Regional Nome</th>
+            <th>Regional Coordenadoria</th>
+            <th>Regional Setor</th>
+            <th>Criado em</th>
+            <th>Aprovado em</th>
+            <th>Aprovador ID</th>
+            <th>Status</th>
+            <th>Ativo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-usuarios"></tbody>
+      </table>
+    </div>
+    <!-- Removidos botões editar, salvar, apagar -->
+  </div>
+
+  <div class="info-card" id="container-todos-usuarios">
+    <h2>Todos os Usuários</h2>
+    <div id="abas-todos-usuarios" style="text-align:center;margin:20px 0;">
+      <button id="btn-mostrar-tudo-todos-usuarios" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
+      <button id="btn-grupo-profissionais-todos-usuarios" class="btn-icone" title="Profissionais"><i class="fa-solid fa-user-tie"></i></button>
+      <button id="btn-grupo-sistema-todos-usuarios" class="btn-icone" title="Sistema"><i class="fa-solid fa-gears"></i></button>
+      <button id="btn-ocultar-tudo-todos-usuarios" class="btn-icone" title="Ocultar Tudo"><i class="fa-solid fa-eye-slash"></i></button>
+    </div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="6" style="background:#e3f2fd; color:#003366; font-weight:bold;">Dados Pessoais</th>
+            <th colspan="13" class="grupo-header grupo-profissionais-todos-usuarios" id="grupo-profissionais-todos-usuarios" style="background:#e8f5e9; color:#003366; font-weight:bold;">Profissionais</th>
+            <th colspan="5" class="grupo-header grupo-sistema-todos-usuarios" id="grupo-sistema-todos-usuarios" style="background:#fff8e1; color:#003366; font-weight:bold;">Sistema</th>
+          </tr>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Pessoa Física ID</th>
+            <th>Instituição</th>
+            <th>Tipo Lotação</th>
+            <th>Email Institucional</th>
+            <th>Telefone Institucional</th>
+            <th>Ramal</th>
+            <th>Sede Hierarquia</th>
+            <th>Sede Coordenadoria</th>
+            <th>Sede Setor</th>
+            <th>Sede Assistência</th>
+            <th>Regional Nome</th>
+            <th>Regional Coordenadoria</th>
+            <th>Regional Setor</th>
+            <th>Criado em</th>
+            <th>Aprovado em</th>
+            <th>Aprovador ID</th>
+            <th>Tipo</th>
+            <th>Status</th>
+            <th>Ativo</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-todos-usuarios"></tbody>
+      </table>
+    </div>
+    <!-- Removidos botões editar, salvar, apagar -->
+  </div>
+
+  <div class="info-card" id="container-projetos">
+    <h2>Projetos</h2>
+    <div id="abas-projetos" style="text-align:center;margin:20px 0;">
+      <button id="btn-mostrar-tudo-projetos" class="btn-icone" title="Mostrar Tudo"><i class="fa-solid fa-table-list"></i></button>
+      <button id="btn-grupo-geometria" onclick="alternarGrupoProjetos('geometria')" class="btn-icone" title="Geometria"><i class="fa-solid fa-draw-polygon"></i></button>
+      <button id="btn-grupo-ca" onclick="alternarGrupoProjetos('ca')" class="btn-icone" title="Conformidade Ambiental (CA)"><i class="fa-solid fa-leaf"></i></button>
+      <button id="btn-grupo-ifm" onclick="alternarGrupoProjetos('ifm')" class="btn-icone" title="Multicritério (IFM)"><i class="fa-solid fa-layer-group"></i></button>
+      <button id="btn-grupo-ifs" onclick="alternarGrupoProjetos('ifs')" class="btn-icone" title="Socioeconômico (IFS)"><i class="fa-solid fa-users"></i></button>
+      <button id="btn-grupo-iqi" onclick="alternarGrupoProjetos('iqi')" class="btn-icone" title="Infraestrutural (IQI)"><i class="fa-solid fa-industry"></i></button>
+      <button id="btn-esconder-tudo-projetos" class="btn-icone" title="Esconder Tudo"><i class="fa-solid fa-eye-slash"></i></button>
+    </div>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="15" style="background-color: #003366; color: white;">
         Informações Gerais do Projeto
        </th>
-          <th class="grupo-header grupo-geometria" colspan="3" id="grupo-geometria" style="background:#e0f7fa; font-weight:bold; color:#003;">
+            <th class="grupo-header grupo-geometria" colspan="3" id="grupo-geometria" style="background:#e0f7fa; font-weight:bold; color:#003;">
         Geometria
        </th>
-          <th class="grupo-header grupo-ca" colspan="2" id="grupo-ca" style="background:#e8f5e9; font-weight:bold; color:#003;">
+            <th class="grupo-header grupo-ca" colspan="2" id="grupo-ca" style="background:#e8f5e9; font-weight:bold; color:#003;">
         Conformidade Ambiental (CA)
        </th>
-          <th class="grupo-header grupo-ifm" colspan="3" id="grupo-ifm" style="background:#fff8e1; font-weight:bold; color:#003;">
+            <th class="grupo-header grupo-ifm" colspan="3" id="grupo-ifm" style="background:#fff8e1; font-weight:bold; color:#003;">
         Favorabilidade Multicritério (IFM)
        </th>
-          <th class="grupo-header grupo-ifs" colspan="3" id="grupo-ifs" style="background:#f3e5f5; font-weight:bold; color:#003;">
+            <th class="grupo-header grupo-ifs" colspan="3" id="grupo-ifs" style="background:#f3e5f5; font-weight:bold; color:#003;">
         Favorabilidade Socioeconômica (IFS)
        </th>
-          <th class="grupo-header grupo-iqi" colspan="3" id="grupo-iqi" style="background:#e0f2f1; font-weight:bold; color:#003;">
+            <th class="grupo-header grupo-iqi" colspan="3" id="grupo-iqi" style="background:#e0f2f1; font-weight:bold; color:#003;">
         Favorabilidade Infraestrutural (IQI)
        </th>
-        </tr>
-        <tr>
-          <th style="background-color: #e3f2fd; color: #003366;">
+          </tr>
+          <tr>
+            <th style="background-color: #e3f2fd; color: #003366;">
         Id
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Nome
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Interessado
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         CNPJ
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Representante legal
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         CPF
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         E-mail
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Telefone
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Trecho
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Município / UF
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Extensão
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Extensão calculada
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Analista responsável
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Criado em
        </th>
-          <th style="background-color: #e3f2fd; color: #003366;">
+            <th style="background-color: #e3f2fd; color: #003366;">
         Situação do projeto
        </th>
-          <th style="background:#e0f7fa; color:#003;">
+            <th style="background:#e0f7fa; color:#003;">
         Situação do upload
        </th>
-          <th style="background:#e0f7fa; color:#003;">
+            <th style="background:#e0f7fa; color:#003;">
         Situação da geometria
        </th>
-          <th style="background:#e0f7fa; color:#003;">
+            <th style="background:#e0f7fa; color:#003;">
         Validada em
        </th>
-          <th style="background:#e8f5e9; color:#003;">
+            <th style="background:#e8f5e9; color:#003;">
         Situação da CA
        </th>
-          <th style="background:#e8f5e9; color:#003;">
+            <th style="background:#e8f5e9; color:#003;">
         CA aprovada em
        </th>
-          <th style="background:#fff8e1; color:#003;">
+            <th style="background:#fff8e1; color:#003;">
         Situação do IFM
        </th>
-          <th style="background:#fff8e1; color:#003;">
+            <th style="background:#fff8e1; color:#003;">
         IFM trecho
        </th>
-          <th style="background:#fff8e1; color:#003;">
+            <th style="background:#fff8e1; color:#003;">
         IFM aprovado em
        </th>
-          <th style="background:#f3e5f5; color:#003;">
+            <th style="background:#f3e5f5; color:#003;">
         Situação do IFS
        </th>
-          <th style="background:#f3e5f5; color:#003;">
+            <th style="background:#f3e5f5; color:#003;">
         IFS trecho
        </th>
-          <th style="background:#f3e5f5; color:#003;">
+            <th style="background:#f3e5f5; color:#003;">
         IFS aprovado em
        </th>
-          <th style="background:#e0f2f1; color:#003;">
+            <th style="background:#e0f2f1; color:#003;">
         Situação do IQI
        </th>
-          <th style="background:#e0f2f1; color:#003;">
+            <th style="background:#e0f2f1; color:#003;">
         IQI trecho
        </th>
-          <th style="background:#e0f2f1; color:#003;">
+            <th style="background:#e0f2f1; color:#003;">
         IQI aprovado em
        </th>
-        </tr>
-      </thead>
-      <tbody id="tabela-projetos">
-      </tbody>
-    </table>
+          </tr>
+        </thead>
+        <tbody id="tabela-projetos">
+        </tbody>
+      </table>
+    </div>
+    <!-- Removidos botões editar, salvar, apagar -->
   </div>
-  <!-- Removidos botões editar, salvar, apagar -->
-</div>
 
-<div class="painel-container" id="container-pessoa-fisica">
-  <h2>Pessoa Física</h2>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Rua</th>
-          <th>Número</th>
-          <th>Complemento</th>
-          <th>Bairro</th>
-          <th>CEP</th>
-          <th>Cidade</th>
-          <th>UF</th>
-          <th>Criado em</th>
-          <th>Atualizado em</th>
-          <th>Auditoria</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-pessoa-fisica"></tbody>
-    </table>
-  </div>
-  <div style="text-align:center; margin-top:10px;">
-    <button class="btn-icone" title="Auditoria" onclick="selecionarBotao('container-pessoa-fisica', this)"><i class="fa-solid fa-magnifying-glass-chart"></i></button>
-    <button class="btn-icone" title="Salvar" onclick="selecionarBotao('container-pessoa-fisica', this)"><i class="fa-solid fa-floppy-disk"></i></button>
-    <button class="btn-icone" title="Apagar" onclick="selecionarBotao('container-pessoa-fisica', this)"><i class="fa-solid fa-trash"></i></button>
-    <button class="btn-icone" title="Desfazer Seleção" onclick="selecionarBotao('container-pessoa-fisica', this)"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-</div>
+  <div class="info-card" id="container-pessoas-fisicas">
+    <h2>Pessoas Físicas Cadastradas</h2>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Rua</th>
+            <th>Número</th>
+            <th>Complemento</th>
+            <th>Bairro</th>
+            <th>CEP</th>
+            <th>Cidade</th>
+            <th>UF</th>
+            <th>Criado em</th>
+            <th>Atualizado em</th>
+            <th>Auditoria</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-pessoa-fisica"></tbody>      </table>
+    </div>
 
-<div class="painel-container" id="container-pessoa-juridica">
-  <h2>Pessoa Jurídica</h2>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Razão Social</th>
-          <th>CNPJ</th>
-          <th>Nome Fantasia</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Celular</th>
-          <th>Rua</th>
-          <th>Número</th>
-          <th>Complemento</th>
-          <th>Bairro</th>
-          <th>CEP</th>
-          <th>Cidade</th>
-          <th>UF</th>
-          <th>Criado em</th>
-          <th>Atualizado em</th>
-          <th>Auditoria</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-pessoa-juridica"></tbody>
-    </table>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn-icone" title="Adicionar" onclick="adicionarPF()"><i class="fa-solid fa-plus"></i></button>
+      <button class="btn-icone" title="Editar" onclick="editarPF()"><i class="fa-solid fa-edit"></i></button>
+      <button class="btn-icone" title="Salvar" onclick="salvarPF()"><i class="fa-solid fa-floppy-disk"></i></button>
+      <button class="btn-icone" title="Apagar" onclick="apagarPF()"><i class="fa-solid fa-trash"></i></button>
+    </div>
   </div>
-  <div style="text-align:center; margin-top:10px;">
-    <button class="btn-icone" title="Auditoria" onclick="selecionarBotao('container-pessoa-juridica', this)"><i class="fa-solid fa-magnifying-glass-chart"></i></button>
-    <button class="btn-icone" title="Salvar" onclick="selecionarBotao('container-pessoa-juridica', this)"><i class="fa-solid fa-floppy-disk"></i></button>
-    <button class="btn-icone" title="Apagar" onclick="selecionarBotao('container-pessoa-juridica', this)"><i class="fa-solid fa-trash"></i></button>
-    <button class="btn-icone" title="Desfazer Seleção" onclick="selecionarBotao('container-pessoa-juridica', this)"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-</div>
 
-<div class="painel-container" id="container-elemento-rodoviario">
-  <h2>Elemento Rodoviário</h2>
-  <div class="tabela-scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Código</th>
-          <th>Denominação</th>
-          <th>Município</th>
-          <th>Auditoria</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-elemento-rodoviario"></tbody>
-    </table>
+  <div class="info-card" id="container-pessoas-juridicas">
+    <h2>Pessoas Jurídicas Cadastradas</h2>
+    <div class="tabela-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Razão Social</th>
+            <th>CNPJ</th>
+            <th>Nome Fantasia</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Celular</th>
+            <th>Rua</th>
+            <th>Número</th>
+            <th>Complemento</th>
+            <th>Bairro</th>
+            <th>CEP</th>
+            <th>Cidade</th>
+            <th>UF</th>
+            <th>Criado em</th>
+            <th>Atualizado em</th>
+            <th>Auditoria</th>
+          </tr>
+        </thead>        <tbody id="tabela-pessoa-juridica"></tbody>      </table>
+    </div>
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn-icone" title="Adicionar" onclick="adicionarPJ()"><i class="fa-solid fa-plus"></i></button>
+      <button class="btn-icone" title="Editar" onclick="editarPJ()"><i class="fa-solid fa-edit"></i></button>
+      <button class="btn-icone" title="Salvar" onclick="salvarPJ()"><i class="fa-solid fa-floppy-disk"></i></button>
+      <button class="btn-icone" title="Apagar" onclick="apagarPJ()"><i class="fa-solid fa-trash"></i></button>
+    </div>
   </div>
-  <div style="text-align:center; margin-top:10px;">
-    <button class="btn-icone" title="Auditoria" onclick="selecionarBotao('container-elemento-rodoviario', this)"><i class="fa-solid fa-magnifying-glass-chart"></i></button>
-    <button class="btn-icone" title="Salvar" onclick="selecionarBotao('container-elemento-rodoviario', this)"><i class="fa-solid fa-floppy-disk"></i></button>
-    <button class="btn-icone" title="Apagar" onclick="selecionarBotao('container-elemento-rodoviario', this)"><i class="fa-solid fa-trash"></i></button>
-    <button class="btn-icone" title="Desfazer Seleção" onclick="selecionarBotao('container-elemento-rodoviario', this)"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-</div>
+
+  <div class="info-card" id="container-elementos-rodoviarios">
+    <h2>Elementos Rodoviários</h2>
+    
+    <!-- Navegação entre as tabelas -->
+    <div style="text-align:center; margin:20px 0;">
+      <button id="btn-trecho-rodoviario" class="btn-icone selecionado" onclick="mostrarTabela('trecho-rodoviario')" title="Trecho Rodoviário">
+        <i class="fa-solid fa-road"></i> Trechos
+      </button>
+      <button id="btn-rodovia" class="btn-icone" onclick="mostrarTabela('rodovia')" title="Rodovia">
+        <i class="fa-solid fa-highway"></i> Rodovias
+      </button>
+      <button id="btn-dispositivo" class="btn-icone" onclick="mostrarTabela('dispositivo')" title="Dispositivo">
+        <i class="fa-solid fa-cogs"></i> Dispositivos
+      </button>
+      <button id="btn-obra-arte" class="btn-icone" onclick="mostrarTabela('obra-arte')" title="Obra de Arte">
+        <i class="fa-solid fa-bridge-water"></i> Obras de Arte
+      </button>
+    </div>    <!-- Tabela Trecho Rodoviário -->
+    <div id="tabela-container-trecho-rodoviario" class="tabela-elemento">
+      <h3>Trechos Rodoviários</h3>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Denominação</th>
+              <th>Tipo</th>
+              <th>Município</th>
+              <th>Extensão (km)</th>
+              <th>Criado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-trecho-rodoviario"></tbody>
+        </table>
+      </div>
+    </div>    <!-- Tabela Rodovia -->
+    <div id="tabela-container-rodovia" class="tabela-elemento" style="display:none;">
+      <h3>Rodovias</h3>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Denominação</th>
+              <th>Tipo</th>
+              <th>Município</th>
+              <th>Extensão (km)</th>
+              <th>Criado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-rodovia"></tbody>
+        </table>
+      </div>
+    </div>    <!-- Tabela Dispositivo -->
+    <div id="tabela-container-dispositivo" class="tabela-elemento" style="display:none;">
+      <h3>Dispositivos</h3>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Denominação</th>
+              <th>Tipo</th>
+              <th>Município</th>
+              <th>Extensão (km)</th>
+              <th>Criado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-dispositivo"></tbody>
+        </table>
+      </div>
+    </div>    <!-- Tabela Obra de Arte -->
+    <div id="tabela-container-obra-arte" class="tabela-elemento" style="display:none;">
+      <h3>Obras de Arte</h3>
+      <div class="tabela-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Código</th>
+              <th>Denominação</th>
+              <th>Tipo</th>
+              <th>Município</th>
+              <th>Extensão (km)</th>
+              <th>Criado em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-obra-arte"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn-icone" title="Adicionar" onclick="adicionarElemento()"><i class="fa-solid fa-plus"></i></button>
+      <button class="btn-icone" title="Editar" onclick="editarElemento()"><i class="fa-solid fa-edit"></i></button>
+      <button class="btn-icone" title="Salvar" onclick="salvarElemento()"><i class="fa-solid fa-floppy-disk"></i></button>
+      <button class="btn-icone" title="Apagar" onclick="apagarElemento()"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  </div> <!-- Fim do container-elementos-rodoviarios -->
+
+</div> <!-- FIM DO cards-column-container -->
+
+<button id="voltar-topo" title="Voltar ao topo" style="display: none;">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>
 <script>
 // Lógica de alternância independente para grupos de colunas no container de projetos
 const gruposProjetosAtivos = {
@@ -1199,13 +1807,6 @@ function alternarGrupoAdmins(grupo) {
   const btn = document.getElementById(btnId);
   if (gruposAdminsAtivos[grupo]) {
     btn.classList.add('selecionado');
-    cols.forEach(idx => {
-      document.querySelectorAll('#container-admin table tr th:nth-child('+(idx+1)+'), #container-admin table tr td:nth-child('+(idx+1)+')').forEach(el => el.style.display = '');
-    });
-    const header = document.getElementById(headerId);
-    if(header) header.style.display = '';
-  } else {
-    btn.classList.remove('selecionado');
     cols.forEach(idx => {
       document.querySelectorAll('#container-admin table tr th:nth-child('+(idx+1)+'), #container-admin table tr td:nth-child('+(idx+1)+')').forEach(el => { el.style.display = 'none'; });
     });
@@ -1300,10 +1901,12 @@ fetch("/cadastro/pfs/json")
         <td>${pf.bairro || ''}</td>
         <td>${formatarCEP ? formatarCEP(pf.cep) : pf.cep || ''}</td>
         <td>${pf.cidade || ''}</td>
-        <td>${pf.uf || ''}</td>
-        <td>${formatarDataHora ? formatarDataHora(pf.criado_em) : pf.criado_em || ''}</td>
+        <td>${pf.uf || ''}</td>        <td>${formatarDataHora ? formatarDataHora(pf.criado_em) : pf.criado_em || ''}</td>
         <td>${formatarDataHora ? formatarDataHora(pf.atualizado_em) : pf.atualizado_em || ''}</td>
-        <td><button class="btn-icone" title="Auditoria" onclick="auditarPessoaFisica(${pf.id})"><i class="fa-solid fa-magnifying-glass-chart"></i></button></td>
+        <td>
+          <button class="btn-icone" title="Auditoria/Relatório" onclick="auditoriaPF(${pf.id})"><i class="fa-solid fa-magnifying-glass-chart"></i></button>
+          <button class="btn-icone" title="Exportar Dados" onclick="exportarPF(${pf.id})"><i class="fa-solid fa-download"></i></button>
+        </td>
       `;
       tabelaPF.appendChild(linha);
     });
@@ -1331,10 +1934,12 @@ fetch("/cadastro/pjs/json")
         <td>${pj.bairro || ''}</td>
         <td>${formatarCEP ? formatarCEP(pj.cep) : pj.cep || ''}</td>
         <td>${pj.cidade || ''}</td>
-        <td>${pj.uf || ''}</td>
-        <td>${formatarDataHora ? formatarDataHora(pj.criado_em) : pj.criado_em || ''}</td>
+        <td>${pj.uf || ''}</td>        <td>${formatarDataHora ? formatarDataHora(pj.criado_em) : pj.criado_em || ''}</td>
         <td>${formatarDataHora ? formatarDataHora(pj.atualizado_em) : pj.atualizado_em || ''}</td>
-        <td><button class="btn-icone" title="Auditoria" onclick="auditarPessoaJuridica(${pj.id})"><i class="fa-solid fa-magnifying-glass-chart"></i></button></td>
+        <td>
+          <button class="btn-icone" title="Auditoria/Relatório" onclick="auditoriaPJ(${pj.id})"><i class="fa-solid fa-magnifying-glass-chart"></i></button>
+          <button class="btn-icone" title="Exportar Dados" onclick="exportarPJ(${pj.id})"><i class="fa-solid fa-download"></i></button>
+        </td>
       `;
       tabelaPJ.appendChild(linha);
     });
@@ -1359,14 +1964,208 @@ fetch("/cadastro/trechos/json")
     });
   });
 
-function auditarPessoaFisica(id) {
-  alert(`Abrir auditoria da Pessoa Física ID ${id}`);
+// Carregar Trechos Rodoviários
+fetch("/painel-master/dados/trechos-estadualizacao")
+  .then(res => res.json())
+  .then(trechos => {
+    const tabela = document.getElementById("tabela-trecho-rodoviario");
+    if (!tabela) return;
+    tabela.innerHTML = "";
+    trechos.forEach(trecho => {
+      const linha = document.createElement("tr");
+      linha.innerHTML = `
+        <td>${trecho.id}</td>
+        <td>${trecho.codigo}</td>
+        <td>${trecho.denominacao}</td>
+        <td>${trecho.tipo || ''}</td>
+        <td>${trecho.municipio || ''}</td>
+        <td>${trecho.extensao_km || ''}</td>
+        <td>${trecho.criado_em}</td>
+        <td>
+          <button class="btn-icone" title="Editar" onclick="editarTrechoRodoviario(${trecho.id})"><i class="fa-solid fa-edit"></i></button>
+          <button class="btn-icone" title="Visualizar" onclick="visualizarTrechoRodoviario(${trecho.id})"><i class="fa-solid fa-eye"></i></button>
+        </td>
+      `;
+      tabela.appendChild(linha);
+    });
+  })
+  .catch(error => console.error("Erro ao carregar trechos rodoviários:", error));
+
+// Carregar Rodovias
+fetch("/painel-master/dados/rodovias")
+  .then(res => res.json())
+  .then(rodovias => {    const tabela = document.getElementById("tabela-rodovia");
+    if (!tabela) return;
+    tabela.innerHTML = "";
+    rodovias.forEach(rodovia => {
+      const linha = document.createElement("tr");
+      linha.innerHTML = `
+        <td>${rodovia.id}</td>
+        <td>${rodovia.codigo}</td>
+        <td>${rodovia.denominacao}</td>
+        <td>${rodovia.tipo}</td>
+        <td>${rodovia.municipio || ''}</td>
+        <td>${rodovia.extensao_km || ''}</td>
+        <td>${rodovia.criado_em}</td>
+        <td>
+          <button class="btn-icone" title="Editar" onclick="editarRodovia(${rodovia.id})"><i class="fa-solid fa-edit"></i></button>
+          <button class="btn-icone" title="Visualizar" onclick="visualizarRodovia(${rodovia.id})"><i class="fa-solid fa-eye"></i></button>
+        </td>
+      `;
+      tabela.appendChild(linha);
+    });
+  })
+  .catch(error => console.error("Erro ao carregar rodovias:", error));
+
+// Carregar Dispositivos
+fetch("/painel-master/dados/dispositivos")
+  .then(res => res.json())
+  .then(dispositivos => {
+    const tabela = document.getElementById("tabela-dispositivo");
+    if (!tabela) return;
+    tabela.innerHTML = "";
+    dispositivos.forEach(dispositivo => {
+      const linha = document.createElement("tr");
+      linha.innerHTML = `
+        <td>${dispositivo.id}</td>
+        <td>${dispositivo.codigo}</td>
+        <td>${dispositivo.denominacao}</td>
+        <td>${dispositivo.tipo}</td>
+        <td>${dispositivo.municipio || ''}</td>
+        <td>${dispositivo.extensao_km || ''}</td>
+        <td>${dispositivo.criado_em}</td>
+        <td>
+          <button class="btn-icone" title="Editar" onclick="editarDispositivo(${dispositivo.id})"><i class="fa-solid fa-edit"></i></button>
+          <button class="btn-icone" title="Visualizar" onclick="visualizarDispositivo(${dispositivo.id})"><i class="fa-solid fa-eye"></i></button>
+        </td>
+      `;
+      tabela.appendChild(linha);
+    });
+  })
+  .catch(error => console.error("Erro ao carregar dispositivos:", error));
+
+// Carregar Obras de Arte
+fetch("/painel-master/dados/obras-arte")
+  .then(res => res.json())
+  .then(obras => {
+    const tabela = document.getElementById("tabela-obra-arte");
+    if (!tabela) return;
+    tabela.innerHTML = "";
+    obras.forEach(obra => {
+      const linha = document.createElement("tr");
+      linha.innerHTML = `
+        <td>${obra.id}</td>
+        <td>${obra.codigo}</td>
+        <td>${obra.denominacao}</td>
+        <td>${obra.tipo}</td>
+        <td>${obra.municipio || ''}</td>
+        <td>${obra.extensao_km || ''}</td>
+        <td>${obra.criado_em}</td>
+        <td>
+          <button class="btn-icone" title="Editar" onclick="editarObraArte(${obra.id})"><i class="fa-solid fa-edit"></i></button>
+          <button class="btn-icone" title="Visualizar" onclick="visualizarObraArte(${obra.id})"><i class="fa-solid fa-eye"></i></button>
+        </td>
+      `;
+      tabela.appendChild(linha);
+    });
+  })
+  .catch(error => console.error("Erro ao carregar obras de arte:", error));
+
+// ===== FUNCIONALIDADES DAS ABAS PARA CONTROLE DE GRUPOS DE COLUNAS =====
+
+// Função genérica para alternar grupos de colunas
+function alternarGrupo(prefixo, grupo) {
+  const elementos = document.querySelectorAll(`.grupo-${grupo}`);
+  const btn = document.getElementById(`btn-grupo-${grupo}`);
+  
+  elementos.forEach(el => {
+    if (el.style.display === 'none') {
+      el.style.display = '';
+      btn?.classList.add('selecionado');
+    } else {
+      el.style.display = 'none';
+      btn?.classList.remove('selecionado');
+    }
+  });
 }
-function auditarPessoaJuridica(id) {
-  alert(`Abrir auditoria da Pessoa Jurídica ID ${id}`);
+
+// Função para mostrar tudo
+function mostrarTudo(prefixo) {
+  const grupos = ['profissionais', 'sistema'];
+  grupos.forEach(grupo => {
+    const elementos = document.querySelectorAll(`.grupo-${grupo}-${prefixo}`);
+    const btn = document.getElementById(`btn-grupo-${grupo}-${prefixo}`);
+    elementos.forEach(el => el.style.display = '');
+    if (btn) btn.classList.add('selecionado');
+  });
 }
-function auditarTrecho(id) {
-  alert(`Abrir auditoria do Elemento Rodoviário ID ${id}`);
+
+// Função para ocultar tudo
+function ocultarTudo(prefixo) {
+  const grupos = ['profissionais', 'sistema'];
+  grupos.forEach(grupo => {
+    const elementos = document.querySelectorAll(`.grupo-${grupo}-${prefixo}`);
+    const btn = document.getElementById(`btn-grupo-${grupo}-${prefixo}`);
+    elementos.forEach(el => el.style.display = 'none');
+    if (btn) btn.classList.remove('selecionado');
+  });
 }
-  </script></body>
+
+// Evento para botões das abas - Coordenadores
+document.getElementById('btn-mostrar-tudo-admins')?.addEventListener('click', () => mostrarTudo('admins'));
+document.getElementById('btn-ocultar-tudo-admins')?.addEventListener('click', () => ocultarTudo('admins'));
+document.getElementById('btn-grupo-profissionais-admins')?.addEventListener('click', () => alternarGrupo('admins', 'profissionais-admins'));
+document.getElementById('btn-grupo-sistema-admins')?.addEventListener('click', () => alternarGrupo('admins', 'sistema-admins'));
+
+// Evento para botões das abas - Analistas
+document.getElementById('btn-mostrar-tudo-usuarios')?.addEventListener('click', () => mostrarTudo('usuarios'));
+document.getElementById('btn-ocultar-tudo-usuarios')?.addEventListener('click', () => ocultarTudo('usuarios'));
+document.getElementById('btn-grupo-profissionais-usuarios')?.addEventListener('click', () => alternarGrupo('usuarios', 'profissionais-usuarios'));
+document.getElementById('btn-grupo-sistema-usuarios')?.addEventListener('click', () => alternarGrupo('usuarios', 'sistema-usuarios'));
+
+// Evento para botões das abas - Todos os Usuários
+document.getElementById('btn-mostrar-tudo-todos-usuarios')?.addEventListener('click', () => mostrarTudo('todos-usuarios'));
+document.getElementById('btn-ocultar-tudo-todos-usuarios')?.addEventListener('click', () => ocultarTudo('todos-usuarios'));
+document.getElementById('btn-grupo-profissionais-todos-usuarios')?.addEventListener('click', () => alternarGrupo('todos-usuarios', 'profissionais-todos-usuarios'));
+document.getElementById('btn-grupo-sistema-todos-usuarios')?.addEventListener('click', () => alternarGrupo('todos-usuarios', 'sistema-todos-usuarios'));
+
+// Função para alternar grupos de projetos
+function alternarGrupoProjetos(grupo) {
+  const elementos = document.querySelectorAll(`.grupo-${grupo}`);
+  const btn = document.getElementById(`btn-grupo-${grupo}`);
+  
+  elementos.forEach(el => {
+    if (el.style.display === 'none') {
+      el.style.display = '';
+      btn?.classList.add('selecionado');
+    } else {
+      el.style.display = 'none';
+      btn?.classList.remove('selecionado');
+    }
+  });
+}
+
+// Evento para botões das abas - Projetos
+document.getElementById('btn-mostrar-tudo-projetos')?.addEventListener('click', () => {
+  const grupos = ['geometria', 'ca', 'ifm', 'ifs', 'iqi'];
+  grupos.forEach(grupo => {
+    const elementos = document.querySelectorAll(`.grupo-${grupo}`);
+    const btn = document.getElementById(`btn-grupo-${grupo}`);
+    elementos.forEach(el => el.style.display = '');
+    if (btn) btn.classList.add('selecionado');
+  });
+});
+
+document.getElementById('btn-esconder-tudo-projetos')?.addEventListener('click', () => {
+  const grupos = ['geometria', 'ca', 'ifm', 'ifs', 'iqi'];
+  grupos.forEach(grupo => {
+    const elementos = document.querySelectorAll(`.grupo-${grupo}`);
+    const btn = document.getElementById(`btn-grupo-${grupo}`);
+    elementos.forEach(el => el.style.display = 'none');
+    if (btn) btn.classList.remove('selecionado');
+  });
+});
+  </script>
+<script src="/static/js/session_control.js"></script>
+</body>
 </html>

@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.models.cd_usuario_sistema import UsuarioSistema
+from app.core.session_control import session_manager
 
 # ✅ Padrão de roteador aplicado
 from fastapi import APIRouter
@@ -21,9 +22,12 @@ def painel_usuario_comum(request: Request, db: Session = Depends(get_db)):
     if not usuario_id:
         return HTMLResponse(status_code=401, content="Não autorizado.")
     usuario = db.query(UsuarioSistema).filter(UsuarioSistema.id == usuario_id).first()
+    session_status = session_manager.check_session_validity(request)
+    tempo_restante = int(session_status.get('remaining_seconds', 0))
     return templates.TemplateResponse("pn_painel_usuario_comum.html", {
         "request": request,
-        "usuario": usuario
+        "usuario": usuario,
+        "tempo_restante": tempo_restante
     })
 
 @router.get("/usuarios", response_class=JSONResponse)

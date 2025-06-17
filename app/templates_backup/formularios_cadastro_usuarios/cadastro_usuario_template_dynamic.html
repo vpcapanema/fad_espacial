@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Usuário - {{ usuario.nome }}</title>
+    <style>
+        /* Estilos FAD completos para fidelidade visual */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f8fb; color: #222; }
+        .formulario-cadastro { max-width: 900px; margin: 0 auto; padding: 32px 24px 24px 24px; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px #00336622; }
+        .fad-header-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+            background: #003366;
+            border-radius: 12px 12px 0 0;
+            padding: 24px 0 18px 0;
+        }
+        .fad-header-logo img {
+            max-width: 140px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .cadastro-titulo {
+            font-size: 1.6rem;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            margin: 0 0 2px 0;
+            letter-spacing: 1px;
+        }
+        .secao {
+            margin-bottom: 32px;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            background: #f7fafd;
+        }
+        .secao-titulo {
+            background: #e3ecf7;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e6ed;
+            font-weight: bold;
+            color: #003366;
+            font-size: 1.1rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .secao-conteudo {
+            padding: 20px;
+        }
+        .campo-grupo { display: flex; flex-wrap: wrap; gap: 2%; margin-bottom: 12px; }
+        .campo { display: flex; flex-direction: column; margin-bottom: 0; }
+        /* Informações Pessoais */
+        .campo.nome { width: 82.53%; }
+        .campo.id { width: 15.47%; margin-left: auto; }
+        .campo.cpf { width: 44.12%; }
+        .campo.telefone { width: 53.88%; margin-left: auto; }
+        .campo.email { width: 82.53%; }
+        .campo.pessoa_fisica_id { width: 15.47%; margin-left: auto; }
+        /* Profissionais */
+        .campo.instituicao { width: 75%; }
+        .campo.lotacao { width: 15.79%; margin-left: auto; }
+        .campo.email_institucional { width: 51.11%; }
+        .campo.telefone_institucional { width: 25.78%; }
+        .campo.ramal { width: 19.11%; margin-left: auto; }
+        .campo.sede_hierarquia { width: 47.37%; }
+        .campo.sede_diretoria { width: 50.53%; margin-left: auto; }
+        .campo.sede_coordenadoria_geral { width: 47.37%; }
+        .campo.sede_coordenadoria { width: 50.53%; margin-left: auto; }
+        .campo.sede_setor { width: 47.37%; }
+        .campo.sede_assistencia { width: 50.53%; margin-left: auto; }
+        .campo.regional_nome { width: 100%; }
+        .campo.regional_coordenadoria { width: 100%; }
+        .campo.regional_setor { width: 100%; }
+        /* Informações do Usuário */
+        .campo.tipo { width: 29.13%; }
+        .campo.status { width: 34.01%; }
+        .campo.ativo { width: 28%; margin-left: auto; }
+        .campo.criado_em { width: 100%; }
+        .campo-label { font-size: 12px; color: #555; font-weight: bold; margin-bottom: 2px; }
+        .campo-valor { background: #fff; border: 1px solid #dbe3ee; border-radius: 4px; padding: 8px 10px; margin-bottom: 8px; }
+        .campo-valor.ativo-sim { color: #218838; font-weight: bold; }
+        .campo-valor.ativo-nao { color: #c82333; font-weight: bold; }
+        .rodape { margin-top: 32px; font-size: 12px; color: #888; text-align: right; }
+        @media (max-width: 700px) {
+            .formulario-cadastro { padding: 8px; }
+            .campo-grupo { flex-direction: column; gap: 8px; }
+            .campo { width: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="formulario-cadastro">
+        <div class="fad-header-logo">
+            <img src="/static/images/FAD_LOGO/fad_logo_banco_HOME.PNG" alt="Logo FAD">
+            <div class="cadastro-titulo">Cadastro de Usuário</div>
+        </div>
+
+        <!-- 1. INFORMAÇÕES PESSOAIS -->
+        <div class="secao">
+            <div class="secao-titulo">1. Informações Pessoais</div>
+            <div class="secao-conteudo">
+                <div class="campo-grupo">
+                    <div class="campo nome">
+                        <div class="campo-label">Nome completo</div>
+                        <div class="campo-valor">{{ usuario.nome }}</div>
+                    </div>
+                    <div class="campo id">
+                        <div class="campo-label">ID usuário</div>
+                        <div class="campo-valor">{{ usuario.id }}</div>
+                    </div>
+                </div>
+                <div class="campo-grupo">
+                    <div class="campo cpf">
+                        <div class="campo-label">CPF</div>
+                        <div class="campo-valor">{{ usuario.cpf }}</div>
+                    </div>
+                    <div class="campo telefone">
+                        <div class="campo-label">Telefone</div>
+                        <div class="campo-valor">{{ usuario.telefone }}</div>
+                    </div>
+                </div>
+                <div class="campo-grupo">
+                    <div class="campo email">
+                        <div class="campo-label">E-mail</div>
+                        <div class="campo-valor">{{ usuario.email }}</div>
+                    </div>
+                    <div class="campo pessoa_fisica_id">
+                        <div class="campo-label">ID Pessoa Física</div>
+                        <div class="campo-valor">{{ usuario.pessoa_fisica_id }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. INFORMAÇÕES PROFISSIONAIS (dinâmico) -->
+        <div class="secao">
+            <div class="secao-titulo">2. Informações Profissionais</div>
+            <div class="secao-conteudo">
+                <div class="campo-grupo">
+                    {% if usuario.instituicao %}
+                    <div class="campo instituicao">
+                        <div class="campo-label">Instituição</div>
+                        <div class="campo-valor">{{ usuario.instituicao }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.tipo_lotacao %}
+                    <div class="campo lotacao">
+                        <div class="campo-label">Lotação</div>
+                        <div class="campo-valor">{{ usuario.tipo_lotacao }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="campo-grupo">
+                    {% if usuario.email_institucional %}
+                    <div class="campo email_institucional">
+                        <div class="campo-label">E-mail Institucional</div>
+                        <div class="campo-valor">{{ usuario.email_institucional }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.telefone_institucional %}
+                    <div class="campo telefone_institucional">
+                        <div class="campo-label">Telefone Inst.</div>
+                        <div class="campo-valor">{{ usuario.telefone_institucional }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.ramal %}
+                    <div class="campo ramal">
+                        <div class="campo-label">Ramal</div>
+                        <div class="campo-valor">{{ usuario.ramal }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="campo-grupo">
+                    {% if usuario.sede_hierarquia %}
+                    <div class="campo sede_hierarquia">
+                        <div class="campo-label">Sede Hierarquia</div>
+                        <div class="campo-valor">{{ usuario.sede_hierarquia }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.sede_diretoria %}
+                    <div class="campo sede_diretoria">
+                        <div class="campo-label">Diretoria</div>
+                        <div class="campo-valor">{{ usuario.sede_diretoria }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="campo-grupo">
+                    {% if usuario.sede_coordenadoria_geral %}
+                    <div class="campo sede_coordenadoria_geral">
+                        <div class="campo-label">Coordenadoria Geral</div>
+                        <div class="campo-valor">{{ usuario.sede_coordenadoria_geral }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.sede_coordenadoria %}
+                    <div class="campo sede_coordenadoria">
+                        <div class="campo-label">Coordenadoria</div>
+                        <div class="campo-valor">{{ usuario.sede_coordenadoria }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="campo-grupo">
+                    {% if usuario.sede_setor %}
+                    <div class="campo sede_setor">
+                        <div class="campo-label">Sede Setor</div>
+                        <div class="campo-valor">{{ usuario.sede_setor }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.sede_assistencia %}
+                    <div class="campo sede_assistencia">
+                        <div class="campo-label">Sede Assistência</div>
+                        <div class="campo-valor">{{ usuario.sede_assistencia }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if usuario.regional_nome or usuario.regional_coordenadoria or usuario.regional_setor %}
+                <div class="campo-grupo">
+                    {% if usuario.regional_nome %}
+                    <div class="campo regional_nome">
+                        <div class="campo-label">Nome Regional</div>
+                        <div class="campo-valor">{{ usuario.regional_nome }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.regional_coordenadoria %}
+                    <div class="campo regional_coordenadoria">
+                        <div class="campo-label">Coordenadoria Regional</div>
+                        <div class="campo-valor">{{ usuario.regional_coordenadoria }}</div>
+                    </div>
+                    {% endif %}
+                    {% if usuario.regional_setor %}
+                    <div class="campo regional_setor">
+                        <div class="campo-label">Setor Regional</div>
+                        <div class="campo-valor">{{ usuario.regional_setor }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 3. INFORMAÇÕES DO USUÁRIO -->
+        <div class="secao">
+            <div class="secao-titulo">3. Informações do Usuário</div>
+            <div class="secao-conteudo">
+                <div class="campo-grupo">
+                    <div class="campo tipo">
+                        <div class="campo-label">Tipo</div>
+                        <div class="campo-valor">{{ usuario.tipo }}</div>
+                    </div>
+                    <div class="campo status">
+                        <div class="campo-label">Status</div>
+                        <div class="campo-valor">{{ usuario.status }}</div>
+                    </div>
+                    <div class="campo ativo">
+                        <div class="campo-label">Ativo</div>
+                        <div class="campo-valor {% if usuario.ativo %}ativo-sim{% else %}ativo-nao{% endif %}">{{ 'Sim' if usuario.ativo else 'Não' }}</div>
+                    </div>
+                </div>
+                <div class="campo-grupo">
+                    <div class="campo criado_em">
+                        <div class="campo-label">Criado em</div>
+                        <div class="campo-valor">{{ usuario.criado_em.strftime('%d/%m/%Y %H:%M') if usuario.criado_em else '' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rodape">
+            Documento gerado automaticamente em {{ data_geracao.strftime('%d/%m/%Y %H:%M:%S') if data_geracao else '' }}
+        </div>
+    </div>
+</body>
+</html>

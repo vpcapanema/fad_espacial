@@ -3,205 +3,156 @@
 <head>
   <meta charset="UTF-8">
   <title>Cadastro - Pessoa Física</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f2f9ff;
-      margin: 0;
-      padding: 0;
-    }
-
-    .form-container {
-      max-width: 500px;
-      margin: 60px auto;
-      padding: 2rem;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .form-container h2 {
-      color: #003366;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-container input,
-    .form-container button {
-      width: 100%;
-      padding: 0.8rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-    }
-
-    .form-container button {
-      background-color: #009933;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      border: none;
-    }
-
-    .form-container button:hover {
-      background-color: #007a29;
-    }
-
-    .dialog {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 300px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      display: none;
-      z-index: 9999;
-    }
-
-    .dialog-header {
-      padding: 10px;
-      background: #f1f1f1;
-      border-bottom: 1px solid #ccc;
-      border-radius: 8px 8px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .dialog-body {
-      padding: 15px;
-      text-align: center;
-    }
-
-    .close-button {
-      background: #cc0000;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .ok-button {
-      margin-top: 10px;
-      padding: 6px 16px;
-      background: #006699;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <link rel="stylesheet" href="/static/css/cd_pf/cd_cadastro_pf.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
-
+  {% include 'componentes/fad_header.html' %}
   <div class="form-container">
-    <h2>Cadastro de Pessoa Física</h2>
+    <h3>Cadastro de Pessoa Física</h3>
     <form id="pfForm">
-      <input type="text" name="nome" placeholder="Nome completo" required>
-      <input type="text" name="cpf" id="cpf" placeholder="CPF" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="text" name="telefone" id="telefone" placeholder="Telefone" required>
-      <button type="submit">Cadastrar</button>
+      <div class="form-section">
+        <h3>Informações Pessoais</h3>
+        <div class="form-group">
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="nome">Nome Completo:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="text" name="nome" id="nome" required maxlength="255" />
+              <div class="feedback-erro" id="nome-erro"></div>
+            </div>
+            <div class="form-field half">
+              <label for="cpf">CPF:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="text" name="cpf" id="cpf" required maxlength="14" />
+              <div class="feedback-erro" id="cpf-erro"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="email">E-mail:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="email" name="email" id="email" required maxlength="255" />
+              <div class="feedback-erro" id="email-erro"></div>
+            </div>            <div class="form-field half">
+              <label for="telefone">Telefone:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="text" name="telefone" id="telefone" required maxlength="16" placeholder="(XX) XXXXX-XXXX ou (XX) XXXX-XXXX" />
+              <div class="feedback-erro" id="telefone-erro"></div>
+              <div class="feedback-info" id="telefone-tipo" style="font-size: 11px; color: #666; margin-top: 2px; display: none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <h3>Endereço Residencial</h3>
+        <div class="form-group">
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="rua">Logradouro:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="logradouro" id="logradouro" required maxlength="255" />
+              <div class="feedback-erro" id="rua-erro"></div>
+            </div>
+            <div class="form-field half">
+              <label for="numero">Número:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="numero" id="numero" required maxlength="10" />
+              <div class="feedback-erro" id="numero-erro"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="complemento">Complemento:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="complemento" id="complemento" required maxlength="50" />
+              <div class="feedback-erro" id="complemento-erro"></div>
+            </div>
+            <div class="form-field half">
+              <label for="cep">CEP:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="cep" id="cep" required maxlength="9" />
+              <div class="feedback-erro" id="cep-erro"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="bairro">Bairro/Distrito:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="bairro" id="bairro" required maxlength="100" />
+              <div class="feedback-erro" id="bairro-erro"></div>
+            </div>
+            <div class="form-field half">
+              <label for="cidade">Município:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input name="municipio" id="municipio" required maxlength="100" />
+              <div class="feedback-erro" id="cidade-erro"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="uf">UF:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <select name="uf" id="uf" required>
+                <option value="">Selecione...</option>
+                <option value="AC">AC</option>
+                <option value="AL">AL</option>
+                <option value="AP">AP</option>
+                <option value="AM">AM</option>
+                <option value="BA">BA</option>
+                <option value="CE">CE</option>
+                <option value="DF">DF</option>
+                <option value="ES">ES</option>
+                <option value="GO">GO</option>
+                <option value="MA">MA</option>
+                <option value="MT">MT</option>
+                <option value="MS">MS</option>
+                <option value="MG">MG</option>
+                <option value="PA">PA</option>
+                <option value="PB">PB</option>
+                <option value="PR">PR</option>
+                <option value="PE">PE</option>
+                <option value="PI">PI</option>
+                <option value="RJ">RJ</option>
+                <option value="RN">RN</option>
+                <option value="RS">RS</option>
+                <option value="RO">RO</option>
+                <option value="RR">RR</option>
+                <option value="SC">SC</option>
+                <option value="SP">SP</option>
+                <option value="SE">SE</option>
+                <option value="TO">TO</option>
+              </select>
+              <div class="feedback-erro" id="uf-erro"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="botao-fad" disabled> Cadastrar </button>
+      <div id="sucessoBox" style="display:none; text-align:center; margin-top:18px;"></div>
+      <div id="erroBox" style="display:none; text-align:center; margin-top:18px;"></div>
+      <div id="okBtnContainer" style="text-align:center; margin-top:10px; display:none;">
+        <button type="button" class="ok-btn" id="okBtn">OK</button>
+      </div>
     </form>
-  </div>
-
-    <!-- Caixa de erro -->
-  <div id="erroBox" class="dialog">
-    <div class="dialog-header">
-      <span id="erroTexto">Erro</span>
-      <button class="close-button" onclick="window.location.reload();">&times;</button>
-    </div>
-    <div class="dialog-body">
-      <button class="ok-button" onclick="window.location.reload();">OK</button>
+    <div style="text-align:center; margin-top: 30px;">
+      <a href="/boas-vindas" class="menu-link" style="background:#004080; color:#fff; text-decoration:none; padding:10px 22px; border-radius:6px; font-size:16px; font-weight:500; display:inline-block;">Página inicial</a>
     </div>
   </div>
-
-  <!-- Caixa de sucesso -->
-  <div id="sucessoBox" class="dialog">
-    <div class="dialog-header" style="background: #d0f5d0;">
-      <span style="color: #0b6600;">Cadastro realizado!</span>
-      <button class="close-button" style="background: #0b6600;" onclick="window.location.reload();">&times;</button>
-    </div>
-    <div class="dialog-body">
-      <p>Cadastro salvo com sucesso.</p>
-      <button class="ok-button" onclick="window.location.reload();">OK</button>
-    </div>
-  </div>
-
-
+  <!-- Remover todos os scripts inline e utilitários antigos, manter só o principal como módulo -->
+  <script type="module" src="/static/js/cd_pf/formulario_pf.js"></script>
   <script>
-    const form = document.getElementById("pfForm");
-    const erroBox = document.getElementById("erroBox");
-    const erroTexto = document.getElementById("erroTexto");
-    const sucessoBox = document.getElementById("sucessoBox");
-
-    const cpfInput = document.getElementById("cpf");
-    const telInput = document.getElementById("telefone");
-
-    // Máscara CPF
-    cpfInput.addEventListener("input", function () {
-      let value = this.value.replace(/\D/g, '');
-      if (value.length > 11) value = value.slice(0, 11);
-      value = value.replace(/(\d{3})(\d)/, "$1.$2");
-      value = value.replace(/(\d{3})(\d)/, "$1.$2");
-      value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-      this.value = value;
-    });
-
-    // Máscara Telefone
-    telInput.addEventListener("input", function () {
-      let value = this.value.replace(/\D/g, '');
-      if (value.length > 11) value = value.slice(0, 11);
-      value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
-      value = value.replace(/(\d{1})?(\d{4})(\d{4})$/, "$1 $2-$3");
-      this.value = value;
-    });
-
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
-      erroBox.style.display = "none";
-
-      const formData = new URLSearchParams(new FormData(form));
-
-      try {
-        const response = await fetch("/cadastro/interessado/pf", {
-          method: "POST",
-          body: formData
-        });
-
-        const contentType = response.headers.get("content-type");
-
-        if (response.ok) {
-          sucessoBox.style.display = "block";
-        } else {
-          let mensagemErro = "Erro ao salvar.";
-
-          if (contentType && contentType.includes("application/json")) {
-            const data = await response.json();
-            mensagemErro = data.detail || mensagemErro;
+    document.getElementById('cep').addEventListener('blur', async function() {
+      const cep = this.value.replace(/\D/g, '');
+      if (cep.length === 8) {
+        try {
+          const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+          const data = await response.json();
+          if (!data.erro) {
+            document.getElementById('logradouro').value = data.logradouro || '';
+            document.getElementById('bairro').value = data.bairro || '';
+            document.getElementById('cidade').value = data.localidade || '';
+            document.getElementById('uf').value = data.uf || '';
           } else {
-            const texto = await response.text();
-            mensagemErro = texto || mensagemErro;
+            alert('CEP não encontrado.');
           }
-
-          erroTexto.innerText = mensagemErro;
-          erroBox.style.display = "block";
+        } catch (error) {
+          alert('Erro ao buscar o CEP.');
         }
-
-      } catch (error) {
-        erroTexto.innerText = "Erro de conexão com o servidor.";
-        erroBox.style.display = "block";
+      } else {
+        alert('CEP inválido.');
       }
     });
   </script>
-
 </body>
 </html>
-
-

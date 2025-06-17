@@ -1,9 +1,10 @@
+<!-- ✅ Template atualizado para usar fad_header.html padronizado -->
 <!DOCTYPE html>
 
 <html lang="pt-br">
 <head>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" name="viewport"/><meta charset="utf-8"/>
-<title>Painel do Administrador - FAD</title>
+<title>Painel do Coordenador - FAD</title>
 <style>
     html, body {
       margin: 0;
@@ -379,15 +380,7 @@ button.btn-fad:hover {
 }
 </style></head>
 <body>
-<header class="fad-header">
-<div class="logout">
-<form action="/login/logout" method="post">
-<button class="btn-fad" type="submit">Sair</button>
-</form>
-</div>
-<h1>FAD</h1>
-<h2>FERRAMENTA DE ANÁLISE DINAMIZADA</h2>
-</header>
+{% include "componentes/fad_header.html" %}
 <div class="boas-vindas">
 <h2>Bem-vindo(a), {{ usuario.nome }}</h2>
 <h3 id="data-hoje"></h3>
@@ -426,11 +419,38 @@ button.btn-fad:hover {
 </li>
 </ul>
 </li>
-<li class="link-scroll"><a href="#container-admin">Administradores</a></li>
+<li class="link-scroll"><a href="#container-admin">Coordenadores</a></li>
 <li class="link-scroll"><a href="#container-usuarios">Usuários</a></li>
 <li class="link-scroll"><a href="#container-projetos">Projetos</a></li>
 </ul>
 </nav>
+<div id="session-status" style="background:#e3f2fd;color:#003366;padding:10px 0;text-align:center;font-size:17px;font-weight:bold;letter-spacing:0.5px;">
+  Usuário logado: {{ usuario.nome }} |
+  Tempo restante da sessão: <span id="session-timer"></span>
+</div>
+
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+  var tempoRestante = parseInt("{{ tempo_restante|default(0) }}");
+  var timerEl = document.getElementById('session-timer');
+  function formatarTempo(segundos) {
+    var min = Math.floor(segundos/60);
+    var seg = segundos%60;
+    return (min < 10 ? '0' : '') + min + ':' + (seg < 10 ? '0' : '') + seg;
+  }
+  function atualizarTimer() {
+    if (tempoRestante <= 0) {
+      timerEl.textContent = '00:00';
+      window.location.href = '/login';
+      return;
+    }
+    timerEl.textContent = formatarTempo(tempoRestante);
+    tempoRestante--;
+    setTimeout(atualizarTimer, 1000);
+  }
+  if (timerEl) atualizarTimer();
+});
+</script>
 <div class="painel-container" id="container-admin">
 <h2>Coordenadores</h2>
 <table>
@@ -855,7 +875,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .catch(err => console.error("Erro ao carregar analistas:", err));
 
-  // Carregar Administradores
+  // Carregar Coordenadores
   fetch("/painel-coordenador/usuarios")
     .then(res => res.json())
     .then(admins => {
@@ -877,6 +897,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tabela.appendChild(linha);
       });
     })
-    .catch(err => console.error("Erro ao carregar administradores:", err));
+    .catch(err => console.error("Erro ao carregar coordenadores:", err));
 });
 </script>

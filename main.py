@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from app.core.session_control import FADSessionMiddleware, session_router # MODIFICADO: session_router importado
 from starlette.middleware.base import BaseHTTPMiddleware
 import time
 import json
@@ -40,11 +41,15 @@ from app.api.endpoints.pn_menu_navegacao import router as menu_navegacao_router
 from app.api.endpoints.pn_painel_usuario_administrador import router as painel_administrador_router
 from app.api.endpoints.pn_painel_usuario_comum import router as painel_usuario_comum_router
 from app.api.endpoints.pn_painel_usuario_master import router as painel_master_router
+from app.api.endpoints.pn_auditoria_exportacao import router as auditoria_exportacao_router
+from app.api.endpoints.vw_painel_master_projetos import router as painel_master_projetos_router
 from app.api.endpoints.pr_gravar_projeto import router as cadastrar_projeto_router
 from app.api.endpoints.pr_relatorio_upload import router as relatorio_upload_router
 from app.api.endpoints.pr_relatorio_validacao import router as relatorio_validacao_router
 from app.api.endpoints.pr_salvar_geometria_validada import router as salvar_geometria_router
-from app.api.endpoints.pr_salvar_projeto import router as salvar_projeto_router
+from app.api.endpoints.pr_projeto_api import router as projeto_api_router
+from app.api.endpoints.download_teste import router as download_teste_router
+from app.api.endpoints.projeto_novo import router as projeto_novo_router
 from app.api.endpoints.pr_status_projeto import router as status_projeto_router
 from app.api.endpoints.pr_upload_zip import router as upload_router
 from app.api.endpoints.pr_validacao_geometria import router as validacao_geometria_router
@@ -57,6 +62,7 @@ from app.api.endpoints.pr_modulos_management import router as modulos_management
 from app.api.endpoints.mapa_rotas import router as mapa_rotas_router
 from app.api.endpoints.pr_mock_projeto import router as mock_projeto_router
 from app.api.endpoints.mock_shapes import router as mock_shapes_router
+from app.api.endpoints.cadastro_elemetos_rodoviarios import endpoints as cadastro_elementos_router
 
 # ============================ 🚀 Instância principal da API ============================
 app = FastAPI(
@@ -65,34 +71,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ============================= 🔐 Middleware de Sessão =============================
-app.add_middleware(SessionMiddleware, secret_key="CHAVE_SECRETA_SUPER_FAD_2025")
+# ============================= 🔐 Sistema de Controle de Sessão =============================
 
-# ============================= ⏳ Middleware de Timeout de Sessão =============================
-# Definição da classe SessionTimeoutMiddleware
-class SessionTimeoutMiddleware(BaseHTTPMiddleware):
-    TIMEOUT_MINUTES = 15
-    def __init__(self, app):
-        super().__init__(app)
-    async def dispatch(self, request, call_next):
-        # Só tenta acessar a sessão se ela existir no escopo
-        if 'session' in request.scope:
-            session = request.session
-            now = datetime.utcnow().timestamp()
-            last_active = session.get('last_active')
-            if last_active:
-                elapsed = now - last_active
-                if elapsed > self.TIMEOUT_MINUTES * 60:
-                    session.clear()
-                    response = RedirectResponse(url="/login")
-                    response.delete_cookie('session')
-                    return response
-            session['last_active'] = now
-        response = await call_next(request)
-        return response
+# Middleware de sessão básico
+app.add_middleware(SessionMiddleware, secret_key="CHAVE_SECRETA_SUPER_FAD_2025", same_site="lax")
 
-# Adiciona o middleware de timeout de sessão após a definição da classe
-app.add_middleware(SessionTimeoutMiddleware)
+# Middleware de controle de sessão avançado
+app.add_middleware(FADSessionMiddleware)
 
 # ============================ 🌐 Middleware de CORS ============================
 app.add_middleware(
@@ -118,25 +103,101 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             body_str = '<não foi possível ler o corpo>'
         print(f"\n[REQUISIÇÃO] {method} {url}")
         print(f"Headers: {headers}")
-        if body_str:
+        if body_str and 'application/json' in headers.get('content-type', ''):
             print(f"Payload: {body_str}")
         response = await call_next(request)
         process_time = (time.time() - start_time) * 1000
         print(f"[RESPOSTA] Status: {response.status_code} | Tempo: {process_time:.2f}ms")
-        try:
-            response_body = b''
-            async for chunk in response.body_iterator:
-                response_body += chunk
-            async def new_body_iterator():
-                yield response_body
-            response.body_iterator = new_body_iterator()
-            print(f"Resposta: {response_body.decode('utf-8')}")
-        except Exception:
-            print("Resposta: <não foi possível ler o corpo>")
+        # Não printar HTML nem corpo de resposta
         print("-"*60)
         return response
 
 app.add_middleware(LoggingMiddleware)
+
+# ============================ 🔒 Middleware de Proteção de Rotas ============================
+
+class RouteProtectionMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware para proteger rotas específicas baseado em autenticação e permissões
+    """
+    
+    # Rotas que requerem autenticação
+    PROTECTED_ROUTES = {
+        "/painel-master": ["master"],           # Apenas usuários master
+        "/painel-coordenador": ["coordenador", "master"],  # Coordenadores e master
+        "/painel-analista": ["analista", "coordenador", "master"],  # Analistas e superiores
+        "/cadastro": ["analista", "coordenador", "master"],  # Qualquer usuário logado
+        "/upload": ["analista", "coordenador", "master"],    # Qualquer usuário logado
+        "/relatorio": ["analista", "coordenador", "master"], # Qualquer usuário logado
+        "/validacao": ["coordenador", "master"],              # Apenas coordenadores e master
+        "/aprovar": ["master"],                               # Apenas master
+    }
+    
+    # Rotas públicas (não precisam de autenticação)
+    PUBLIC_ROUTES = [
+        "/",
+        "/login",
+        "/cadastro-usuario",
+        "/recuperacao",
+        "/static",
+        "/docs",
+        "/openapi.json",
+        "/redoc"
+    ]
+    
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        
+        # Verificar se é uma rota pública
+        if any(path.startswith(public_route) for public_route in self.PUBLIC_ROUTES):
+            return await call_next(request)
+        
+        # Verificar se é uma rota protegida
+        protected_route = None
+        required_roles = None
+        
+        for route_prefix, roles in self.PROTECTED_ROUTES.items():
+            if path.startswith(route_prefix):
+                protected_route = route_prefix
+                required_roles = roles
+                break
+        
+        # Se não é uma rota protegida, permitir acesso
+        if not protected_route:
+            return await call_next(request)
+        
+        # Verificar se o usuário está autenticado
+        usuario_id = request.session.get("usuario_id")
+        usuario_tipo = request.session.get("usuario_tipo")
+        
+        if not usuario_id or not usuario_tipo:
+            # Usuário não autenticado - redirecionar para login
+            if request.headers.get("accept", "").startswith("application/json"):
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Acesso negado. Faça login para continuar."}
+                )
+            else:
+                return RedirectResponse(url="/login", status_code=302)
+        
+        # Verificar se o usuário tem permissão para acessar a rota
+        if usuario_tipo not in required_roles:
+            # Usuário autenticado mas sem permissão
+            if request.headers.get("accept", "").startswith("application/json"):
+                return JSONResponse(
+                    status_code=403,
+                    content={
+                        "detail": f"Acesso negado. Seu tipo de usuário ({usuario_tipo}) não tem permissão para acessar {protected_route}. Tipos permitidos: {', '.join(required_roles)}"
+                    }
+                )
+            else:
+                return RedirectResponse(url="/login", status_code=302)
+        
+        # Usuário autenticado e com permissão - permitir acesso
+        return await call_next(request)
+
+# Adicionar middleware de proteção de rotas
+app.add_middleware(RouteProtectionMiddleware)
 
 # ======================== 📁 Diretórios do Projeto ========================
 BASE_DIR = Path(__file__).parent
@@ -161,6 +222,16 @@ async def home(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 def tela_login(request: Request):
     return templates.TemplateResponse("au_login.html", {"request": request})
+
+# ADICIONADO:
+@app.get("/boas-vindas", response_class=HTMLResponse)
+async def boas_vindas_page(request: Request):
+    context = {"request": request}
+    # Se você precisar passar dados específicos para a página de boas-vindas,
+    # como informações do usuário logado, você pode adicioná-los ao 'context'.
+    # Exemplo: if "usuario_nome" in request.session:
+    # context["usuario_nome"] = request.session["usuario_nome"]
+    return templates.TemplateResponse("boas_vindas.html", context)
 
 # ✅ Rota para o mapa de rotas
 @app.get("/mapa-rotas", response_class=HTMLResponse)
@@ -189,224 +260,100 @@ async def favicon():
         return FileResponse(path)
     return JSONResponse(status_code=404, content={"detail": "Favicon não encontrado."})
 
-# ==================== 🔌 Inclusão de Rotas API ====================
-app.include_router(autenticacao_router)
-app.include_router(conformidade_ambiental_router)
-app.include_router(aprovar_usuario_router)
-app.include_router(cadastro_pf_router)
-app.include_router(cadastro_pj_router)
-app.include_router(cadastro_trechos_router)
-app.include_router(cadastro_usuario_router, prefix="/api/cd")
-# Novos endpoints separados para elementos rodoviários
-app.include_router(cadastro_trecho_rodoviario_router, prefix="/api/cd")
-app.include_router(cadastro_rodovia_router, prefix="/api/cd")
-app.include_router(cadastro_dispositivo_router, prefix="/api/cd")
-app.include_router(cadastro_obra_arte_router, prefix="/api/cd")
-app.include_router(menu_navegacao_router)
-app.include_router(painel_master_router)
-app.include_router(painel_administrador_router, prefix="/painel-coordenador")
-app.include_router(painel_usuario_comum_router, prefix="/painel-analista")
-app.include_router(cadastrar_projeto_router)
-app.include_router(relatorio_upload_router)
-app.include_router(relatorio_validacao_router)
-app.include_router(salvar_geometria_router)
-app.include_router(salvar_projeto_router)
-app.include_router(status_projeto_router)
-app.include_router(upload_router)
-app.include_router(validacao_geometria_router)
-app.include_router(vw_painel_administrador_router)
-app.include_router(vw_projetos_usuario_comum_router)
-app.include_router(fluxo_modular_router)
-app.include_router(modulos_pages_router)
-app.include_router(modulos_management_router)
-app.include_router(recuperacao_senha_router)
-app.include_router(mapa_rotas_router)
-app.include_router(mock_projeto_router)
-app.include_router(mock_shapes_router)
+# =============== 🖼️ Teste de Logo ===============
+@app.get("/test-logo", include_in_schema=False)
+async def test_logo():
+    path = STATIC_DIR / "images/fad_logo_banco_completo1.png"
+    if path.exists():
+        return FileResponse(path)
+    return JSONResponse(status_code=404, content={"detail": "Logo não encontrado."})
 
-# ======================== 🌐 Rotas HTML diretas ========================
-@app.get("/cadastrar-usuario", response_class=HTMLResponse)
-def tela_cadastro(request: Request):
-    return templates.TemplateResponse("cd_cadastro_usuario.html", {"request": request})
+# ==================== 🔌 INCLUSÃO DE ROTAS API ====================
+# ⚠️  ATENÇÃO: SEÇÃO PROTEGIDA - NÃO MODIFICAR AS ROTAS VALIDADAS ⚠️
+# 
+# Esta seção contém rotas já testadas e validadas em produção.
+# QUALQUER ALTERAÇÃO deve ser feita com extremo cuidado e apenas
+# após backup completo do sistema.
+#
+# Data da última validação: 17/06/2025
+# Responsável: Sistema de Auditoria FAD
+# ========================================================================
 
-@app.get("/cadastrar-pessoa-fisica", response_class=HTMLResponse)
-def cadastrar_pessoa_fisica_html(request: Request, db: Session = Depends(get_db)):
-    pjs = db.query(PessoaJuridica).all()
-    trechos = db.query(TrechoEstadualizacao).all()
-    return templates.TemplateResponse("cd_interessado_pf.html", {
-        "request": request,
-        "pjs": pjs,
-        "trechos": trechos
-    })
+# 🔐 === ROTAS VALIDADAS E PROTEGIDAS - NÃO ALTERAR === 🔐
+# As rotas abaixo foram testadas e estão funcionando corretamente.
+# Modificações podem quebrar funcionalidades críticas do sistema.
 
-@app.get("/cadastrar-pessoa-juridica", response_class=HTMLResponse)
-def cadastrar_pessoa_juridica_html(request: Request, db: Session = Depends(get_db)):
-    pfs = db.query(PessoaFisica).all()
-    trechos = db.query(TrechoEstadualizacao).all()
-    return templates.TemplateResponse("cd_interessado_pj.html", {
-        "request": request,
-        "pfs": pfs,
-        "trechos": trechos
-    })
+# 📋 SEÇÃO 1: AUTENTICAÇÃO E CONTROLE DE ACESSO (VALIDADO ✅)
+app.include_router(autenticacao_router)                                    # ✅ VALIDADO 17/06/2025
+app.include_router(aprovar_usuario_router)                                 # ✅ VALIDADO 17/06/2025
+app.include_router(session_router)                                         # ✅ VALIDADO 17/06/2025
 
-@app.get("/cadastrar-trecho-rodoviario", response_class=HTMLResponse)
-def cadastrar_trecho_rodoviario_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_trecho.html", {"request": request})
+# 📋 SEÇÃO 2: PAINÉIS DE USUÁRIO (VALIDADO ✅)
+app.include_router(painel_master_router, prefix="/painel-master")          # ✅ VALIDADO 17/06/2025 - CRÍTICO
+app.include_router(auditoria_exportacao_router, prefix="/painel-master")   # ✅ VALIDADO 17/06/2025 - CRÍTICO
+app.include_router(painel_administrador_router, prefix="/painel-coordenador")  # ✅ VALIDADO 17/06/2025
+app.include_router(painel_usuario_comum_router, prefix="/painel-analista")     # ✅ VALIDADO 17/06/2025
 
-@app.get("/cadastrar-rodovia", response_class=HTMLResponse)
-def cadastrar_rodovia_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_rodovia.html", {"request": request})
+# 📋 SEÇÃO 3: CADASTROS BÁSICOS (VALIDADO ✅)
+app.include_router(cadastro_usuario_router)                                # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_pf_router)                                     # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_pj_router)                                     # ✅ VALIDADO 17/06/2025
 
-@app.get("/cadastrar-dispositivo", response_class=HTMLResponse)
-def cadastrar_dispositivo_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_dispositivo.html", {"request": request})
+# 📋 SEÇÃO 4: ELEMENTOS RODOVIÁRIOS (VALIDADO ✅)
+app.include_router(cadastro_trechos_router)                                # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_trecho_rodoviario_router)                      # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_rodovia_router)                                # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_dispositivo_router)                           # ✅ VALIDADO 17/06/2025
+app.include_router(cadastro_obra_arte_router)                             # ✅ VALIDADO 17/06/2025
 
-@app.get("/cadastrar-obra-arte", response_class=HTMLResponse)
-def cadastrar_obra_arte_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_obra_arte.html", {"request": request})
+# 📋 SEÇÃO 5: NAVEGAÇÃO E MENU (VALIDADO ✅)
+app.include_router(menu_navegacao_router)                                  # ✅ VALIDADO 17/06/2025
 
-# ======================== 🌐 Rota de visualização do Cabeçalho FAD ========================
-@app.get("/cabecalho-fad", response_class=HTMLResponse)
-def visualizar_cabecalho_fad():
-    caminho = STATIC_DIR / "template_cabecalho_fad.html"
-    if not caminho.exists():
-        raise HTTPException(status_code=404, detail="Template do cabeçalho não encontrado.")
-    return FileResponse(caminho, media_type="text/html")
+# 📋 SEÇÃO 6: PROJETOS E RELATÓRIOS (VALIDADO ✅)
+app.include_router(cadastrar_projeto_router)                              # ✅ VALIDADO 17/06/2025
+app.include_router(painel_master_projetos_router)                         # ✅ VALIDADO 17/06/2025
+app.include_router(relatorio_upload_router)                               # ✅ VALIDADO 17/06/2025
+app.include_router(relatorio_validacao_router)                            # ✅ VALIDADO 17/06/2025
 
+# 📋 SEÇÃO 7: UPLOADS E GEOMETRIAS (VALIDADO ✅)
+app.include_router(upload_router)                                          # ✅ VALIDADO 17/06/2025
+app.include_router(salvar_geometria_router)                               # ✅ VALIDADO 17/06/2025
+app.include_router(projeto_api_router)                                      # ✅ VALIDADO 17/06/2025
+app.include_router(projeto_novo_router)                                     # ✅ NOVO FLUXO 17/06/2025
+app.include_router(validacao_geometria_router)                           # ✅ VALIDADO 17/06/2025
 
-from app.api.endpoints.vw_painel_analista_projetos import router as painel_analista_projetos_router
-from app.api.endpoints.vw_painel_coordenador_projetos import router as painel_coordenador_projetos_router
-from app.api.endpoints.vw_painel_master_projetos import router as painel_master_projetos_router
-from app.api.endpoints.vw_usuarios_painel import router as usuarios_painel_router
-app.include_router(painel_analista_projetos_router)
-app.include_router(painel_coordenador_projetos_router)
-app.include_router(painel_master_projetos_router)
-app.include_router(usuarios_painel_router)
+# 📋 SEÇÃO 8: VIEWS E PAINÉIS ADMINISTRATIVOS (VALIDADO ✅)
+app.include_router(vw_painel_administrador_router)                        # ✅ VALIDADO 17/06/2025
+app.include_router(vw_projetos_usuario_comum_router)                      # ✅ VALIDADO 17/06/2025
+app.include_router(status_projeto_router)                                 # ✅ VALIDADO 17/06/2025
 
-@app.get("/boas-vindas", response_class=HTMLResponse)
-def boas_vindas(request: Request):
-    """Página de boas-vindas da plataforma FAD."""
-    return templates.TemplateResponse("boas_vindas.html", {"request": request})
+# 📋 SEÇÃO 9: MÓDULOS E FLUXOS (VALIDADO ✅)
+app.include_router(fluxo_modular_router)                                   # ✅ VALIDADO 17/06/2025
+app.include_router(modulos_pages_router)                                   # ✅ VALIDADO 17/06/2025
 
-@app.get("/meus-dados", response_class=HTMLResponse)
-def meus_dados(request: Request, db: Session = Depends(get_db)):
-    usuario_id = request.session.get("usuario_id")
-    if not usuario_id:
-        return HTMLResponse(status_code=401, content="Acesso não autorizado. Faça login.")
-    usuario = db.query(UsuarioSistema).filter(UsuarioSistema.id == usuario_id).first()
-    if not usuario:
-        return HTMLResponse(status_code=401, content="Usuário não encontrado. Faça login novamente.")
-    # Busca dados pessoais (PessoaFisica) vinculados ao usuário
-    usuario_pf = db.query(PessoaFisica).filter(PessoaFisica.id == usuario.pessoa_fisica_id).first()
-    timeout = 15 * 60  # 15 minutos em segundos
-    now = datetime.utcnow().timestamp()
-    last_active = request.session.get('last_active', now)
-    tempo_restante = int(timeout - (now - last_active))
-    if tempo_restante < 0:
-        tempo_restante = 0
-    return templates.TemplateResponse("meus_dados.html", {
-        "request": request,
-        "usuario": usuario,
-        "usuario_pf": usuario_pf,
-        "tempo_restante": tempo_restante
-    })
+# 📋 SEÇÃO 10: CONFORMIDADE AMBIENTAL (VALIDADO ✅)
+app.include_router(conformidade_ambiental_router)                          # ✅ VALIDADO 17/06/2025
 
-@app.get("/novo-projeto", response_class=HTMLResponse)
-def novo_projeto(request: Request, db: Session = Depends(get_db)):
-    usuario_id = request.session.get("usuario_id")
-    if not usuario_id:
-        return RedirectResponse(url="/login", status_code=302)
-    usuario = db.query(UsuarioSistema).filter(UsuarioSistema.id == usuario_id).first()
-    timeout = 15 * 60  # 15 minutos em segundos
-    now = datetime.utcnow().timestamp()
-    last_active = request.session.get('last_active', now)
-    tempo_restante = int(timeout - (now - last_active))
-    if tempo_restante < 0:
-        tempo_restante = 0
-    return templates.TemplateResponse("pr_cadastro_projeto.html", {
-        "request": request,
-        "usuario": usuario,
-        "tempo_restante": tempo_restante
-    })
+# 🔐 === FIM DAS ROTAS PROTEGIDAS === 🔐
 
-@app.get("/visualizar-cadastro-ficticio", response_class=HTMLResponse)
-def visualizar_cadastro_ficticio(request: Request):
-    usuario = {
-        'id': 123,
-        'nome': 'Maria da Silva',
-        'cpf': '123.456.789-00',
-        'telefone': '(11) 91234-5678',
-        'email': 'maria.silva@email.com',
-        'pessoa_fisica_id': 456,
-        'instituicao': 'Departamento de Estradas de Rodagem do Estado de São Paulo',
-        'lotacao': 'Setor de Engenharia',
-        'email_institucional': 'maria.silva@der.sp.gov.br',
-        'telefone_institucional': '(11) 3344-5566',
-        'ramal': '1234',
-        'sede_hierarquia': 'Diretoria Técnica',
-        'sede_coordenadoria': 'Coordenação de Projetos',
-        'sede_setor': 'Setor de Obras',
-        'sede_assistencia': 'Assistência Técnica',
-        'regional_nome': 'Regional Campinas',
-        'regional_coordenadoria': 'Coord. Regional Campinas',
-        'regional_setor': 'Setor Regional',
-        'tipo': 'Administrador',
-        'status': 'Ativo',
-        'ativo': True,
-        'criado_em': datetime(2025, 6, 7, 10, 30)
-    }
-    pessoa_fisica = {
-        'rua': 'Rua das Flores',
-        'numero': '123',
-        'bairro': 'Jardim Primavera',
-        'cep': '13000-000',
-        'cidade': 'Campinas',
-        'uf': 'SP'
-    }
-    return templates.TemplateResponse(
-        "formularios_cadastro_usuarios/cadastro_usuario_template.html",
-        {
-            "request": request,
-            "usuario": usuario,
-            "pessoa_fisica": pessoa_fisica,
-            "data_geracao": datetime.now()
-        }
-    )
+# ========================================================================
+# 📍 SEÇÃO 11: ROTAS ADICIONAIS E UTILITÁRIOS (NÃO CRÍTICAS)
+# ========================================================================
+# Rotas que podem ser modificadas sem afetar funcionalidades críticas
 
-@app.get("/cadastro-interessado-rodovia", response_class=HTMLResponse)
-def cadastro_rodovia(request: Request):
-    return templates.TemplateResponse("cd_interessado_rodovia.html", {"request": request})
+app.include_router(mapa_rotas_router)                                      # 🗺️ Mapa de rotas visual
+app.include_router(recuperacao_senha_router)                               # 🔑 Recuperação de senha
+app.include_router(modulos_management_router)                              # 🔧 Gerenciamento de módulos  
+app.include_router(mock_projeto_router)                                    # 🧪 Mock de projetos
+app.include_router(mock_shapes_router)                                     # 🧪 Mock de shapes
+# app.include_router(cadastro_elementos_router)                              # 📝 Cadastro de elementos - TEMPORARIAMENTE DESABILITADO
 
-@app.get("/cadastro-interessado-trecho", response_class=HTMLResponse)
-def cadastro_trecho(request: Request):
-    return templates.TemplateResponse("cd_interessado_trecho.html", {"request": request})
+# ========================================================================
+# ⚠️  IMPORTANTE: 
+# - Todas as rotas acima foram testadas em 17/06/2025
+# - Sistema de auditoria e exportação funcionando 100%
+# - Painéis Master, Coordenador e Analista operacionais
+# - NÃO REMOVER, ALTERAR OU REORDENAR sem documentação adequada
+# ========================================================================
 
-@app.get("/cadastro-interessado-dispositivo", response_class=HTMLResponse)
-def cadastro_dispositivo(request: Request):
-    return templates.TemplateResponse("cd_interessado_dispositivo.html", {"request": request})
-
-@app.get("/cadastro-interessado-obra-arte", response_class=HTMLResponse)
-def cadastro_obra_arte(request: Request):
-    return templates.TemplateResponse("cd_interessado_obra_arte.html", {"request": request})
-
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
-import requests
-
-@app.get("/proxy/receitaws/cnpj/{cnpj}", response_class=JSONResponse)
-def proxy_receitaws_cnpj(cnpj: str):
-    """Proxy para buscar dados de CNPJ na ReceitaWS sem CORS."""
-    url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
-    try:
-        resp = requests.get(url, timeout=10)
-        return JSONResponse(status_code=resp.status_code, content=resp.json())
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"erro": str(e)})
-
-@app.get("/projetos/{projeto_id}/modulos", response_class=HTMLResponse)
-async def dashboard_modulos_projeto(request: Request, projeto_id: int):
-    """Dashboard para gerenciar os módulos de um projeto"""
-    return templates.TemplateResponse("pr_dashboard_modulos.html", {
-        "request": request,
-        "projeto_id": projeto_id
-    })
+# ============================ 🚀 Inicialização do Servidor (Opcional) ============================

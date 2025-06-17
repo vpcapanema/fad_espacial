@@ -6,7 +6,7 @@ from datetime import datetime
 class UsuarioSistema(Base):
     __tablename__ = "usuario_sistema"
     __table_args__ = (
-        UniqueConstraint('cpf', 'tipo', name='uix_cpf_tipo'),        CheckConstraint(
+        CheckConstraint(
             "tipo IN ('analista', 'coordenador', 'master')",
             name="check_tipo_usuario_valido"
         ),

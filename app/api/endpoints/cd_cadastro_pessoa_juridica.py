@@ -88,14 +88,17 @@ def editar_pessoa_juridica(pj_id: int, dados: dict = Body(...), db: Session = De
 
 @router.post("/cadastro/pessoa-juridica", status_code=201)
 def cadastrar_pessoa_juridica(dados: dict = Body(...), db: Session = Depends(get_db)):
+    print(f"[LOG PJ] Recebida requisição para cadastrar pessoa jurídica: {dados}")
     campos_obrigatorios = [
         'razao_social', 'cnpj', 'email', 'telefone', 'rua', 'numero', 'bairro', 'cep', 'cidade', 'uf'
     ]
     for campo in campos_obrigatorios:
         if not dados.get(campo):
+            print(f"[LOG PJ] Campo obrigatório ausente: {campo}")
             raise HTTPException(status_code=400, detail=f"Campo obrigatório ausente: {campo}")
     cnpj_limpo = re.sub(r"\D", "", dados['cnpj'])
     if db.query(PessoaJuridica).filter(PessoaJuridica.cnpj == cnpj_limpo).first():
+        print("[LOG PJ] CNPJ já cadastrado")
         raise HTTPException(status_code=400, detail="CNPJ já cadastrado")
     pj = PessoaJuridica(
         razao_social=dados['razao_social'],
@@ -117,7 +120,8 @@ def cadastrar_pessoa_juridica(dados: dict = Body(...), db: Session = Depends(get
     try:
         db.commit()
         db.refresh(pj)
-    except Exception:
+    except Exception as e:
+        print(f"[LOG PJ] Erro ao cadastrar PJ: {e}")
         db.rollback()
         raise HTTPException(status_code=400, detail="Erro de integridade ao cadastrar PJ")
     return {"msg": "Pessoa Jurídica cadastrada com sucesso", "id": pj.id}

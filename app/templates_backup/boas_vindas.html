@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Bem-vindo à Plataforma FAD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef5f9;
+      color: #222;
+    }
+    .welcome-box {
+      max-width: 700px;
+      margin: 40px auto 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 2.5rem 2.5rem 2rem 2.5rem;
+      text-align: center;
+    }
+    .welcome-box h3 {
+      color: #003366;
+      margin-bottom: 0.5rem;
+      font-size: 28px;
+    }
+    .welcome-box p {
+      font-size: 17px;
+      color: #444;
+      margin-bottom: 2.2rem;
+    }
+    .menu-section {
+      margin: 2.5rem 0 1.5rem 0;
+      text-align: left;
+    }
+    .menu-section h4 {
+      color: #007a29;
+      margin-bottom: 0.7rem;
+      font-size: 20px;
+      border-left: 4px solid #009933;
+      padding-left: 10px;
+    }
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+    }
+    .menu-link {
+      display: block;
+      background: #2196f3;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 6px;
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background 0.2s, box-shadow 0.2s;
+      width: auto;
+      box-sizing: border-box;
+      text-align: left;
+      box-shadow: 0 2px 8px rgba(33,150,243,0.08);
+      filter: brightness(0.97) saturate(0.95);
+    }
+    .menu-link.menu-link-wide {
+      width: 365px;
+      max-width: 100%;
+    }
+    .menu-link:hover {
+      background: #42a5f5;
+      color: #fff;
+      filter: brightness(1.03) saturate(1.05);
+    }
+    .menu-link.disabled {
+      background: #aaa;
+      color: #eee;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .info-box {
+      background: #eafbe7;
+      color: #007a29;
+      border-left: 5px solid #009933;
+      padding: 12px 18px;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+      font-size: 15px;
+      text-align: left;
+      display: inline-block;
+    }
+    .footer {
+      margin-top: 40px;
+      padding: 18px 0 10px 0;
+      background: #003366;
+      color: #fff;
+      text-align: center;
+      font-size: 15px;
+      border-radius: 0 0 12px 12px;
+    }
+    .btn-acesso-fad {
+      display: inline-block;
+      background: linear-gradient(90deg, #007a29 0%, #004080 100%);
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 14px 38px;
+      border-radius: 8px;
+      margin: 18px 0 0 0;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      letter-spacing: 1px;
+      transition: background 0.2s, box-shadow 0.2s;
+      border: none;
+    }
+    .btn-acesso-fad:hover {
+      background: linear-gradient(90deg, #004080 0%, #007a29 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    }
+    .btn-voltar-fad {
+      display: inline-block;
+      background: #fff;
+      color: #004080;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 6px;
+      border: 2px solid #004080;
+      text-decoration: none;
+      margin-top: 18px;
+      transition: background 0.2s, color 0.2s;
+      vertical-align: middle;
+    }
+    .btn-voltar-fad:hover {
+      background: #004080;
+      color: #fff;
+    }
+    .btn-voltar-fad svg path {
+      transition: fill 0.2s;
+    }
+    .btn-voltar-fad:hover svg path {
+      fill: #fff;
+    }
+    .secao-com-imagem {
+      display: flex;
+      align-items: center;
+      background: linear-gradient(90deg, #eafbe7 0%, #eef5f9 100%);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      margin-bottom: 2.8rem;
+      padding: 2.2rem 2.5rem;
+      gap: 56px;
+      transition: box-shadow 0.2s;
+    }
+    .secao-com-imagem:hover {
+      box-shadow: 0 6px 24px rgba(0,0,0,0.16);
+    }
+    .img-secao {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-right: 28px;
+      border: 2px solid #00993322;
+    }
+    @media (max-width: 600px) {
+      .welcome-box { padding: 1rem 0.5rem; }
+      .menu-link { font-size: 15px; padding: 8px 10px; }
+    }
+    @media (max-width: 700px) {
+      .secao-com-imagem { flex-direction: column; gap: 12px; padding: 1rem 0.5rem; }
+      .img-secao { margin-right: 0; margin-bottom: 10px; }
+      .menu-list { width: 100%; }
+      .menu-link.menu-link-infra { width: 100%; }
+      #submenu-cadastro-elemento { min-width: 100% !important; width: 100% !important; }
+    }
+    #submenu-cadastro-elemento {
+      min-width: 365px !important;
+      width: 365px !important;
+    }
+    #submenu-cadastro-elemento .menu-link {
+      margin: 0;
+      border-radius: 0 !important;
+      background: #64b5f6 !important;
+      color: #fff !important;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+      filter: brightness(0.97) saturate(0.95);
+    }
+    #submenu-cadastro-elemento .menu-link:hover {
+      background: #90caf9 !important;
+      color: #fff !important;
+      filter: brightness(1.03) saturate(1.05);
+    }
+    #submenu-cadastro-elemento .menu-link:first-child {
+      border-radius: 8px 8px 0 0 !important;
+    }
+    #submenu-cadastro-elemento .menu-link:last-child {
+      border-radius: 0 0 8px 8px !important;
+    }
+  </style>
+</head>
+<body>
+  {% include 'componentes/fad_header.html' %}
+  <script>
+    // Torna a logo da FAD clicável para ir para a home
+    document.addEventListener('DOMContentLoaded', function() {
+      const logo = document.querySelector('.logo-fad');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', function() {
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+  <div class="welcome-box">
+    <h3>Bem-vindo à Plataforma FAD</h3>
+    <p>
+      A FAD é uma plataforma integrada para cadastro, análise e gestão de dados rodoviários e ambientais.<br>
+      Utilize o menu abaixo para acessar os principais serviços e cadastros do sistema.
+    </p>
+    <div class="info-box">
+      <b>Novidade:</b> O publicador de camadas está em construção.<br>
+      Para dúvidas, consulte a <a href="#" style="color:#007a29;text-decoration:underline;">documentação</a> ou entre em contato com o suporte.
+    </div>
+    <div class="menu-section">
+      <div class="secao-com-imagem">
+        <img src="/static/images/modulo_cadastro.png" alt="Cadastro" class="img-secao">
+        <div>
+          <h4>Cadastro</h4>
+          <ul class="menu-list">
+            <li><a class="menu-link menu-link-wide" href="/cadastrar-pessoa-fisica" target="_blank">Cadastro de pessoa física</a></li>
+            <li><a class="menu-link menu-link-wide" href="/cadastrar-pessoa-juridica" target="_blank">Cadastro de pessoa jurídica</a></li>
+            <li><a class="menu-link menu-link-wide" href="/cadastrar-usuario" target="_blank">Cadastro de usuário do sistema</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="secao-com-imagem">
+        <img src="/static/images/modulo_infraestrutura.png" alt="Infraestrutura Rodoviária" class="img-secao">
+        <div>
+          <h4>Infraestrutura Rodoviária</h4>
+          <ul class="menu-list">
+            <li style="position:relative; width:100%;">
+              <a class="menu-link menu-link-wide" href="#" id="menu-cadastro-elemento">Cadastro de elemento rodoviário &#x25B6;</a>
+              <div id="submenu-cadastro-elemento" style="display:none; position:absolute; left:100%; top:0; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.13); border-radius:8px; min-width:365px; z-index:10; width:365px;">
+                <a class="menu-link" href="/cadastrar-trecho-rodoviario" target="_blank" style="border-radius:8px 8px 0 0;">Trecho rodoviário</a>
+                <a class="menu-link" href="/cadastrar-rodovia" target="_blank">Rodovia</a>
+                <a class="menu-link" href="/cadastrar-dispositivo" target="_blank">Dispositivo</a>
+                <a class="menu-link" href="/cadastrar-obra-arte" target="_blank" style="border-radius:0 0 8px 8px;">Obra de arte</a>
+              </div>
+            </li>
+            <li style="width:100%;"><a class="menu-link menu-link-wide" href="/pagina_em_construcao" target="_blank">Avaliação de elemento rodoviário (IQI)</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="secao-com-imagem">
+        <img src="/static/images/geoserviços.png" alt="Geo Serviços" class="img-secao">
+        <div>
+          <h4>Geo Serviços</h4>
+          <ul class="menu-list">
+            <li><a class="menu-link menu-link-wide" href="http://www.fad-webgis.lat.s3-website.us-east-2.amazonaws.com/" target="_blank">WebGIS</a></li>
+            <li><a class="menu-link menu-link-wide" href="/pagina_em_construcao" target="_blank">Publicador de camadas <span style="font-size:13px;">(em construção)</span></a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin: 2.5rem 0 1.5rem 0; text-align: center;">
+        <a href="/login" class="btn-acesso-fad">Acesso ao sistema</a>
+      </div>
+      <div style="text-align: center;">
+        <a href="/" class="btn-voltar-fad" title="Retornar para a página inicial">
+          <span style="vertical-align: middle; display: inline-block; margin-right: 6px;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M10 2L2 10H5V18H9V13H11V18H15V10H18L10 2Z" fill="#004080"/></svg>
+          </span>
+          Página inicial
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    Plataforma FAD &copy; 2025 &mdash; Governo do Estado de São Paulo<br>
+    Desenvolvido pelo DER/SP | Suporte: suporte@fad.sp.gov.br
+  </div>
+  <script>
+    const menu = document.getElementById('menu-cadastro-elemento');
+    const submenu = document.getElementById('submenu-cadastro-elemento');
+    menu.addEventListener('mouseenter', () => { submenu.style.display = 'block'; });
+    menu.addEventListener('mouseleave', () => { setTimeout(()=>{ if(!submenu.matches(':hover')) submenu.style.display = 'none'; }, 200); });
+    submenu.addEventListener('mouseleave', () => { submenu.style.display = 'none'; });
+    menu.addEventListener('click', e => { e.preventDefault(); submenu.style.display = submenu.style.display==='block'?'none':'block'; });
+  </script>
+</body>
+</html>

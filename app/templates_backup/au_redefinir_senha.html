@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Redefinir Senha - FAD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      padding: 0;
+    }
+    .redefinir-container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .redefinir-container h2 {
+      color: #003366;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    .redefinir-container .user-info {
+      background: #e8f4fd;
+      border: 1px solid #b3d9f7;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .redefinir-container .user-info strong {
+      color: #003366;
+    }
+    .password-field {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .redefinir-container input,
+    .redefinir-container button {
+      width: 100%;
+      padding: 0.875rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .redefinir-container input:focus {
+      outline: none;
+      border-color: #006699;
+      box-shadow: 0 0 0 2px rgba(0,102,153,0.1);
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #666;
+      user-select: none;
+    }
+    .toggle-password:hover {
+      color: #006699;
+    }
+    .password-strength {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+    .strength-weak {
+      background: #ffeaa7;
+      color: #d63031;
+      border: 1px solid #fdcb6e;
+    }
+    .strength-medium {
+      background: #ffeaa7;
+      color: #e17055;
+      border: 1px solid #fdcb6e;
+    }
+    .strength-strong {
+      background: #d5f4e6;
+      color: #00b894;
+      border: 1px solid #81ecec;
+    }
+    .password-requirements {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    .requirement {
+      margin: 0.25rem 0;
+      color: #666;
+    }
+    .requirement.met {
+      color: #28a745;
+    }
+    .requirement.met::before {
+      content: "✓ ";
+      font-weight: bold;
+    }
+    .requirement:not(.met)::before {
+      content: "○ ";
+    }
+    .password-suggestions {
+      background: #e3f2fd;
+      border: 1px solid #bbdefb;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1rem 0;
+      text-align: left;
+    }
+    .suggestion-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      font-family: monospace;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .suggestion-item:hover {
+      background: #f0f8ff;
+      border-color: #006699;
+    }
+    .redefinir-container button {
+      background-color: #006699;
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .redefinir-container button:hover:not(:disabled) {
+      background-color: #005080;
+    }
+    .redefinir-container button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    .dialog-header {
+      padding: 15px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .dialog-body {
+      padding: 20px;
+      text-align: center;
+    }
+    .close-button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .ok-button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      background: #006699;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .hidden {
+      display: none;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #006699;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <img src="/static/images/fad_logo_banco_completo1.png"
+           alt="FAD - Ferramenta de Análise Dinamizada"
+           class="logo-fad">
+    </div>
+  </header>
+
+  <div class="redefinir-container">
+    <h2>🔐 Redefinir Senha</h2>
+    
+    <div class="user-info">
+      <strong>Usuário:</strong> {{ usuario_nome }}<br>
+      <strong>Email:</strong> {{ usuario_email }}
+    </div>
+
+    <form id="redefineForm">
+      <input type="hidden" name="token" value="{{ token }}">
+      
+      <div class="password-field">
+        <input type="password" 
+               name="nova_senha" 
+               id="nova_senha"
+               placeholder="Nova senha" 
+               required>
+        <span class="toggle-password" onclick="togglePassword('nova_senha')">👁️</span>
+      </div>
+      <div id="strengthIndicator" class="password-strength hidden"></div>
+      
+      <div class="password-field">
+        <input type="password" 
+               name="confirmar_senha" 
+               id="confirmar_senha"
+               placeholder="Confirmar nova senha" 
+               required>
+        <span class="toggle-password" onclick="togglePassword('confirmar_senha')">👁️</span>
+      </div>
+
+      <div class="password-requirements">
+        <strong>Requisitos da senha:</strong>
+        <div class="requirement" id="req-length">Pelo menos 8 caracteres</div>
+        <div class="requirement" id="req-upper">Uma letra maiúscula</div>
+        <div class="requirement" id="req-lower">Uma letra minúscula</div>
+        <div class="requirement" id="req-number">Um número</div>
+        <div class="requirement" id="req-special">Um caractere especial (!@#$%^&*...)</div>
+      </div>
+
+      <div class="password-suggestions">
+        <strong>💡 Sugestões de senhas seguras:</strong>
+        <small style="display: block; margin-bottom: 0.5rem; color: #666;">
+          Clique em uma sugestão para usar:
+        </small>
+        {% for sugestao in sugestoes_senha %}
+        <div class="suggestion-item" onclick="useSuggestion('{{ sugestao }}')">
+          {{ sugestao }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" id="submitBtn" disabled>
+        Alterar Senha
+      </button>
+    </form>
+  </div>
+
+  <!-- Dialog de resultado -->
+  <div id="resultDialog" class="dialog hidden">
+    <div class="dialog-header">
+      <span id="dialogTitle">Resultado</span>
+      <button class="close-button" onclick="closeDialog()">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p id="dialogMessage"></p>
+      <button class="ok-button" onclick="closeDialog()">OK</button>
+    </div>
+  </div>
+
+  <!-- Dialog de carregamento -->
+  <div id="loadingDialog" class="dialog hidden">
+    <div class="dialog-header">
+      <span>Processando...</span>
+    </div>
+    <div class="dialog-body">
+      <div class="loading-spinner"></div>
+      <p>Alterando sua senha...</p>
+    </div>
+  </div>
+
+  <script>
+    const novaSenhaInput = document.getElementById('nova_senha');
+    const confirmarSenhaInput = document.getElementById('confirmar_senha');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('redefineForm');
+    
+    // Elementos de requisitos
+    const requirements = {
+      length: document.getElementById('req-length'),
+      upper: document.getElementById('req-upper'),
+      lower: document.getElementById('req-lower'),
+      number: document.getElementById('req-number'),
+      special: document.getElementById('req-special')
+    };
+
+    // Valida requisitos da senha
+    function validatePassword(password) {
+      const checks = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?]/.test(password)
+      };
+
+      // Atualiza indicadores visuais
+      Object.keys(checks).forEach(key => {
+        if (checks[key]) {
+          requirements[key].classList.add('met');
+        } else {
+          requirements[key].classList.remove('met');
+        }
+      });
+
+      const allMet = Object.values(checks).every(Boolean);
+      
+      // Indicador de força
+      const strengthIndicator = document.getElementById('strengthIndicator');
+      const metCount = Object.values(checks).filter(Boolean).length;
+      
+      if (password.length === 0) {
+        strengthIndicator.classList.add('hidden');
+      } else {
+        strengthIndicator.classList.remove('hidden');
+        
+        if (metCount <= 2) {
+          strengthIndicator.className = 'password-strength strength-weak';
+          strengthIndicator.textContent = '🔴 Senha fraca';
+        } else if (metCount <= 4) {
+          strengthIndicator.className = 'password-strength strength-medium';
+          strengthIndicator.textContent = '🟡 Senha média';
+        } else {
+          strengthIndicator.className = 'password-strength strength-strong';
+          strengthIndicator.textContent = '🟢 Senha forte';
+        }
+      }
+
+      return allMet;
+    }
+
+    // Valida se as senhas coincidem
+    function validatePasswordMatch() {
+      const senha1 = novaSenhaInput.value;
+      const senha2 = confirmarSenhaInput.value;
+      
+      if (senha2.length > 0 && senha1 !== senha2) {
+        confirmarSenhaInput.setCustomValidity('As senhas não coincidem');
+        return false;
+      } else {
+        confirmarSenhaInput.setCustomValidity('');
+        return true;
+      }
+    }
+
+    // Atualiza botão de envio
+    function updateSubmitButton() {
+      const senhaValida = validatePassword(novaSenhaInput.value);
+      const senhasIguais = validatePasswordMatch();
+      const senha2Preenchida = confirmarSenhaInput.value.length > 0;
+      
+      submitBtn.disabled = !(senhaValida && senhasIguais && senha2Preenchida);
+    }
+
+    // Event listeners
+    novaSenhaInput.addEventListener('input', function() {
+      validatePassword(this.value);
+      updateSubmitButton();
+    });
+
+    confirmarSenhaInput.addEventListener('input', function() {
+      validatePasswordMatch();
+      updateSubmitButton();
+    });
+
+    // Usar sugestão de senha
+    function useSuggestion(password) {
+      novaSenhaInput.value = password;
+      confirmarSenhaInput.value = password;
+      validatePassword(password);
+      updateSubmitButton();
+    }
+
+    // Toggle visibilidade da senha
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.type = field.type === 'password' ? 'text' : 'password';
+    }
+
+    // Envio do formulário
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      const loadingDialog = document.getElementById('loadingDialog');
+      const resultDialog = document.getElementById('resultDialog');
+      
+      loadingDialog.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const encodedData = new URLSearchParams();
+      formData.forEach((value, key) => {
+        encodedData.append(key, value);
+      });
+
+      try {
+        const response = await fetch('/recuperacao/redefinir', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: encodedData
+        });
+
+        loadingDialog.classList.add('hidden');
+        
+        const data = await response.json();
+        
+        const dialogTitle = document.getElementById('dialogTitle');
+        const dialogMessage = document.getElementById('dialogMessage');
+
+        if (data.success) {
+          dialogTitle.textContent = '✅ Sucesso!';
+          dialogMessage.textContent = data.message;
+          resultDialog.classList.remove('hidden');
+          
+          // Redireciona após 3 segundos
+          setTimeout(() => {
+            if (data.redirect) {
+              window.location.href = data.redirect;
+            } else {
+              window.location.href = '/login';
+            }
+          }, 3000);
+        } else {
+          dialogTitle.textContent = '❌ Erro';
+          dialogMessage.textContent = data.message;
+          resultDialog.classList.remove('hidden');
+        }
+
+      } catch (error) {
+        loadingDialog.classList.add('hidden');
+        
+        const dialogTitle = document.getElementById('dialogTitle');
+        const dialogMessage = document.getElementById('dialogMessage');
+        
+        dialogTitle.textContent = '❌ Erro de Conexão';
+        dialogMessage.textContent = 'Não foi possível conectar com o servidor. Tente novamente.';
+        resultDialog.classList.remove('hidden');
+      }
+
+      submitBtn.disabled = false;
+    });
+
+    function closeDialog() {
+      document.getElementById('resultDialog').classList.add('hidden');
+      document.getElementById('loadingDialog').classList.add('hidden');
+    }
+
+    // Logo clicável
+    document.addEventListener('DOMContentLoaded', function() {
+      const logo = document.querySelector('.logo-fad');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', function() {
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
+
+  <script src="/static/js/componentes/fad_header.js"></script>
+</body>
+</html>

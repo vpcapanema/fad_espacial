@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from datetime import datetime
+from pathlib import Path
+import zipfile
 
 from app.database.session import get_db
 from app.models.pr_geometrias_upload import GeometriaUpload
@@ -94,5 +96,70 @@ def validar_geometria(db: Session = Depends(get_db)):
 
         return JSONResponse(content={"validado": aprovado})
 
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"validado": False, "erro": str(e)})
+@router.post("/validar/{id_upload}")
+def validar_geometria(id_upload: int, db: Session = Depends(get_db)):
+    try:
+        # Buscar upload
+        upload = db.query(GeometriaUpload).filter(GeometriaUpload.upload_id == id_upload).first()
+        if not upload:
+            return JSONResponse(status_code=404, content={"validado": False, "erro": "Upload não encontrado."})
+
+        # Caminho do arquivo zip
+        nome_base = upload.arquivo.replace('.zip', '')
+        temp_dir = Path("temp") / nome_base
+        zip_path = temp_dir / upload.arquivo
+        if not zip_path.exists():
+            return JSONResponse(status_code=404, content={"validado": False, "erro": "Arquivo ZIP não encontrado."})
+
+        # Checar arquivos obrigatórios
+        obrigatorios = {'.shp': False, '.shx': False, '.dbf': False, '.prj': False}
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            for f in z.namelist():
+                for ext in obrigatorios:
+                    if f.lower().endswith(ext):
+                        obrigatorios[ext] = True
+        erros = []
+        if not (obrigatorios['.shp'] and obrigatorios['.shx'] and obrigatorios['.dbf']):
+            erros.append("Faltam arquivos obrigatórios (.shp, .shx, .dbf). Upload reprovado.")
+        if not obrigatorios['.prj']:
+            # Aqui você pode chamar função para reprojetar para EPSG 5880 (mock)
+            pass # Implementar reprojeção se necessário
+        # Checar campo cod
+        if not upload.n_cod_trecho_preenchido or upload.n_cod_trecho_preenchido == 0:
+            erros.append("Campo 'cod' não preenchido.")
+        # Checar topologia, comprimento, sobreposição, dentro de SP, etc (mock)
+        # ...
+        # Se houver erros, gerar relatório e reprovar
+        if erros:
+            nome_pdf = f"validacao_{upload.id}_erro.pdf"
+            gerar_relatorio_validacao(
+                usuario=upload,
+                resultados_dict={},
+                erros=erros,
+                aprovado=False,
+                nome_pdf=nome_pdf
+            )
+            return JSONResponse(status_code=400, content={
+                "validado": False,
+                "mensagem": "Geometria reprovada.",
+                "relatorio": f"/static/relatorios/{nome_pdf}",
+                "erros": erros
+            })
+        # Se aprovado, gerar relatório de sucesso
+        nome_pdf = f"validacao_{upload.id}_ok.pdf"
+        gerar_relatorio_validacao(
+            usuario=upload,
+            resultados_dict={"arquivos_obrigatorios": True, "cod_preenchido": True},
+            erros=[],
+            aprovado=True,
+            nome_pdf=nome_pdf
+        )
+        return JSONResponse(content={
+            "validado": True,
+            "mensagem": "Geometria validada com sucesso.",
+            "relatorio": f"/static/relatorios/{nome_pdf}"
+        })
     except Exception as e:
         return JSONResponse(status_code=500, content={"validado": False, "erro": str(e)})

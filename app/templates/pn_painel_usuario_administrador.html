@@ -1,0 +1,24 @@
+<!-- Painel do Coordenador - FAD -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <title>Painel do Coordenador - FAD</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; }
+    .painel-header { background: #003366; color: #fff; padding: 20px; text-align: center; }
+    .session-status { background:#e3f2fd;color:#003366;padding:10px 0;text-align:center;font-size:17px;font-weight:bold;letter-spacing:0.5px; }
+  </style>
+</head>
+<body>
+  <div class="painel-header">
+    <h1>Painel do Coordenador</h1>
+    <h2>Bem-vindo(a), {{ usuario.nome.split(' ')[0] }}</h2>
+  </div>
+  <div class="session-status">
+    Usuário logado: {{ usuario.nome }} |
+    Tempo restante da sessão: <span id="session-timer"></span>
+  </div>
+  <script src="/static/js/session_control.js"></script>
+</body>
+</html>

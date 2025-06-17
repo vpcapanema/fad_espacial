@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - FAD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
 
   <style>
     body {
@@ -18,6 +20,8 @@
       right: 25px;
       font-size: 14px;
       color: #333;
+      text-align: center;
+      width: 100%;
     }
 
     .cadastro-topo a {
@@ -77,18 +81,18 @@
     }
 
     .dialog {
-    position: fixed; /* <== ALTERADO para fixar no centro da tela */
-    top: 50%;         /* <== Centraliza verticalmente */
-    left: 50%;        /* <== Centraliza horizontalmente */
-    transform: translate(-50%, -50%);  /* <== Ajusta para centralização absoluta */
-    width: 300px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
     }
-    
+
     .dialog-header {
       padding: 10px;
       background: #f1f1f1;
@@ -137,49 +141,84 @@
     .hidden {
       display: none;
     }
+
+    .feedback-erro {
+      background: #ffeaea;
+      color: #b30000;
+      border: 1px solid #ffb3b3;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(255,0,0,0.05);
+      animation: shake 0.2s 1;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Link de cadastro no topo -->
-  <div class="cadastro-topo">
-    Não tem acesso? <a href="/cadastro">Cadastre-se aqui</a>
-  </div>
+  {% include 'componentes/fad_header.html' %}
+  <script>
+    // Torna a logo da FAD clicável para ir para a home
+    document.addEventListener('DOMContentLoaded', function() {
+      const logo = document.querySelector('.logo-fad');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', function() {
+          window.location.href = '/';
+        });
+      }
+    });
+  </script>
 
-  <!-- Formulário de login -->
+  <div class="cadastro-topo" style="text-align: right; width: 100%;">
+    <span style="color: #fff; display: block;">Não tem cadastro?</span>
+    <a href="/cadastro-usuario" style="color: #fff; font-weight: bold; text-decoration: underline; display: inline-block; margin-top: 2px;">Cadastre-se aqui</a>
+  </div>
   <div class="login-container">
     <h2>Acesso à FAD</h2>
     <form id="loginForm">
+      <div id="feedbackErro" class="feedback-erro hidden"></div>
       <input type="email" name="email" placeholder="E-mail institucional" required>
-      <div style="position: relative;"><input type="password" name="senha" id="senhaInput" placeholder="Senha" required><span onclick="toggleSenha()" style="position: absolute; right: 10px; top: 10px; cursor: pointer;" title="Mostrar/ocultar senha">👁️</span></div>
+      <div style="position: relative;">
+        <input type="password" name="senha" id="senhaInput" placeholder="Senha" required>
+        <span onclick="toggleSenha()" style="position: absolute; right: 10px; top: 10px; cursor: pointer;" title="Mostrar/ocultar senha">👁️</span>
+      </div>
 
       <label for="tipo">Tipo de Acesso:</label>
       <select id="tipo" name="tipo" required>
-        <option value="comum">Comum</option>
-        <option value="administrador">Administrador</option>
+        <option value="analista">Analista</option>
+        <option value="coordenador">Coordenador</option>
         <option value="master">Master</option>
       </select>
 
-    <button type="submit">Entrar</button>
+      <button type="submit">Entrar</button>
     </form>
-
+    
     <div class="link-extra">
-      <a href="/recuperar-senha">Esqueci minha senha</a>
+      <a href="/recuperacao/solicitar">Esqueci minha senha</a>
     </div>
   </div>
 
-  <!-- Caixa de erro visual -->
   <div id="erroLogin" class="dialog hidden">
     <div class="dialog-header">
       <span id="erroLoginTexto">Erro</span>
-      <button class="close-button" onclick="document.getElementById('erroLogin').style.display='none'; location.reload();">&times;</button>
+      <button class="close-button" onclick="document.getElementById('erroLogin').style.display='none';">&times;</button>
     </div>
     <div class="dialog-body">
-      <button class="ok-button" onclick="document.getElementById('erroLogin').style.display='none'; location.reload();">OK</button>
+      <button class="ok-button" onclick="document.getElementById('erroLogin').style.display='none';">OK</button>
     </div>
   </div>
 
-  <!-- Caixa de carregamento -->
   <div id="caixaCarregando" class="dialog hidden">
     <div class="dialog-header">
       <span>Autenticando...</span>
@@ -190,68 +229,93 @@
   </div>
 
   <script>
-  const form = document.getElementById("loginForm");
-  const erroBox = document.getElementById("erroLogin");
-  const erroTexto = document.getElementById("erroLoginTexto");
-  const carregandoBox = document.getElementById("caixaCarregando");
+    const form = document.getElementById("loginForm");
+    const erroBox = document.getElementById("erroLogin");
+    const erroTexto = document.getElementById("erroLoginTexto");
+    const carregandoBox = document.getElementById("caixaCarregando");
+    const feedbackErro = document.getElementById("feedbackErro");
 
-  form.addEventListener("submit", async function(event) {
-    event.preventDefault();
-    erroBox.classList.add("hidden");
-    carregandoBox.classList.remove("hidden");
-
-    const formData = new FormData(form);
-    const encodedData = new URLSearchParams();
-    formData.forEach((value, key) => {
-      encodedData.append(key, value);
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+      erroBox.classList.add("hidden");
+      feedbackErro.classList.add("hidden");
+      carregandoBox.classList.remove("hidden");
+      const formData = new FormData(form);
+      const encodedData = new URLSearchParams();
+      formData.forEach((value, key) => {
+        encodedData.append(key, value);
+      });
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: encodedData
+        });
+        carregandoBox.classList.add("hidden");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.redirect) {
+            window.location.href = data.redirect; // Alterado de window.open
+          } else {
+            feedbackErro.textContent = "Login realizado, mas sem redirecionamento.";
+            feedbackErro.classList.remove("hidden");
+          }
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          let msg = errorData.message || "Erro inesperado. Código: " + response.status;
+          erroTexto.textContent = msg;
+          erroBox.classList.remove("hidden");
+          erroBox.querySelector('.ok-button').onclick = function() {
+            window.location.reload();
+          };
+        }
+      } catch (e) {
+        carregandoBox.classList.add("hidden");
+        erroTexto.textContent = "Erro de conexão com o servidor.";
+        erroBox.classList.remove("hidden");
+        erroBox.querySelector('.ok-button').onclick = function() {
+          window.location.reload();
+        };
+      }
     });
 
-    try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: encodedData
-      });
-
-      carregandoBox.classList.add("hidden");
-
-      if (response.ok) {
-        const html = await response.text();
-        document.open();
-        document.write(html);
-        document.close();
-      } else {
-        if (response.status === 401) {
-  const errorText = await response.text();
-  if (errorText.includes("email")) {
-    erroTexto.textContent = "E-mail não cadastrado.";
-  } else if (errorText.includes("senha")) {
-    erroTexto.textContent = "Senha incorreta.";
-  } else {
-    erroTexto.textContent = "Credenciais inválidas.";
-  }
-} else if (response.status === 403) {
-          erroTexto.textContent = "Aguardando aprovação do administrador.";
-        } else {
-          erroTexto.textContent = "Erro inesperado. Código: " + response.status;
-        }
-        erroBox.classList.remove("hidden");
-      }
-    } catch (error) {
-      carregandoBox.classList.add("hidden");
-      erroTexto.textContent = "Erro de conexão com o servidor.";
-      erroBox.classList.remove("hidden");
+    function toggleSenha() {
+      const senhaInput = document.getElementById("senhaInput");
+      senhaInput.type = senhaInput.type === "password" ? "text" : "password";
     }
-  });
-</script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const emailInput = document.querySelector('input[name="email"]');
+      const tipoSelect = document.getElementById('tipo');
+      emailInput.addEventListener('blur', async function() {
+        const email = emailInput.value.trim();
+        if (!email) return;
+        tipoSelect.innerHTML = '<option>Carregando...</option>';
+        try {
+          const formData = new FormData();
+          formData.append('email', email);
+          const resp = await fetch('/login/tipos-acesso', { method: 'POST', body: formData });
+          const tipos = await resp.json();
+          tipoSelect.innerHTML = '';
+          if (tipos.length === 0) {
+            tipoSelect.innerHTML = '<option value="">Nenhum acesso encontrado</option>';
+          } else {
+            tipos.forEach(t => {
+              const opt = document.createElement('option');
+              opt.value = t.value;
+              opt.textContent = t.label;
+              tipoSelect.appendChild(opt);
+            });
+          }
+        } catch (e) {
+          tipoSelect.innerHTML = '<option value="">Erro ao buscar tipos</option>';
+        }
+      });
+    });
+  </script>
+
+  <script src="/static/js/componentes/fad_header.js"></script>
 </body>
-</html>  
-
-
-
-<script>function toggleSenha() { const senhaInput = document.getElementById("senhaInput"); senhaInput.type = senhaInput.type === "password" ? "text" : "password"; }</script>
-
-
-
+</html>

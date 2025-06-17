@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Recuperar Senha - FAD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      padding: 0;
+    }
+    .voltar-login {
+      position: absolute;
+      top: 15px;
+      left: 25px;
+      font-size: 14px;
+      color: #333;
+    }
+    .voltar-login a {
+      text-decoration: none;
+      color: #007bff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .voltar-login a:hover {
+      text-decoration: underline;
+    }
+    .recovery-container {
+      max-width: 450px;
+      margin: 80px auto;
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+    }
+    .recovery-container h2 {
+      color: #003366;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    .recovery-container .subtitle {
+      color: #666;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .recovery-container input,
+    .recovery-container select,
+    .recovery-container button {
+      width: 100%;
+      padding: 0.875rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    .recovery-container input:focus,
+    .recovery-container select:focus {
+      outline: none;
+      border-color: #006699;
+      box-shadow: 0 0 0 2px rgba(0,102,153,0.1);
+    }
+    .recovery-container button {
+      background-color: #006699;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    .recovery-container button:hover {
+      background-color: #005080;
+    }
+    .recovery-container button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .recovery-container .info-box {
+      background: #e3f2fd;
+      border: 1px solid #bbdefb;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      color: #0d47a1;
+      font-size: 14px;
+      text-align: left;
+    }
+    .recovery-container .warning-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      color: #856404;
+      font-size: 14px;
+    }
+    .recovery-container .link-extra {
+      margin-top: 1.5rem;
+      font-size: 14px;
+    }
+    .recovery-container .link-extra a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .recovery-container .link-extra a:hover {
+      text-decoration: underline;
+    }
+    .dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    .dialog-header {
+      padding: 15px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .dialog-body {
+      padding: 20px;
+      text-align: center;
+    }
+    .dialog-body p {
+      margin: 0;
+      padding: 5px 0;
+      line-height: 1.5;
+    }
+    .close-button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .ok-button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      background: #006699;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .ok-button:hover {
+      background: #005080;
+    }
+    .hidden {
+      display: none;
+    }
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #006699;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <img src="/static/images/fad_logo_banco_completo1.png"
+           alt="FAD - Ferramenta de Análise Dinamizada"
+           class="logo-fad">
+    </div>
+  </header>
+
+  <div class="voltar-login">
+    <a href="/login">
+      ← Voltar ao Login
+    </a>
+  </div>
+
+  <div class="recovery-container">
+    <h2>🔐 Recuperar Senha</h2>
+    <p class="subtitle">
+      Insira seu email e tipo de acesso para receber instruções de recuperação de senha.
+    </p>
+
+    <form id="recoveryForm">
+      <input type="email" 
+             name="email" 
+             placeholder="E-mail institucional" 
+             required 
+             autocomplete="email">
+      
+      <label for="tipo" style="display: block; text-align: left; margin-bottom: 5px; color: #333; font-weight: 500;">
+        Tipo de Acesso:
+      </label>
+      <select id="tipo" name="tipo" required>
+        <option value="">Selecione seu tipo de acesso</option>
+        <option value="analista">Analista</option>
+        <option value="coordenador">Coordenador</option>
+        <option value="master">Master</option>
+      </select>
+
+      <button type="submit" id="submitBtn">
+        Enviar Instruções
+      </button>
+    </form>
+
+    <div class="info-box">
+      <strong>ℹ️ Como funciona:</strong><br>
+      • Você receberá um email com link seguro<br>
+      • O link expira em 15 minutos<br>
+      • Use o link para criar uma nova senha<br>
+      • Máximo de 3 tentativas por hora
+    </div>
+
+    <div class="warning-box">
+      <strong>⚠️ Importante:</strong> Verifique sua caixa de spam se não receber o email em alguns minutos.
+    </div>
+
+    <div class="link-extra">
+      <a href="/login">Lembrei da minha senha</a>
+    </div>
+  </div>
+
+  <!-- Dialog de resultado -->
+  <div id="resultDialog" class="dialog hidden">
+    <div class="dialog-header">
+      <span id="dialogTitle">Resultado</span>
+      <button class="close-button" onclick="closeDialog()">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p id="dialogMessage"></p>
+      <button class="ok-button" onclick="closeDialog()">OK</button>
+    </div>
+  </div>
+
+  <!-- Dialog de carregamento -->
+  <div id="loadingDialog" class="dialog hidden">
+    <div class="dialog-header">
+      <span>Processando...</span>
+    </div>
+    <div class="dialog-body">
+      <div class="loading-spinner"></div>
+      <p>Enviando instruções de recuperação...</p>
+    </div>
+  </div>
+
+  <script>
+    // Torna a logo da FAD clicável para ir para a home
+    document.addEventListener('DOMContentLoaded', function() {
+      const logo = document.querySelector('.logo-fad');
+      if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', function() {
+          window.location.href = '/';
+        });
+      }
+    });
+
+    const form = document.getElementById("recoveryForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultDialog = document.getElementById("resultDialog");
+    const loadingDialog = document.getElementById("loadingDialog");
+    const dialogTitle = document.getElementById("dialogTitle");
+    const dialogMessage = document.getElementById("dialogMessage");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      // Mostra loading
+      loadingDialog.classList.remove("hidden");
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const encodedData = new URLSearchParams();
+      formData.forEach((value, key) => {
+        encodedData.append(key, value);
+      });
+
+      try {
+        const response = await fetch("/recuperacao/solicitar", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: encodedData
+        });
+
+        loadingDialog.classList.add("hidden");
+        
+        const data = await response.json();
+
+        if (data.success) {
+          dialogTitle.textContent = "✅ Enviado!";
+          dialogMessage.textContent = data.message;
+          resultDialog.classList.remove("hidden");
+          
+          // Redireciona após 3 segundos
+          setTimeout(() => {
+            if (data.redirect) {
+              window.location.href = data.redirect;
+            } else {
+              window.location.href = "/login";
+            }
+          }, 3000);
+        } else {
+          dialogTitle.textContent = "❌ Erro";
+          dialogMessage.textContent = data.message;
+          resultDialog.classList.remove("hidden");
+        }
+
+      } catch (error) {
+        loadingDialog.classList.add("hidden");
+        dialogTitle.textContent = "❌ Erro de Conexão";
+        dialogMessage.textContent = "Não foi possível conectar com o servidor. Tente novamente.";
+        resultDialog.classList.remove("hidden");
+      }
+
+      submitBtn.disabled = false;
+    });
+
+    function closeDialog() {
+      resultDialog.classList.add("hidden");
+      loadingDialog.classList.add("hidden");
+    }
+
+    // Fecha dialog com ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeDialog();
+      }
+    });
+  </script>
+
+  <script src="/static/js/componentes/fad_header.js"></script>
+</body>
+</html>

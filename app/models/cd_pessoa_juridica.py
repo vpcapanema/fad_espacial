@@ -13,7 +13,6 @@ class PessoaJuridica(Base):
     nome_fantasia = Column(String, nullable=True)
     email = Column(String, nullable=False)
     telefone = Column(String, nullable=False)
-    celular = Column(String, nullable=True)
     rua = Column(String, nullable=False)
     numero = Column(String, nullable=False)
     complemento = Column(String, nullable=True)
@@ -22,7 +21,6 @@ class PessoaJuridica(Base):
     cidade = Column(String, nullable=False)
     uf = Column(String, nullable=False)
     criado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
-    atualizado_em = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
 
     projetos = relationship(
         "Projeto",

@@ -1,0 +1,453 @@
+<!-- Componente de navegação entre módulos da FAD-GEO -->
+<div class="modular-navigation" id="modulosNavegacao">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Cabeçalho do fluxo -->
+                <div class="fluxo-header mb-4">
+                    <h4>
+                        <i class="fas fa-route text-primary"></i>
+                        Fluxo Sequencial FAD-GEO
+                    </h4>
+                    <p class="text-muted mb-0">
+                        Projeto: <strong id="nomeProjetoFluxo">-</strong> 
+                        | Progresso: <span id="progressoFluxo" class="badge badge-info">0%</span>
+                    </p>
+                </div>
+
+                <!-- Barra de progresso geral -->
+                <div class="progress mb-4" style="height: 8px;">
+                    <div id="progressoBarraFluxo" class="progress-bar bg-success" role="progressbar" 
+                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+
+                <!-- Cards dos módulos -->
+                <div class="row" id="cardsModulos">
+                    <!-- Módulo 1: Cadastro -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card" data-modulo="1" id="cardModulo1">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-clipboard-list fa-2x" id="iconModulo1"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Cadastro</h6>
+                                <small class="status-text" id="statusModulo1">Pendente</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-acessar" 
+                                            data-modulo="1" id="btnModulo1" disabled>
+                                        Acessar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 2: Conformidade Ambiental -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card" data-modulo="2" id="cardModulo2">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-leaf fa-2x" id="iconModulo2"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Conformidade<br>Ambiental</h6>
+                                <small class="status-text" id="statusModulo2">Bloqueado</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-acessar" 
+                                            data-modulo="2" id="btnModulo2" disabled>
+                                        Acessar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 3: Favorabilidade Multicritério -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card" data-modulo="3" id="cardModulo3">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-balance-scale fa-2x" id="iconModulo3"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Favorabilidade<br>Multicritério</h6>
+                                <small class="status-text" id="statusModulo3">Bloqueado</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-acessar" 
+                                            data-modulo="3" id="btnModulo3" disabled>
+                                        Acessar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 4: Favorabilidade Socioeconômica -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card" data-modulo="4" id="cardModulo4">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-users fa-2x" id="iconModulo4"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Favorabilidade<br>Socioeconômica</h6>
+                                <small class="status-text" id="statusModulo4">Bloqueado</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-acessar" 
+                                            data-modulo="4" id="btnModulo4" disabled>
+                                        Acessar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulo 5: Favorabilidade Infraestrutural -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card" data-modulo="5" id="cardModulo5">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-road fa-2x" id="iconModulo5"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Favorabilidade<br>Infraestrutural</h6>
+                                <small class="status-text" id="statusModulo5">Bloqueado</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-primary btn-acessar" 
+                                            data-modulo="5" id="btnModulo5" disabled>
+                                        Acessar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Área de PDF Final -->
+                    <div class="col-md-2 mb-3">
+                        <div class="card modulo-card pdf-final" id="cardPdfFinal">
+                            <div class="card-body text-center p-3">
+                                <div class="modulo-icon mb-2">
+                                    <i class="fas fa-file-pdf fa-2x text-danger" id="iconPdfFinal"></i>
+                                </div>
+                                <h6 class="card-title mb-1">Relatório<br>Final PDF</h6>
+                                <small class="status-text" id="statusPdfFinal">Aguardando</small>
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-danger btn-pdf" 
+                                            id="btnGerarPdf" disabled>
+                                        Gerar PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legenda de status -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="alert alert-info py-2">
+                            <strong>Legenda:</strong>
+                            <span class="ml-3">
+                                <i class="fas fa-clock text-secondary"></i> Pendente
+                            </span>
+                            <span class="ml-3">
+                                <i class="fas fa-spinner text-primary"></i> Em Execução
+                            </span>
+                            <span class="ml-3">
+                                <i class="fas fa-check-circle text-warning"></i> Aguardando Validação
+                            </span>
+                            <span class="ml-3">
+                                <i class="fas fa-check-circle text-success"></i> Validado
+                            </span>
+                            <span class="ml-3">
+                                <i class="fas fa-times-circle text-danger"></i> Rejeitado
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS específico para navegação modular -->
+<style>
+.modular-navigation {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.modulo-card {
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+    min-height: 180px;
+}
+
+.modulo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.modulo-card.ativo {
+    border-color: #007bff;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.modulo-card.concluido {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.modulo-card.validado {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.modulo-card.rejeitado {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.modulo-card.bloqueado {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modulo-card .modulo-icon i {
+    transition: all 0.3s ease;
+}
+
+.modulo-card:hover .modulo-icon i {
+    transform: scale(1.1);
+}
+
+.modulo-card.ativo .modulo-icon i,
+.modulo-card.concluido .modulo-icon i,
+.modulo-card.validado .modulo-icon i {
+    color: white;
+}
+
+.btn-acessar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-pdf {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border: none;
+    color: white;
+}
+
+.btn-pdf:enabled:hover {
+    background: linear-gradient(45deg, #c82333, #bd2130);
+    color: white;
+}
+
+.fluxo-header h4 {
+    margin-bottom: 5px;
+}
+
+.status-text {
+    font-weight: 500;
+}
+
+.pdf-final {
+    border-color: #dc3545;
+}
+
+.pdf-final.disponivel {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .modulo-card {
+        min-height: 150px;
+    }
+    
+    .modulo-card .card-title {
+        font-size: 0.9rem;
+    }
+    
+    .modulo-icon i {
+        font-size: 1.5rem !important;
+    }
+}
+</style>
+
+<!-- JavaScript para controle da navegação modular -->
+<script>
+class NavegacaoModular {
+    constructor(projetoId) {
+        this.projetoId = projetoId;
+        this.init();
+    }
+
+    async init() {
+        await this.carregarStatusProjeto();
+        this.bindEvents();
+        // Atualiza a cada 30 segundos
+        setInterval(() => this.carregarStatusProjeto(), 30000);
+    }
+
+    async carregarStatusProjeto() {
+        try {
+            const response = await fetch(`/api/pr/fluxo/navegacao/${this.projetoId}`);
+            if (!response.ok) throw new Error('Erro ao carregar status');
+            
+            const data = await response.json();
+            this.atualizarInterface(data);
+        } catch (error) {
+            console.error('Erro ao carregar navegação:', error);
+            this.mostrarErro('Erro ao carregar status do projeto');
+        }
+    }
+
+    atualizarInterface(data) {
+        // Atualiza informações gerais
+        document.getElementById('progressoFluxo').textContent = `${data.progresso_percentual}%`;
+        document.getElementById('progressoBarraFluxo').style.width = `${data.progresso_percentual}%`;
+        
+        // Atualiza cada módulo
+        data.navegacao.forEach(modulo => {
+            this.atualizarCardModulo(modulo);
+        });
+
+        // Atualiza botão PDF
+        this.atualizarBotaoPdf(data.todos_concluidos);
+    }
+
+    atualizarCardModulo(modulo) {
+        const card = document.getElementById(`cardModulo${modulo.numero}`);
+        const icon = document.getElementById(`iconModulo${modulo.numero}`);
+        const status = document.getElementById(`statusModulo${modulo.numero}`);
+        const btn = document.getElementById(`btnModulo${modulo.numero}`);
+
+        // Remove todas as classes de status
+        card.classList.remove('ativo', 'concluido', 'validado', 'rejeitado', 'bloqueado');
+        
+        // Atualiza ícone baseado no status
+        const iconMap = {
+            'pendente': 'fa-clock text-secondary',
+            'em_execucao': 'fa-spinner fa-spin text-primary',
+            'concluido': 'fa-check-circle text-warning',
+            'validado': 'fa-check-circle text-success',
+            'rejeitado': 'fa-times-circle text-danger'
+        };
+
+        icon.className = `fas ${iconMap[modulo.status] || 'fa-question-circle'} fa-2x`;
+        
+        // Atualiza status text
+        const statusMap = {
+            'pendente': 'Pendente',
+            'em_execucao': 'Em Execução',
+            'concluido': 'Aguardando Validação',
+            'validado': 'Validado',
+            'rejeitado': 'Rejeitado'
+        };
+        
+        status.textContent = statusMap[modulo.status] || 'Desconhecido';
+        
+        // Atualiza classe do card
+        if (modulo.status === 'em_execucao') {
+            card.classList.add('ativo');
+        } else if (modulo.status === 'validado') {
+            card.classList.add('validado');
+        } else if (modulo.status === 'concluido') {
+            card.classList.add('concluido');
+        } else if (modulo.status === 'rejeitado') {
+            card.classList.add('rejeitado');
+        } else if (!modulo.pode_acessar) {
+            card.classList.add('bloqueado');
+        }
+
+        // Atualiza botão
+        btn.disabled = !modulo.pode_acessar;
+        if (modulo.pode_acessar) {
+            btn.textContent = modulo.status === 'validado' ? 'Visualizar' : 'Acessar';
+        } else {
+            btn.textContent = 'Bloqueado';
+        }
+    }
+
+    atualizarBotaoPdf(todosConcluidos) {
+        const cardPdf = document.getElementById('cardPdfFinal');
+        const statusPdf = document.getElementById('statusPdfFinal');
+        const btnPdf = document.getElementById('btnGerarPdf');
+        
+        if (todosConcluidos) {
+            cardPdf.classList.add('disponivel');
+            statusPdf.textContent = 'Disponível';
+            btnPdf.disabled = false;
+            btnPdf.textContent = 'Gerar PDF';
+        } else {
+            cardPdf.classList.remove('disponivel');
+            statusPdf.textContent = 'Aguardando';
+            btnPdf.disabled = true;
+            btnPdf.textContent = 'Aguardando';
+        }
+    }
+
+    bindEvents() {
+        // Event listeners para botões de módulos
+        document.querySelectorAll('.btn-acessar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modulo = e.target.dataset.modulo;
+                this.acessarModulo(modulo);
+            });
+        });
+
+        // Event listener para gerar PDF
+        document.getElementById('btnGerarPdf')?.addEventListener('click', () => {
+            this.gerarPdf();
+        });
+    }
+
+    acessarModulo(numeroModulo) {
+        const url = `/modulo/${this.projetoId}/${numeroModulo}`;
+        window.location.href = url;
+    }
+
+    async gerarPdf() {
+        try {
+            const response = await fetch(`/api/pr/pdf/gerar/${this.projetoId}`, {
+                method: 'POST'
+            });
+            
+            if (!response.ok) throw new Error('Erro ao gerar PDF');
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `FAD-GEO-Projeto-${this.projetoId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            this.mostrarErro('Erro ao gerar PDF do projeto');
+        }
+    }
+
+    mostrarErro(mensagem) {
+        // Implementar notificação de erro
+        alert(mensagem);
+    }
+}
+
+// Função para inicializar a navegação modular
+function inicializarNavegacaoModular(projetoId, nomeProjeto = '') {
+    if (nomeProjeto) {
+        document.getElementById('nomeProjetoFluxo').textContent = nomeProjeto;
+    }
+    
+    return new NavegacaoModular(projetoId);
+}
+</script>

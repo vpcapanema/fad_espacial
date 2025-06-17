@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Rotas - Sistema FAD</title>
+    <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #3498db;
+        }
+
+        .section h2 {
+            color: #2980b9;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .route-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .route-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .route-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .route-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+
+        .route-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .route-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 8px;
+        }
+
+        .method-GET { background-color: #28a745; color: white; }
+        .method-POST { background-color: #007bff; color: white; }
+        .method-PUT { background-color: #ffc107; color: black; }
+        .method-DELETE { background-color: #dc3545; color: white; }
+
+        .route-url {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #6c757d;
+            word-break: break-all;
+        }
+
+        .route-description {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .route-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+
+        .route-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .route-link.disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #ffffff, #f1f3f4);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2980b9;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .navigation {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 8px 12px;
+            margin: 5px 0;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .nav-item:hover {
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                display: none;
+            }
+            
+            .route-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'componentes/fad_header.html' %}
+
+    <div class="container">
+        <h1>🗺️ Mapa de Rotas - Sistema FAD</h1>
+        
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Pesquisar rotas...">
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRoutes">0</div>
+                <div class="stat-label">Total de Rotas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="getRoutes">0</div>
+                <div class="stat-label">Rotas GET</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="postRoutes">0</div>
+                <div class="stat-label">Rotas POST</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="otherRoutes">0</div>
+                <div class="stat-label">Outras Rotas</div>
+            </div>
+        </div>
+
+        <!-- Páginas -->
+        <div class="section" id="section-paginas">
+            <h2>📄 Páginas</h2>            <h3>Iniciais</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Página Inicial</div><div class="route-method method-GET">GET</div><div class="route-url">/</div><div class="route-description">Página inicial do sistema FAD</div><a href="/" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Boas-vindas</div><div class="route-method method-GET">GET</div><div class="route-url">/boas-vindas</div><div class="route-description">Página de boas-vindas da plataforma FAD</div><a href="/boas-vindas" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Login</div><div class="route-method method-GET">GET</div><div class="route-url">/login</div><div class="route-description">Tela de autenticação do usuário</div><a href="/login" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cabeçalho FAD</div><div class="route-method method-GET">GET</div><div class="route-url">/cabecalho-fad</div><div class="route-description">Visualização do cabeçalho padrão FAD</div><a href="/cabecalho-fad" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Debug</div><div class="route-method method-GET">GET</div><div class="route-url">/debug</div><div class="route-description">Informações de debug do sistema</div><a href="/debug" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+            <h3>Cadastros</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Cadastro de Usuário</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-usuario</div><div class="route-description">Formulário de cadastro de usuário</div><a href="/cadastrar-usuario" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Pessoa Física</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-pessoa-fisica</div><div class="route-description">Formulário de cadastro de pessoa física</div><a href="/cadastrar-pessoa-fisica" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Pessoa Jurídica</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-pessoa-juridica</div><div class="route-description">Formulário de cadastro de pessoa jurídica</div><a href="/cadastrar-pessoa-juridica" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Trecho Rodoviário</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-trecho-rodoviario</div><div class="route-description">Formulário de cadastro de trecho rodoviário</div><a href="/cadastrar-trecho-rodoviario" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Rodovia</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-rodovia</div><div class="route-description">Formulário de cadastro de rodovia</div><a href="/cadastrar-rodovia" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Dispositivo</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-dispositivo</div><div class="route-description">Formulário de cadastro de dispositivo</div><a href="/cadastrar-dispositivo" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cadastro Obra de Arte</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastrar-obra-arte</div><div class="route-description">Formulário de cadastro de obra de arte</div><a href="/cadastrar-obra-arte" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+            <h3>Painéis</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Painel Usuário Comum</div><div class="route-method method-GET">GET</div><div class="route-url">/painel-analista</div><div class="route-description">Painel principal para usuários comuns</div><a href="/painel-analista" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Painel Coordenador</div><div class="route-method method-GET">GET</div><div class="route-url">/painel-coordenador</div><div class="route-description">Painel principal para coordenadores</div><a href="/painel-coordenador" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Painel Master</div><div class="route-method method-GET">GET</div><div class="route-url">/painel-master</div><div class="route-description">Painel principal para usuários master</div><a href="/painel-master" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+            <h3>Projetos</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Cadastro de Projeto</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastro-projeto</div><div class="route-description">Formulário de cadastro de projeto</div><a href="/cadastro-projeto" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Novo Projeto</div><div class="route-method method-GET">GET</div><div class="route-url">/novo-projeto</div><div class="route-description">Formulário para novo projeto</div><a href="/novo-projeto" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Importar Geometria</div><div class="route-method method-GET">GET</div><div class="route-url">/importar</div><div class="route-description">Importação de geometria</div><a href="/importar" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+            <h3>Conformidade</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Conformidade Ambiental</div><div class="route-method method-GET">GET</div><div class="route-url">/conformidade-ambiental</div><div class="route-description">Página de conformidade ambiental</div><a href="/conformidade-ambiental" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+            <h3>Recuperação de Senha</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Solicitar Recuperação</div><div class="route-method method-GET">GET</div><div class="route-url">/recuperacao/solicitar</div><div class="route-description">Página para solicitar recuperação de senha</div><a href="/recuperacao/solicitar" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Redefinir Senha</div><div class="route-method method-GET">GET</div><div class="route-url">/recuperacao/redefinir</div><div class="route-description">Página para redefinir senha</div><a href="/recuperacao/redefinir" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+        </div>
+
+        <!-- Funções (Endpoints) -->
+        <div class="section" id="section-funcoes">
+            <h2>🔧 Funções (Endpoints)</h2>
+            <h3>Cadastros</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Cadastrar Usuário (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/cd/usuario</div><div class="route-description">Endpoint para cadastrar usuário</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Pessoa Física (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/gravar-pessoa-fisica</div><div class="route-description">Endpoint para cadastrar pessoa física</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Pessoa Jurídica (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/gravar-pessoa-juridica</div><div class="route-description">Endpoint para cadastrar pessoa jurídica</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Trecho Rodoviário (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/cd/trecho-rodoviario/cadastrar</div><div class="route-description">Endpoint para cadastrar trecho rodoviário</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Rodovia (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/cd/rodovia/cadastrar</div><div class="route-description">Endpoint para cadastrar rodovia</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Dispositivo (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/cd/dispositivo/cadastrar</div><div class="route-description">Endpoint para cadastrar dispositivo</div><span class="route-link disabled">POST Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Cadastrar Obra de Arte (POST)</div><div class="route-method method-POST">POST</div><div class="route-url">/api/cd/obra-arte/cadastrar</div><div class="route-description">Endpoint para cadastrar obra de arte</div><span class="route-link disabled">POST Endpoint</span></div>
+            </div>
+            <h3>Consultas/Listagens</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Listar Trechos Rodoviários</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/trecho-rodoviario/listar</div><div class="route-description">Endpoint para listar trechos rodoviários</div><span class="route-link disabled">GET Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Listar Rodovias</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/rodovia/listar</div><div class="route-description">Endpoint para listar rodovias</div><span class="route-link disabled">GET Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Listar Dispositivos</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/dispositivo/listar</div><div class="route-description">Endpoint para listar dispositivos</div><span class="route-link disabled">GET Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Listar Obras de Arte</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/obra-arte/listar</div><div class="route-description">Endpoint para listar obras de arte</div><span class="route-link disabled">GET Endpoint</span></div>
+            </div>
+            <h3>Outras Funções</h3>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Proxy ReceitaWS CNPJ</div><div class="route-method method-GET">GET</div><div class="route-url">/proxy/receitaws/cnpj/{cnpj}</div><div class="route-description">Proxy para buscar dados de CNPJ na ReceitaWS</div><span class="route-link disabled">GET Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Validar CPF</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/validar-cpf/{cpf}</div><div class="route-description">Validação de CPF</div><span class="route-link disabled">GET Endpoint</span></div>
+                <div class="route-card"><div class="route-title">Validar CNPJ</div><div class="route-method method-GET">GET</div><div class="route-url">/api/cd/validar-cnpj/{cnpj}</div><div class="route-description">Validação de CNPJ</div><span class="route-link disabled">GET Endpoint</span></div>
+            </div>
+        </div>
+
+        <!-- Backend (HTML Sender) -->
+        <div class="section" id="section-backend">
+            <h2>🛠 Backend (HTML Sender)</h2>
+            <div class="route-grid">
+                <div class="route-card"><div class="route-title">Formulário de Envio de Cadastro de Usuário</div><div class="route-method method-GET">GET</div><div class="route-url">/cadastro-usuario-sistema-envio</div><div class="route-description">Interface backend de envio de dados de cadastro</div><a href="/cadastro-usuario-sistema-envio" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Visualizar Cadastro Fictício</div><div class="route-method method-GET">GET</div><div class="route-url">/visualizar-cadastro-ficticio</div><div class="route-description">Visualização de cadastro fictício para testes</div><a href="/visualizar-cadastro-ficticio" class="route-link" target="_blank">Acessar</a></div>
+                <div class="route-card"><div class="route-title">Cabeçalho FAD</div><div class="route-method method-GET">GET</div><div class="route-url">/cabecalho-fad</div><div class="route-description">Visualização do cabeçalho FAD</div><a href="/cabecalho-fad" class="route-link" target="_blank">Acessar</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegação Lateral -->
+    <div class="navigation">
+        <a href="#section-paginas" class="nav-item">📄 Páginas</a>
+        <a href="#section-auth" class="nav-item">🔐 Auth</a>
+        <a href="#section-cadastros" class="nav-item">👥 Cadastros</a>
+        <a href="#section-rodoviarios" class="nav-item">🛣️ Rodoviários</a>
+        <a href="#section-paineis" class="nav-item">📊 Painéis</a>
+        <a href="#section-projetos" class="nav-item">📁 Projetos</a>
+        <a href="#section-ambiental" class="nav-item">🌱 Ambiental</a>
+        <a href="#section-recuperacao" class="nav-item">🔑 Recuperação</a>
+        <a href="#section-apis" class="nav-item">🔧 APIs</a>
+    </div>
+
+    <script>
+        // Contadores de estatísticas
+        function updateStats() {
+            const routeCards = document.querySelectorAll('.route-card');
+            const getMethods = document.querySelectorAll('.method-GET');
+            const postMethods = document.querySelectorAll('.method-POST');
+            
+            document.getElementById('totalRoutes').textContent = routeCards.length;
+            document.getElementById('getRoutes').textContent = getMethods.length;
+            document.getElementById('postRoutes').textContent = postMethods.length;
+            document.getElementById('otherRoutes').textContent = 
+                routeCards.length - getMethods.length - postMethods.length;
+        }
+
+        // Funcionalidade de pesquisa
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const routeCards = document.querySelectorAll('.route-card');
+            const sections = document.querySelectorAll('.section');
+            
+            routeCards.forEach(card => {
+                const title = card.querySelector('.route-title').textContent.toLowerCase();
+                const url = card.querySelector('.route-url').textContent.toLowerCase();
+                const description = card.querySelector('.route-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || url.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Ocultar seções vazias
+            sections.forEach(section => {
+                const visibleCards = section.querySelectorAll('.route-card:not([style*="display: none"])');
+                if (visibleCards.length === 0 && searchTerm) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
+                }
+            });
+        });
+
+        // Smooth scroll para navegação
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Inicializar estatísticas
+        updateStats();
+
+        // Adicionar efeito de loading nos links
+        document.querySelectorAll('.route-link:not(.disabled)').forEach(link => {
+            link.addEventListener('click', function() {
+                this.innerHTML = '⏳ Carregando...';
+                setTimeout(() => {
+                    this.innerHTML = this.getAttribute('data-original') || 'Acessar';
+                }, 2000);
+            });
+        });
+
+        // Armazenar texto original dos botões
+        document.querySelectorAll('.route-link:not(.disabled)').forEach(link => {
+            link.setAttribute('data-original', link.innerHTML);
+        });
+    </script>
+
+    <script src="/static/js/componentes/fad_header.js"></script>
+</body>
+</html>

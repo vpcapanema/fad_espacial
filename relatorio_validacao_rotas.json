@@ -1,0 +1,53 @@
+{
+  "data_validacao": "2025-06-17T10:26:55.292014",
+  "servidor": "http://localhost:8000",
+  "total_rotas": 6,
+  "rotas_ok": 6,
+  "rotas_criticas_ok": 5,
+  "total_criticas": 5,
+  "status_geral": "✅ SISTEMA FUNCIONANDO CORRETAMENTE",
+  "resultados": [
+    {
+      "nome": "Homepage",
+      "url": "/",
+      "critico": false,
+      "sucesso": true,
+      "mensagem": "✅ Status 200"
+    },
+    {
+      "nome": "Login Page",
+      "url": "/login",
+      "critico": true,
+      "sucesso": true,
+      "mensagem": "✅ Status 200"
+    },
+    {
+      "nome": "Painel Master (Redirect)",
+      "url": "/painel-master/",
+      "critico": true,
+      "sucesso": true,
+      "mensagem": "✅ Status 302"
+    },
+    {
+      "nome": "Dados Analistas",
+      "url": "/painel-master/dados/analistas",
+      "critico": true,
+      "sucesso": true,
+      "mensagem": "✅ Status 200"
+    },
+    {
+      "nome": "Auditoria PF",
+      "url": "/painel-master/auditoria/pessoa-fisica/1",
+      "critico": true,
+      "sucesso": true,
+      "mensagem": "✅ Status 404"
+    },
+    {
+      "nome": "Exportação PF",
+      "url": "/painel-master/exportar/pessoa-fisica/1/csv",
+      "critico": true,
+      "sucesso": true,
+      "mensagem": "✅ Status 404"
+    }
+  ]
+}

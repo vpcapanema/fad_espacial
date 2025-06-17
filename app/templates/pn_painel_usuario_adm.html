@@ -1,3 +1,4 @@
+<!-- ✅ Template atualizado para usar fad_header.html padronizado -->
 <!DOCTYPE html>
 
 <html lang="pt-br">
@@ -379,15 +380,7 @@ button.btn-fad:hover {
 }
 </style></head>
 <body>
-<header class="fad-header">
-<div class="logout">
-<form action="/login/logout" method="get">
-<button class="btn-fad" type="submit">Sair</button>
-</form>
-</div>
-<h1>FAD</h1>
-<h2>FERRAMENTA DE ANÁLISE DINAMIZADA</h2>
-</header>
+{% include "componentes/fad_header.html" %}
 <div class="boas-vindas">
 <h2>Bem-vindo(a), {{ usuario.nome }}</h2>
 <h3 id="data-hoje"></h3>

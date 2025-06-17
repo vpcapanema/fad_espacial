@@ -7,20 +7,19 @@ class PessoaFisica(Base):
     __tablename__ = "pessoa_fisica"
     __table_args__ = {"schema": "Cadastro"}
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)  # Chave primária única
     nome = Column(String, nullable=False)
-    cpf = Column(String, nullable=False, unique=True)
+    cpf = Column(String, nullable=False, unique=True)  # CPF único
     email = Column(String, nullable=False)
     telefone = Column(String, nullable=False)
-    rua = Column(String, nullable=False)
+    logradouro = Column(String, nullable=False)
     numero = Column(String, nullable=False)
     complemento = Column(String, nullable=True)
-    bairro = Column(String, nullable=False)
     cep = Column(String, nullable=False)
-    cidade = Column(String, nullable=False)  # Alterado de 'municipio' para 'cidade'
+    bairro = Column(String, nullable=False)
+    municipio = Column(String, nullable=False)
     uf = Column(String, nullable=False)
     criado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
-    atualizado_em = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
 
     usuarios = relationship(
         "UsuarioSistema",

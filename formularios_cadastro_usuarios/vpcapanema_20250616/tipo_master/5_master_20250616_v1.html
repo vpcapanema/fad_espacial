@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Usuário - Vinicius do Prado Capanema</title>    <style>
+        /* === ESTILOS GERAIS === */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #f4f8fb; 
+            color: #222; 
+            margin: 0;
+            padding: 0;
+            print-color-adjust: exact; /* Padrão CSS */
+            -webkit-print-color-adjust: exact; /* WebKit */
+        }
+        
+        .formulario-cadastro { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 32px 24px 24px 24px; 
+            background: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 16px #00336622;
+        }
+          /* === OTIMIZAÇÕES PARA PDF (PRESERVANDO ESTILO FAD) === */
+        @media print {
+            /* Força preservação de todas as cores e estilos no PDF */
+            * {
+                print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+            
+            /* Ajustes mínimos para PDF sem alterar o visual */
+            .formulario-cadastro {
+                box-shadow: none !important; /* Remove sombra apenas no PDF */
+                margin: 0 !important; /* Usa toda a página */
+                max-width: none !important; /* Largura total da página */
+            }
+            
+            /* Evita quebras indesejadas nos elementos */
+            .secao {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .campo-grupo {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* Garante que as cores FAD sejam mantidas */
+            .fad-header-logo,
+            .secao-titulo,
+            .secao,
+            .campo-valor,
+            .campo-valor.ativo-sim,
+            .campo-valor.ativo-nao {
+                print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+        }
+        .fad-header-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+            background: #003366;
+            border-radius: 12px 12px 0 0;
+            padding: 24px 0 18px 0;
+        }
+        .fad-header-logo img {
+            max-width: 140px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .cadastro-titulo {
+            font-size: 1.6rem;
+            color: #fff;
+            font-weight: bold;
+            text-align: center;
+            margin: 0 0 2px 0;
+            letter-spacing: 1px;
+        }
+        .secao {
+            margin-bottom: 32px;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            background: #f7fafd;
+        }
+        .secao-titulo {
+            background: #e3ecf7;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e6ed;
+            font-weight: bold;
+            color: #003366;
+            font-size: 1.1rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .secao-conteudo {
+            padding: 20px;
+        }        .campo-grupo { display: flex; flex-wrap: wrap; gap: 2%; margin-bottom: 12px; }
+        .campo { display: flex; flex-direction: column; margin-bottom: 0; }        /* 1. Informações Pessoais */
+        .campo.nome { width: 82.53%; }
+        .campo.id { width: 15.47%; margin-left: auto; }
+        .campo.cpf { width: 100%; }
+        .campo.telefone { width: 100%; }
+        .campo.email { width: 82.53%; }
+        .campo.pessoa_fisica_id { width: 15.47%; margin-left: auto; }
+        
+        /* 2. Informações Profissionais */
+        .campo.instituicao { width: 75%; }
+        .campo.lotacao { width: 23%; margin-left: auto; }
+        .campo.email_institucional { width: 51.11%; }
+        .campo.telefone_institucional { width: 25.78%; }
+        .campo.ramal { width: 19.11%; margin-left: auto; }
+          /* Hierarquia Sede */
+        .campo.sede_hierarquia { width: 100%; }
+        .campo.sede_assistencia_direta { width: 100%; }
+        .campo.sede_diretoria { width: 100%; }
+        .campo.sede_coordenadoria_geral { width: 100%; }
+        .campo.sede_coordenadoria { width: 100%; }
+        .campo.sede_assistencia { width: 100%; }
+        
+        /* Hierarquia Regional */
+        .campo.regional_nome { width: 100%; }
+        .campo.regional_coordenadoria { width: 100%; }
+        .campo.regional_setor { width: 100%; }
+        
+        /* 4. Informações do Sistema */
+        .campo.tipo { width: 29.13%; }
+        .campo.status { width: 34.01%; }
+        .campo.ativo { width: 28%; margin-left: auto; }
+        .campo.criado_em { width: 100%; }
+        .campo-label { font-size: 12px; color: #555; font-weight: bold; margin-bottom: 2px; }
+        .campo-valor { background: #fff; border: 1px solid #dbe3ee; border-radius: 4px; padding: 8px 10px; margin-bottom: 8px; }
+        .campo-valor.ativo-sim { color: #218838; font-weight: bold; }
+        .campo-valor.ativo-nao { color: #c82333; font-weight: bold; }
+        .rodape { margin-top: 32px; font-size: 12px; color: #888; text-align: right; }
+        @media (max-width: 700px) {
+            .formulario-cadastro { padding: 8px; }
+            .campo-grupo { flex-direction: column; gap: 8px; }
+            .campo { width: 100% !important; }
+        }
+    </style>
+</head>
+<body>    <div class="formulario-cadastro">
+        <div class="fad-header-logo">
+            <img src="/app/static/images/fad_logo_banco_completo1.png" alt="FAD - Ferramenta de Análise Dinamizada">
+            <div class="cadastro-titulo">COMPROVANTE DE CADASTRO DE USUÁRIO</div>
+        </div><!-- 1. INFORMAÇÕES PESSOAIS (ENUMERAÇÃO DINÂMICA) -->
+        <div class="secao">
+            <div class="secao-titulo">1. Informações Pessoais</div>
+            <div class="secao-conteudo">
+                <!-- 1.1 Nome e ID (sempre presentes) -->
+                <div class="campo-grupo">
+                    
+                    <div class="campo nome">
+                        <div class="campo-label">1.1 Nome completo</div>
+                        <div class="campo-valor">Vinicius do Prado Capanema</div>
+                    </div>
+                    
+                    
+                    <div class="campo id">
+                        <div class="campo-label">ID Usuário</div>
+                        <div class="campo-valor">5</div>
+                    </div>
+                    
+                </div>
+                  <!-- 1.2 CPF -->
+                
+                <div class="campo-grupo">
+                    <div class="campo cpf">
+                        <div class="campo-label">1.2 CPF</div>
+                        <div class="campo-valor">01499296177</div>
+                    </div>
+                </div>
+                
+                
+                <!-- 1.3 Telefone -->
+                
+                <div class="campo-grupo">
+                    <div class="campo telefone">
+                        <div class="campo-label">1.3 Telefone Celular</div>
+                        <div class="campo-valor">11971100509</div>
+                    </div>
+                </div>
+                
+                
+                <!-- 1.4 E-mail e Pessoa Física ID -->
+                
+                <div class="campo-grupo">
+                    
+                    <div class="campo email">
+                        <div class="campo-label">1.4 E-mail Pessoal</div>
+                        <div class="campo-valor">vpcapanema@der.sp.gov.br</div>
+                    </div>
+                    
+                    
+                    <div class="campo pessoa_fisica_id">
+                        <div class="campo-label">ID Pessoa Física</div>
+                        <div class="campo-valor">6</div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>        <!-- 2. INFORMAÇÕES PROFISSIONAIS (HIERARQUIA DINÂMICA DER/SP) -->
+        
+        <div class="secao">
+            <div class="secao-titulo">2. Informações Profissionais</div>
+            <div class="secao-conteudo">
+                
+                <!-- 2.1 Instituição e 2.2 Tipo de Lotação -->
+                
+                <div class="campo-grupo">
+                    
+                    <div class="campo instituicao">
+                        <div class="campo-label">2.1 Instituição</div>
+                        <div class="campo-valor">DER/SP</div>
+                    </div>
+                    
+                    
+                    <div class="campo lotacao">
+                        <div class="campo-label">2.2 Tipo de Lotação</div>
+                        <div class="campo-valor">sede</div>
+                    </div>
+                    
+                </div>
+                
+
+                <!-- INFORMAÇÕES DE CONTATO INSTITUCIONAL -->
+                
+                <div class="campo-grupo">
+                    
+                    <div class="campo email_institucional">
+                        <div class="campo-label">3.1 E-mail Institucional</div>
+                        <div class="campo-valor">vpcapanema@der.sp.gov.br</div>
+                    </div>
+                    
+                    
+                    <div class="campo telefone_institucional">
+                        <div class="campo-label">3.2 Telefone Comercial</div>
+                        <div class="campo-valor">(11) 3311-4200</div>
+                    </div>
+                    
+                    
+                    <div class="campo ramal">
+                        <div class="campo-label">3.3 Ramal</div>
+                        <div class="campo-valor">5884</div>
+                    </div>
+                    
+                </div>
+                                <!-- HIERARQUIA SEDE (se tipo_lotacao = 'sede') -->
+                
+                
+                    <!-- 2.3 Hierarquia Sede Principal -->
+                    
+                    <div class="campo-grupo">
+                        <div class="campo sede_hierarquia">
+                            <div class="campo-label">2.3 Hierarquia Sede</div>
+                            <div class="campo-valor">Diretorias</div>
+                        </div>
+                    </div>
+                    
+
+                    <!-- 2.4 Órgãos de Assistência Direta -->
+                    
+
+                    <!-- 2.5 Diretoria e hierarquia descendente -->
+                    
+                    <div class="campo-grupo">
+                        <div class="campo sede_diretoria">
+                            <div class="campo-label">2.5 Diretoria</div>
+                            <div class="campo-valor">Diretoria de Planejamento - DP</div>
+                        </div>
+                    </div>
+                    
+
+                    <!-- 2.6 Coordenadoria Geral -->
+                    
+                    <div class="campo-grupo">
+                        <div class="campo sede_coordenadoria_geral">
+                            <div class="campo-label">2.6 Coordenadoria Geral</div>
+                            <div class="campo-valor">Coordenadoria Geral de Planejamento e Pesquisa - CGPP</div>
+                        </div>
+                    </div>
+                    
+
+                    <!-- 2.7 Coordenadoria -->
+                    
+                    <div class="campo-grupo">
+                        <div class="campo sede_coordenadoria">
+                            <div class="campo-label">2.7 Coordenadoria</div>
+                            <div class="campo-valor">Coordenadoria de Estudos e Pesquisas - CEP</div>
+                        </div>
+                    </div>
+                                        <!-- 2.8 Assistência (campo opcional) -->
+                    
+
+                
+
+                <!-- HIERARQUIA REGIONAL (se tipo_lotacao = 'regional') -->
+                
+            </div>
+        </div>
+                <!-- 4. INFORMAÇÕES DE ACESSO AO SISTEMA -->
+        
+        <div class="secao">
+            <div class="secao-titulo">4. Informações de Acesso ao Sistema</div>
+            <div class="secao-conteudo">
+                <!-- 4.1 Tipo, Status e Ativo -->
+                
+                <div class="campo-grupo">
+                    
+                    <div class="campo tipo">
+                        <div class="campo-label">4.1 Tipo de Usuário</div>
+                        <div class="campo-valor">master</div>
+                    </div>
+                    
+                    
+                    <div class="campo status">
+                        <div class="campo-label">4.2 Status</div>
+                        <div class="campo-valor">aprovado</div>
+                    </div>
+                    
+                    
+                    <div class="campo ativo">
+                        <div class="campo-label">4.3 Ativo</div>
+                        <div class="campo-valor ativo-sim">Sim</div>
+                    </div>
+                    
+                </div>
+                
+                
+                <!-- 4.4 Data de Criação -->
+                
+                <div class="campo-grupo">
+                    <div class="campo criado_em">
+                        <div class="campo-label">4.4 Criado em</div>
+                        <div class="campo-valor">26/03/2025 03:34</div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+
+        <div class="rodape">
+            Documento gerado automaticamente em 16/06/2025 01:39:36
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+    // Função para aplicar máscara de CPF
+    function mascaraCPF(cpf) {
+        cpf = cpf.replace(/\D/g, "");
+        cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+        cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+        cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        return cpf;
+    }
+    // Função para aplicar máscara de telefone (celular ou fixo)
+    function mascaraTelefone(tel) {
+        tel = tel.replace(/\D/g, "");
+        if (tel.length > 10) {
+            tel = tel.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        } else {
+            tel = tel.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+        }
+        return tel;
+    }
+    $(document).ready(function() {
+        // Aplica máscara visual nos campos de CPF
+        $(".campo.cpf .campo-valor").each(function() {
+            var texto = $(this).text().replace(/\D/g, "");
+            if (texto.length === 11) {
+                $(this).text(mascaraCPF(texto));
+            }
+        });
+        // Aplica máscara visual nos campos de telefone
+        $(".campo.telefone .campo-valor, .campo.telefone_institucional .campo-valor").each(function() {
+            var texto = $(this).text().replace(/\D/g, "");
+            if (texto.length >= 10) {
+                $(this).text(mascaraTelefone(texto));
+            }
+        });
+    });
+    </script>
+</body>
+</html>

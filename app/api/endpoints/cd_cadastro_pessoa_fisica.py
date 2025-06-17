@@ -15,28 +15,36 @@ templates = Jinja2Templates(directory="app/templates")
 # Página de cadastro de PF (interface HTML)
 @router.get("/cadastrar-pessoa-fisica")
 def interessado_pf(request: Request, db: Session = Depends(get_db)):
-    pjs = db.query(PessoaJuridica).all()
-    trechos = db.query(TrechoEstadualizacao).all()
-    return templates.TemplateResponse("cd_interessado_pf.html", {
-        "request": request,
-        "pjs": pjs,
-        "trechos": trechos
-    })
+    print("[LOG PF] Acessando página de cadastro de pessoa física")
+    try:
+        # Pessoa física é independente - não precisa carregar PJs nem trechos
+        return templates.TemplateResponse("cd_interessado_pf.html", {
+            "request": request
+        })
+    except Exception as e:
+        print(f"[LOG PF] Erro ao carregar página: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {e}")
 
 # 🔄 Endpoint JSON para atualização da lista de PFs
 @router.get("/cadastro/pfs/json")
 def listar_pfs_json(db: Session = Depends(get_db)):
-    pfs = db.query(PessoaFisica).all()
-    return [
-        {
-            "id": pf.id,
-            "nome": pf.nome,
-            "cpf": pf.cpf,
-            "email": pf.email,
-            "telefone": pf.telefone
-        }
-        for pf in pfs
-    ]
+    print("[LOG PF] Carregando lista de pessoas físicas para JSON")
+    try:
+        pfs = db.query(PessoaFisica).all()
+        print(f"[LOG PF] Encontradas {len(pfs)} pessoas físicas")
+        return [
+            {
+                "id": pf.id,
+                "nome": pf.nome,
+                "cpf": pf.cpf,
+                "email": pf.email,
+                "telefone": pf.telefone
+            }
+            for pf in pfs
+        ]
+    except Exception as e:
+        print(f"[LOG PF] Erro ao carregar lista de pessoas físicas: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno ao carregar lista de pessoas físicas")
 
 # 🔄 Endpoint JSON para atualização da lista de PJs
 @router.get("/cadastro/pjs/json")
@@ -112,27 +120,30 @@ def validar_cpf_endpoint(cpf: str, db: Session = Depends(get_db)):
 
 @router.post("/cadastrar-pessoa-fisica", status_code=status.HTTP_201_CREATED)
 def cadastrar_pessoa_fisica(dados: dict = Body(...), db: Session = Depends(get_db)):
+    print(f"[LOG PF] Recebida requisição para cadastrar pessoa física: {dados}")
     campos_obrigatorios = [
-        'nome', 'cpf', 'email', 'telefone', 'rua', 'numero', 'bairro', 'cep', 'cidade', 'uf'
+        'nome', 'cpf', 'email', 'telefone', 'logradouro', 'numero', 'bairro', 'cep', 'municipio', 'uf'
     ]
     for campo in campos_obrigatorios:
         if not dados.get(campo):
+            print(f"[LOG PF] Campo obrigatório ausente: {campo}")
             raise HTTPException(status_code=400, detail=f"Campo obrigatório ausente: {campo}")
     # Normaliza CPF
     cpf_limpo = re.sub(r"\D", "", dados['cpf'])
     if db.query(PessoaFisica).filter(PessoaFisica.cpf == cpf_limpo).first():
+        print("[LOG PF] CPF já cadastrado")
         raise HTTPException(status_code=400, detail="CPF já cadastrado")
     pf = PessoaFisica(
         nome=dados['nome'],
         cpf=cpf_limpo,
         email=dados['email'],
         telefone=dados['telefone'],
-        rua=dados['rua'],
+        logradouro=dados['logradouro'],
         numero=dados['numero'],
         complemento=dados.get('complemento'),
         bairro=dados['bairro'],
         cep=dados['cep'],
-        cidade=dados['cidade'],
+        municipio=dados['municipio'],
         uf=dados['uf'],
         criado_em=datetime.utcnow()
     )
@@ -140,7 +151,9 @@ def cadastrar_pessoa_fisica(dados: dict = Body(...), db: Session = Depends(get_d
     try:
         db.commit()
         db.refresh(pf)
-    except IntegrityError:
+    except IntegrityError as e:
+        print(f"[LOG PF] Erro de integridade ao cadastrar PF: {e}")
         db.rollback()
         raise HTTPException(status_code=400, detail="Erro de integridade ao cadastrar PF")
+    print(f"[LOG PF] Pessoa Física cadastrada com sucesso: {pf.id}")
     return {"msg": "Pessoa Física cadastrada com sucesso", "id": pf.id}

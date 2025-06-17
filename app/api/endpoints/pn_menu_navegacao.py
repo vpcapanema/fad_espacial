@@ -16,7 +16,7 @@ def geo_de_obra(request: Request):
 
 @router.get("/cadastrar-trechos")
 def cadastrar_trechos(request: Request):
-    return templates.TemplateResponse("cd_interessado_trecho.html", {"request": request})
+    return templates.TemplateResponse("cd_trecho.html", {"request": request})
 
 @router.get("/favorabilidade-multicriterio")
 def fav_multicriterio(request: Request):

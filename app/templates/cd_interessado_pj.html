@@ -931,7 +931,8 @@
     <div style="text-align:center; margin-top: 30px;">
       <a href="/boas-vindas" class="menu-link" style="background:#004080; color:#fff; text-decoration:none; padding:10px 22px; border-radius:6px; font-size:16px; font-weight:500; display:inline-block;">Página inicial</a>
     </div>
-  </div>  <script>
+  </div>  <script type="module" src="/static/js/cd_pj/formulario_pj.js"></script>
+  <script>
     // Sistema de Validação Centralizado
     class ValidadorFormulario {
       constructor() {
@@ -1482,5 +1483,33 @@
       validador.verificarFormularioCompleto();
     });
   </script>
+  <script>
+  document.getElementById('cnpj').addEventListener('blur', async function() {
+    const cnpj = this.value.replace(/\D/g, '');
+    if (cnpj.length === 14) {
+      try {
+        const response = await fetch(`/api/cnpj/${cnpj}`);
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('razao_social').value = data.razao_social || '';
+          document.getElementById('nome_fantasia').value = data.nome_fantasia || '';
+          document.getElementById('email').value = data.email || '';
+          document.getElementById('telefone').value = data.telefone || '';
+          document.getElementById('cep').value = data.cep || '';
+          document.getElementById('rua').value = data.logradouro || '';
+          document.getElementById('bairro').value = data.bairro || '';
+          document.getElementById('cidade').value = data.cidade || '';
+          document.getElementById('uf').value = data.uf || '';
+        } else {
+          alert('CNPJ não encontrado.');
+        }
+      } catch (error) {
+        alert('Erro ao buscar o CNPJ.');
+      }
+    } else {
+      alert('CNPJ inválido.');
+    }
+  });
+</script>
 </body>
 </html>

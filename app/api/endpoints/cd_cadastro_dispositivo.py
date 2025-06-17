@@ -6,7 +6,7 @@ from datetime import datetime
 import re
 from fastapi.templating import Jinja2Templates
 
-router = APIRouter(tags=['Cadastro de Dispositivo'])
+router = APIRouter(prefix="/api/cd", tags=['Cadastro de Dispositivo'])
 templates = Jinja2Templates(directory="app/templates")
 
 def capitalizar_nome(s):
@@ -174,4 +174,4 @@ def obter_dispositivo_por_id(dispositivo_id: int, db: Session = Depends(get_db))
 
 @router.get("/cadastrar-dispositivo")
 def cadastrar_dispositivo_html(request: Request):
-    return templates.TemplateResponse("cd_interessado_dispositivo.html", {"request": request})
+    return templates.TemplateResponse("cd_dispositivo.html", {"request": request})

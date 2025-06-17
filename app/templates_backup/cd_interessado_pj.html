@@ -3,151 +3,1513 @@
 <head>
   <meta charset="UTF-8">
   <title>Cadastro - Pessoa Jurídica</title>
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <link rel="stylesheet" href="/static/css/formulario_pj.css">
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f9ff; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef5f9;
+    }
+
     .form-container {
-      max-width: 600px;
-      margin: 60px auto;
-      padding: 2rem;
+      max-width: 720px;
+      margin: 30px auto;
+      padding: 2rem 2.5%;
       background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .form-container h2 {
-      color: #003366;
-      text-align: center;
-      margin-bottom: 1.5rem;
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid #cce0f5;
+      border-radius: 8px;
+      background-color: #f7fbff;
     }
-    .form-container input {
-      width: 100%;
-      padding: 0.8rem;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }    label {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      position: relative;
+    }
+
+    input, select {
+      padding: 0.7rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      margin-bottom: 1rem;
+      font-size: 1rem;
     }
-    .form-container button {
+
+    button {
+      display: block;
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.9rem;
       background-color: #009933;
       color: white;
       border: none;
       border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
+      margin-top: 2rem;
     }
-    .form-container button:hover { background-color: #007a29; }
-    .dialog { margin: 30px auto; width: 300px; background: white; border: 1px solid #ccc;
-      border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); display: none; }
-    .dialog-header {
-      padding: 10px; background: #f1f1f1; border-bottom: 1px solid #ccc;
-      border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;
+
+    button:hover {
+      background-color: #007a29;
     }
-    .dialog-body { padding: 15px; text-align: center; }
-    .close-button {
-      background: #cc0000; color: white; border: none; border-radius: 4px;
-      width: 24px; height: 24px; font-size: 16px; cursor: pointer;
+
+    #sucessoBox {
+      display: none;
+      color: #0b6600;
+      background: #e6ffe6;
+      border: 1px solid #0b6600;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
     }
-    .ok-button {
-      margin-top: 10px; padding: 6px 16px; background: #006699; color: white;
-      border: none; border-radius: 4px; cursor: pointer;
+
+    #erroBox {
+      display: none;
+      color: #a80000;
+      background: #ffeaea;
+      border: 1px solid #a80000;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .botao-fad {
+      display: block;
+      margin: 32px auto 0 auto;
+      padding: 0.9rem 2.5rem;
+      background-color: #b0b7c3;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+    }
+    .botao-fad.ativo {
+      background-color: #0056b3;
+    }
+    .botao-fad:disabled {
+      background-color: #b0b7c3;
+      cursor: not-allowed;
+    }
+    .ok-btn {
+      display: inline-block;
+      margin: 18px auto 0 auto;
+      padding: 4px 16px;
+      font-size: 0.95rem;
+      background: #e3e8f0;
+      color: #003366;
+      border: 1px solid #b0b7c3;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .ok-btn:hover {
+      background: #d0d8e6;
+    }    /* === INDICADORES DE VALIDAÇÃO === */
+    .obrigatorio-icone {
+      color: #d32f2f;
+      margin-left: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      display: inline;
+    }
+    .check-icone {
+      color: #28a745;
+      margin-left: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      display: none;
+    }
+    
+    /* Esconder asterisco e mostrar check quando campo válido */
+    .form-field.campo-validado .obrigatorio-icone {
+      display: none !important;
+    }
+    .form-field.campo-validado .check-icone {
+      display: inline !important;
+    }
+    
+    /* Garantir que apenas um aparece por vez */
+    .form-field:not(.campo-validado) .check-icone {
+      display: none !important;
+    }
+    .form-field:not(.campo-validado) .obrigatorio-icone {
+      display: inline !important;
+    }    /* === VALIDAÇÃO VISUAL === */
+    .campo-erro input, .campo-erro select {
+      border: 1.5px solid #d32f2f !important;
+      background: #fff6f6;
+    }
+    
+    /* Aplicar estilo apenas aos inputs/selects validados */
+    .form-field.campo-validado input,
+    .form-field.campo-validado select {
+      border: 1px solid #28a745 !important;
+      background: #fff !important;
+    }
+    .feedback-erro {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-top: 2px;
+      min-height: 18px;
+      transition: opacity 0.3s ease;
+    }    .loading-msg {
+      color: #007bff;
+      font-size: 13px;
+      margin-top: 2px;
+      min-height: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media (max-width: 768px) {
+      .form-container { margin: 15px; padding: 1.5rem; }
+      .form-section { padding: 1rem; }
     }
   </style>
 </head>
 <body>
-
+  {% include 'componentes/fad_header.html' %}
   <div class="form-container">
-    <h2>Cadastro de Pessoa Jurídica</h2>
+    <h3 style="text-align:center; font-size: 24px;">Cadastro de Pessoa Jurídica</h3>
     <form id="pjForm">
-      <input name="razao_social" placeholder="Razão Social" required>
-      <input name="cnpj" placeholder="CNPJ" required>
-      <input name="nome_fantasia" placeholder="Nome Fantasia">
-      <input name="email" placeholder="Email">
-      <input name="telefone" placeholder="Telefone">
-      <input name="rua" placeholder="Rua">
-      <input name="numero" placeholder="Número">
-      <input name="complemento" placeholder="Complemento">
-      <input name="bairro" placeholder="Bairro">
-      <input name="cep" placeholder="CEP">
-      <input name="cidade" placeholder="Cidade">
-      <input name="uf" placeholder="UF">
-      <button type="submit">Cadastrar</button>
+      <div class="form-section">
+        <h4 style="text-align:left; color:#003366; margin-bottom: 1rem; margin-top:0;">Dados Principais</h4>        <div class="form-group">          <div class="form-field">
+            <label for="razao_social">Razão Social: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="razao_social" id="razao_social" required maxlength="255" />
+            <div class="feedback-erro" id="razao_social-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="cnpj">CNPJ: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="cnpj" id="cnpj" required maxlength="18" />
+            <div class="loading-msg" id="cnpj-loading"></div>
+            <div class="feedback-erro" id="cnpj-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="nome_fantasia">Nome Fantasia: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="nome_fantasia" id="nome_fantasia" required maxlength="255" />
+            <div class="feedback-erro" id="nome_fantasia-erro"></div>
+          </div>          <div class="form-field">
+            <label for="telefone_institucional">Telefone Institucional: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="telefone_institucional" id="telefone_institucional" required maxlength="16" placeholder="(XX) XXXXX-XXXX ou (XX) XXXX-XXXX" />
+            <div class="feedback-erro" id="telefone_institucional-erro"></div>
+            <div class="feedback-info" id="telefone-tipo" style="font-size: 11px; color: #666; margin-top: 2px; display: none;"></div>
+          </div>
+          <div class="form-field">
+            <label for="email">Email: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="email" id="email" required maxlength="255" />
+            <div class="feedback-erro" id="email-erro"></div>
+          </div>
+        </div>
+      </div>      <div class="form-section">
+        <h4 style="text-align:left; color:#003366; margin-bottom: 1rem; margin-top:0;">Endereço</h4>        <div class="form-group">          <div class="form-field">
+            <label for="cep">CEP: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="cep" id="cep" required maxlength="9" />
+            <div class="loading-msg" id="cep-loading"></div>
+            <div class="feedback-erro" id="cep-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="rua">Logradouro: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="rua" id="rua" required maxlength="255" />
+            <div class="feedback-erro" id="rua-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="numero">Número: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="numero" id="numero" required maxlength="10" />
+            <div class="feedback-erro" id="numero-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="complemento">Complemento: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="complemento" id="complemento" required maxlength="50" />
+            <div class="feedback-erro" id="complemento-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="bairro">Bairro: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input name="bairro" id="bairro" required maxlength="100" />
+            <div class="feedback-erro" id="bairro-erro"></div>
+          </div>
+          <div class="form-field">
+            <label for="uf">UF: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <select name="uf" id="uf" required>
+              <option value="">Selecione...</option>
+              <option value="SP">SP</option><option value="RJ">RJ</option>
+              <!-- demais UFs aqui -->
+            </select>
+            <div class="feedback-erro" id="uf-erro"></div>
+          </div>          <div class="form-field half">
+            <label for="cidade">Município: <span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <select name="cidade" id="cidade" required>
+              <option value="">Selecione...</option>
+              <option value="ADAMANTINA">ADAMANTINA</option>
+              <option value="ADOLFO">ADOLFO</option>
+              <option value="AGUAÍ">AGUAÍ</option>
+              <option value="ÁGUAS DA PRATA">ÁGUAS DA PRATA</option>
+              <option value="ÁGUAS DE LINDÓIA">ÁGUAS DE LINDÓIA</option>
+              <option value="ÁGUAS DE SANTA BÁRBARA">ÁGUAS DE SANTA BÁRBARA</option>
+              <option value="ÁGUAS DE SÃO PEDRO">ÁGUAS DE SÃO PEDRO</option>
+              <option value="ALAMBARI">ALAMBARI</option>
+              <option value="ALFREDO MARCONDES">ALFREDO MARCONDES</option>
+              <option value="ALTAIR">ALTAIR</option>
+              <option value="ALTINÓPOLIS">ALTINÓPOLIS</option>
+              <option value="ALTO ALEGRE">ALTO ALEGRE</option>
+              <option value="ALUMÍNIO">ALUMÍNIO</option>
+              <option value="ÁLVARES FLORENCE">ÁLVARES FLORENCE</option>
+              <option value="ÁLVARES MACHADO">ÁLVARES MACHADO</option>
+              <option value="ÁLVARO DE CARVALHO">ÁLVARO DE CARVALHO</option>
+              <option value="ALVINLÂNDIA">ALVINLÂNDIA</option>
+              <option value="AMERICANA">AMERICANA</option>
+              <option value="AMÉRICO BRASILIENSE">AMÉRICO BRASILIENSE</option>
+              <option value="AMÉRICO DE CAMPOS">AMÉRICO DE CAMPOS</option>
+              <option value="AMPARO">AMPARO</option>
+              <option value="ANALÂNDIA">ANALÂNDIA</option>
+              <option value="ANDRADINA">ANDRADINA</option>
+              <option value="ANGATUBA">ANGATUBA</option>
+              <option value="ANHEMBI">ANHEMBI</option>
+              <option value="ANHUMAS">ANHUMAS</option>
+              <option value="APARECIDA">APARECIDA</option>
+              <option value="APARECIDA D'OESTE">APARECIDA D'OESTE</option>
+              <option value="APIAÍ">APIAÍ</option>
+              <option value="ARAÇARIGUAMA">ARAÇARIGUAMA</option>
+              <option value="ARAÇATUBA">ARAÇATUBA</option>
+              <option value="ARAÇOIABA DA SERRA">ARAÇOIABA DA SERRA</option>
+              <option value="ARAMINA">ARAMINA</option>
+              <option value="ARANDU">ARANDU</option>
+              <option value="ARAPEÍ">ARAPEÍ</option>
+              <option value="ARARAQUARA">ARARAQUARA</option>
+              <option value="ARARAS">ARARAS</option>
+              <option value="ARCO-ÍRIS">ARCO-ÍRIS</option>
+              <option value="AREALVA">AREALVA</option>
+              <option value="AREIAS">AREIAS</option>
+              <option value="AREIÓPOLIS">AREIÓPOLIS</option>
+              <option value="ARIRANHA">ARIRANHA</option>
+              <option value="ARTUR NOGUEIRA">ARTUR NOGUEIRA</option>
+              <option value="ARUJÁ">ARUJÁ</option>
+              <option value="ASPÁSIA">ASPÁSIA</option>
+              <option value="ASSIS">ASSIS</option>
+              <option value="ATIBAIA">ATIBAIA</option>
+              <option value="AURIFLAMA">AURIFLAMA</option>
+              <option value="AVAÍ">AVAÍ</option>
+              <option value="AVANHANDAVA">AVANHANDAVA</option>
+              <option value="AVARÉ">AVARÉ</option>
+              <option value="BADY BASSITT">BADY BASSITT</option>
+              <option value="BALBINOS">BALBINOS</option>
+              <option value="BÁLSAMO">BÁLSAMO</option>
+              <option value="BANANAL">BANANAL</option>
+              <option value="BARÃO DE ANTONINA">BARÃO DE ANTONINA</option>
+              <option value="BARBOSA">BARBOSA</option>
+              <option value="BARIRI">BARIRI</option>
+              <option value="BARRA BONITA">BARRA BONITA</option>
+              <option value="BARRA DO CHAPÉU">BARRA DO CHAPÉU</option>
+              <option value="BARRA DO TURVO">BARRA DO TURVO</option>
+              <option value="BARRETOS">BARRETOS</option>
+              <option value="BARRINHA">BARRINHA</option>
+              <option value="BARUERI">BARUERI</option>
+              <option value="BASTOS">BASTOS</option>
+              <option value="BATATAIS">BATATAIS</option>
+              <option value="BAURU">BAURU</option>
+              <option value="BEBEDOURO">BEBEDOURO</option>
+              <option value="BENTO DE ABREU">BENTO DE ABREU</option>
+              <option value="BERNARDINO DE CAMPOS">BERNARDINO DE CAMPOS</option>
+              <option value="BERTIOGA">BERTIOGA</option>
+              <option value="BILAC">BILAC</option>
+              <option value="BIRIGUI">BIRIGUI</option>
+              <option value="BIRITIBA MIRIM">BIRITIBA MIRIM</option>
+              <option value="BOA ESPERANÇA DO SUL">BOA ESPERANÇA DO SUL</option>
+              <option value="BOCAINA">BOCAINA</option>
+              <option value="BOFETE">BOFETE</option>
+              <option value="BOITUVA">BOITUVA</option>
+              <option value="BOM JESUS DOS PERDÕES">BOM JESUS DOS PERDÕES</option>
+              <option value="BOM SUCESSO DE ITARARÉ">BOM SUCESSO DE ITARARÉ</option>
+              <option value="BORÁ">BORÁ</option>
+              <option value="BORACÉIA">BORACÉIA</option>
+              <option value="BORBOREMA">BORBOREMA</option>
+              <option value="BOREBI">BOREBI</option>
+              <option value="BOTUCATU">BOTUCATU</option>
+              <option value="BRAGANÇA PAULISTA">BRAGANÇA PAULISTA</option>
+              <option value="BRAÚNA">BRAÚNA</option>
+              <option value="BREJO ALEGRE">BREJO ALEGRE</option>
+              <option value="BRODOWSKI">BRODOWSKI</option>
+              <option value="BROTAS">BROTAS</option>
+              <option value="BURI">BURI</option>
+              <option value="BURITAMA">BURITAMA</option>
+              <option value="BURITIZAL">BURITIZAL</option>
+              <option value="CABRÁLIA PAULISTA">CABRÁLIA PAULISTA</option>
+              <option value="CABREÚVA">CABREÚVA</option>
+              <option value="CAÇAPAVA">CAÇAPAVA</option>
+              <option value="CACHOEIRA PAULISTA">CACHOEIRA PAULISTA</option>
+              <option value="CACONDE">CACONDE</option>
+              <option value="CAFELÂNDIA">CAFELÂNDIA</option>
+              <option value="CAIABU">CAIABU</option>
+              <option value="CAIEIRAS">CAIEIRAS</option>
+              <option value="CAIUÁ">CAIUÁ</option>
+              <option value="CAJAMAR">CAJAMAR</option>
+              <option value="CAJATI">CAJATI</option>
+              <option value="CAJOBI">CAJOBI</option>
+              <option value="CAJURU">CAJURU</option>
+              <option value="CAMPINA DO MONTE ALEGRE">CAMPINA DO MONTE ALEGRE</option>
+              <option value="CAMPINAS">CAMPINAS</option>
+              <option value="CAMPO LIMPO PAULISTA">CAMPO LIMPO PAULISTA</option>
+              <option value="CAMPOS DO JORDÃO">CAMPOS DO JORDÃO</option>
+              <option value="CAMPOS NOVOS PAULISTA">CAMPOS NOVOS PAULISTA</option>
+              <option value="CANANÉIA">CANANÉIA</option>
+              <option value="CANAS">CANAS</option>
+              <option value="CÂNDIDO MOTA">CÂNDIDO MOTA</option>
+              <option value="CÂNDIDO RODRIGUES">CÂNDIDO RODRIGUES</option>
+              <option value="CANITAR">CANITAR</option>
+              <option value="CAPÃO BONITO">CAPÃO BONITO</option>
+              <option value="CAPELA DO ALTO">CAPELA DO ALTO</option>
+              <option value="CAPIVARI">CAPIVARI</option>
+              <option value="CARAGUATATUBA">CARAGUATATUBA</option>
+              <option value="CARAPICUÍBA">CARAPICUÍBA</option>
+              <option value="CARDOSO">CARDOSO</option>
+              <option value="CASA BRANCA">CASA BRANCA</option>
+              <option value="CÁSSIA DOS COQUEIROS">CÁSSIA DOS COQUEIROS</option>
+              <option value="CASTILHO">CASTILHO</option>
+              <option value="CATANDUVA">CATANDUVA</option>
+              <option value="CATIGUÁ">CATIGUÁ</option>
+              <option value="CEDRAL">CEDRAL</option>
+              <option value="CERQUEIRA CÉSAR">CERQUEIRA CÉSAR</option>
+              <option value="CERQUILHO">CERQUILHO</option>
+              <option value="CESÁRIO LANGE">CESÁRIO LANGE</option>
+              <option value="CHARQUEADA">CHARQUEADA</option>
+              <option value="CHAVANTES">CHAVANTES</option>
+              <option value="CLEMENTINA">CLEMENTINA</option>
+              <option value="COLINA">COLINA</option>
+              <option value="COLÔMBIA">COLÔMBIA</option>
+              <option value="CONCHAL">CONCHAL</option>
+              <option value="CONCHAS">CONCHAS</option>
+              <option value="CORDEIRÓPOLIS">CORDEIRÓPOLIS</option>
+              <option value="COROADOS">COROADOS</option>
+              <option value="CORONEL MACEDO">CORONEL MACEDO</option>
+              <option value="CORUMBATAÍ">CORUMBATAÍ</option>
+              <option value="COSMÓPOLIS">COSMÓPOLIS</option>
+              <option value="COSMORAMA">COSMORAMA</option>
+              <option value="COTIA">COTIA</option>
+              <option value="CRAVINHOS">CRAVINHOS</option>
+              <option value="CRISTAIS PAULISTA">CRISTAIS PAULISTA</option>
+              <option value="CRUZÁLIA">CRUZÁLIA</option>
+              <option value="CRUZEIRO">CRUZEIRO</option>
+              <option value="CUBATÃO">CUBATÃO</option>
+              <option value="CUNHA">CUNHA</option>
+              <option value="DESCALVADO">DESCALVADO</option>
+              <option value="DIADEMA">DIADEMA</option>
+              <option value="DIRCE REIS">DIRCE REIS</option>
+              <option value="DIVINOLÂNDIA">DIVINOLÂNDIA</option>
+              <option value="DOLCINÓPOLIS">DOLCINÓPOLIS</option>
+              <option value="DOURADO">DOURADO</option>
+              <option value="DRACENA">DRACENA</option>
+              <option value="DUARTINA">DUARTINA</option>
+              <option value="DUMONT">DUMONT</option>
+              <option value="ECHAPORÃ">ECHAPORÃ</option>
+              <option value="ELDORADO">ELDORADO</option>
+              <option value="ELIAS FAUSTO">ELIAS FAUSTO</option>
+              <option value="ELISIÁRIO">ELISIÁRIO</option>
+              <option value="EMBAÚBA">EMBAÚBA</option>
+              <option value="EMBU DAS ARTES">EMBU DAS ARTES</option>
+              <option value="EMBU-GUAÇU">EMBU-GUAÇU</option>
+              <option value="EMILIANÓPOLIS">EMILIANÓPOLIS</option>
+              <option value="ENGENHEIRO COELHO">ENGENHEIRO COELHO</option>
+              <option value="ESPÍRITO SANTO DO PINHAL">ESPÍRITO SANTO DO PINHAL</option>
+              <option value="ESPÍRITO SANTO DO TURVO">ESPÍRITO SANTO DO TURVO</option>
+              <option value="ESTIVA GERBI">ESTIVA GERBI</option>
+              <option value="ESTRELA D'OESTE">ESTRELA D'OESTE</option>
+              <option value="ESTRELA DO NORTE">ESTRELA DO NORTE</option>
+              <option value="EUCLIDES DA CUNHA PAULISTA">EUCLIDES DA CUNHA PAULISTA</option>
+              <option value="FARTURA">FARTURA</option>
+              <option value="FERNANDO PRESTES">FERNANDO PRESTES</option>
+              <option value="FERNANDÓPOLIS">FERNANDÓPOLIS</option>
+              <option value="FERNÃO">FERNÃO</option>
+              <option value="FERRAZ DE VASCONCELOS">FERRAZ DE VASCONCELOS</option>
+              <option value="FLORA RICA">FLORA RICA</option>
+              <option value="FLOREAL">FLOREAL</option>
+              <option value="FLORÍNIA">FLORÍNIA</option>
+              <option value="FRANCA">FRANCA</option>
+              <option value="FRANCISCO MORATO">FRANCISCO MORATO</option>
+              <option value="FRANCO DA ROCHA">FRANCO DA ROCHA</option>
+              <option value="GABRIEL MONTEIRO">GABRIEL MONTEIRO</option>
+              <option value="GÁLIA">GÁLIA</option>
+              <option value="GARÇA">GARÇA</option>
+              <option value="GASTÃO VIDIGAL">GASTÃO VIDIGAL</option>
+              <option value="GAVIÃO PEIXOTO">GAVIÃO PEIXOTO</option>
+              <option value="GENERAL SALGADO">GENERAL SALGADO</option>
+              <option value="GETULINA">GETULINA</option>
+              <option value="GLICÉRIO">GLICÉRIO</option>
+              <option value="GUAIÇARA">GUAIÇARA</option>
+              <option value="GUAIMBÊ">GUAIMBÊ</option>
+              <option value="GUAÍRA">GUAÍRA</option>
+              <option value="GUAPIAÇU">GUAPIAÇU</option>
+              <option value="GUAPIARA">GUAPIARA</option>
+              <option value="GUARÁ">GUARÁ</option>
+              <option value="GUARAÇAÍ">GUARAÇAÍ</option>
+              <option value="GUARACI">GUARACI</option>
+              <option value="GUARANI D'OESTE">GUARANI D'OESTE</option>
+              <option value="GUARANTÃ">GUARANTÃ</option>
+              <option value="GUARARAPES">GUARARAPES</option>
+              <option value="GUARAREMA">GUARAREMA</option>
+              <option value="GUARATINGUETÁ">GUARATINGUETÁ</option>
+              <option value="GUAREÍ">GUAREÍ</option>
+              <option value="GUARIBA">GUARIBA</option>
+              <option value="GUARUJÁ">GUARUJÁ</option>
+              <option value="GUARULHOS">GUARULHOS</option>
+              <option value="GUATAPARÁ">GUATAPARÁ</option>
+              <option value="GUZOLÂNDIA">GUZOLÂNDIA</option>
+              <option value="HERCULÂNDIA">HERCULÂNDIA</option>
+              <option value="HOLAMBRA">HOLAMBRA</option>
+              <option value="HORTOLÂNDIA">HORTOLÂNDIA</option>
+              <option value="IACANGA">IACANGA</option>
+              <option value="IACRI">IACRI</option>
+              <option value="IARAS">IARAS</option>
+              <option value="IBATÉ">IBATÉ</option>
+              <option value="IBIPORÃ">IBIPORÃ</option>
+              <option value="IBIRÁ">IBIRÁ</option>
+              <option value="IBIRAREMA">IBIRAREMA</option>
+              <option value="IBITINGA">IBITINGA</option>
+              <option value="IBIÚNA">IBIÚNA</option>
+              <option value="ICÉM">ICÉM</option>
+              <option value="IEPÊ">IEPÊ</option>
+              <option value="IGARAÇU DO TIETÊ">IGARAÇU DO TIETÊ</option>
+              <option value="IGARAPAVA">IGARAPAVA</option>
+              <option value="IGARATÁ">IGARATÁ</option>
+              <option value="IGUAPE">IGUAPE</option>
+              <option value="ILHA COMPRIDA">ILHA COMPRIDA</option>
+              <option value="ILHA SOLTEIRA">ILHA SOLTEIRA</option>
+              <option value="ILHABELA">ILHABELA</option>
+              <option value="INDAIATUBA">INDAIATUBA</option>
+              <option value="INDIANA">INDIANA</option>
+              <option value="INDIAPORÃ">INDIAPORÃ</option>
+              <option value="INÚBIA PAULISTA">INÚBIA PAULISTA</option>
+              <option value="IPAUSSU">IPAUSSU</option>
+              <option value="IPERÓ">IPERÓ</option>
+              <option value="IPEÚNA">IPEÚNA</option>
+              <option value="IPIGUÁ">IPIGUÁ</option>
+              <option value="IPORANGA">IPORANGA</option>
+              <option value="IPUÃ">IPUÃ</option>
+              <option value="IRACEMÁPOLIS">IRACEMÁPOLIS</option>
+              <option value="IRAPUÃ">IRAPUÃ</option>
+              <option value="IRAPURU">IRAPURU</option>
+              <option value="ITABERÁ">ITABERÁ</option>
+              <option value="ITAI">ITAI</option>
+              <option value="ITAJOBI">ITAJOBI</option>
+              <option value="ITAJU">ITAJU</option>
+              <option value="ITANHAÉM">ITANHAÉM</option>
+              <option value="ITAOCA">ITAOCA</option>
+              <option value="ITAPECERICA DA SERRA">ITAPECERICA DA SERRA</option>
+              <option value="ITAPETININGA">ITAPETININGA</option>
+              <option value="ITAPEVA">ITAPEVA</option>
+              <option value="ITAPEVI">ITAPEVI</option>
+              <option value="ITAPIRA">ITAPIRA</option>
+              <option value="ITAPIRAPUÃ PAULISTA">ITAPIRAPUÃ PAULISTA</option>
+              <option value="ITÁPOLIS">ITÁPOLIS</option>
+              <option value="ITAPORANGA">ITAPORANGA</option>
+              <option value="ITAPUÍ">ITAPUÍ</option>
+              <option value="ITAPURA">ITAPURA</option>
+              <option value="ITAQUAQUECETUBA">ITAQUAQUECETUBA</option>
+              <option value="ITARARÉ">ITARARÉ</option>
+              <option value="ITARIRI">ITARIRI</option>
+              <option value="ITATIBA">ITATIBA</option>
+              <option value="ITATINGA">ITATINGA</option>
+              <option value="ITIRAPINA">ITIRAPINA</option>
+              <option value="ITIRAPUÃ">ITIRAPUÃ</option>
+              <option value="ITOBI">ITOBI</option>
+              <option value="ITU">ITU</option>
+              <option value="ITUPEVA">ITUPEVA</option>
+              <option value="ITUVERAVA">ITUVERAVA</option>
+              <option value="JABORANDI">JABORANDI</option>
+              <option value="JABOTICABAL">JABOTICABAL</option>
+              <option value="JACAREÍ">JACAREÍ</option>
+              <option value="JACI">JACI</option>
+              <option value="JACUPIRANGA">JACUPIRANGA</option>
+              <option value="JAGUARIÚNA">JAGUARIÚNA</option>
+              <option value="JALES">JALES</option>
+              <option value="JAMBEIRO">JAMBEIRO</option>
+              <option value="JANDIRA">JANDIRA</option>
+              <option value="JARDINÓPOLIS">JARDINÓPOLIS</option>
+              <option value="JARINU">JARINU</option>
+              <option value="JAÚ">JAÚ</option>
+              <option value="JERIQUARA">JERIQUARA</option>
+              <option value="JOANÓPOLIS">JOANÓPOLIS</option>
+              <option value="JOÃO RAMALHO">JOÃO RAMALHO</option>
+              <option value="JOSÉ BONIFÁCIO">JOSÉ BONIFÁCIO</option>
+              <option value="JÚLIO MESQUITA">JÚLIO MESQUITA</option>
+              <option value="JUMIRIM">JUMIRIM</option>
+              <option value="JUNDIAÍ">JUNDIAÍ</option>
+              <option value="JUNQUEIRÓPOLIS">JUNQUEIRÓPOLIS</option>
+              <option value="JUQUIÁ">JUQUIÁ</option>
+              <option value="JUQUITIBA">JUQUITIBA</option>
+              <option value="LAGOINHA">LAGOINHA</option>
+              <option value="LARANJAL PAULISTA">LARANJAL PAULISTA</option>
+              <option value="LAVÍNIA">LAVÍNIA</option>
+              <option value="LAVRINHAS">LAVRINHAS</option>
+              <option value="LEME">LEME</option>
+              <option value="LENÇÓIS PAULISTA">LENÇÓIS PAULISTA</option>
+              <option value="LIMEIRA">LIMEIRA</option>
+              <option value="LINDÓIA">LINDÓIA</option>
+              <option value="LINS">LINS</option>
+              <option value="LORENA">LORENA</option>
+              <option value="LOURDES">LOURDES</option>
+              <option value="LOUVEIRA">LOUVEIRA</option>
+              <option value="LUCÉLIA">LUCÉLIA</option>
+              <option value="LUCIANÓPOLIS">LUCIANÓPOLIS</option>
+              <option value="LUÍS ANTÔNIO">LUÍS ANTÔNIO</option>
+              <option value="LUIZIÂNIA">LUIZIÂNIA</option>
+              <option value="LUPÉRCIO">LUPÉRCIO</option>
+              <option value="LUTÉCIA">LUTÉCIA</option>
+              <option value="MACATUBA">MACATUBA</option>
+              <option value="MACAUBAL">MACAUBAL</option>
+              <option value="MACEDÔNIA">MACEDÔNIA</option>
+              <option value="MAGDA">MAGDA</option>
+              <option value="MAIRINQUE">MAIRINQUE</option>
+              <option value="MAIRIPORÃ">MAIRIPORÃ</option>
+              <option value="MANDURI">MANDURI</option>
+              <option value="MARABÁ PAULISTA">MARABÁ PAULISTA</option>
+              <option value="MARACAÍ">MARACAÍ</option>
+              <option value="MARAPOAMA">MARAPOAMA</option>
+              <option value="MARIÁPOLIS">MARIÁPOLIS</option>
+              <option value="MARÍLIA">MARÍLIA</option>
+              <option value="MARINÓPOLIS">MARINÓPOLIS</option>
+              <option value="MARTINÓPOLIS">MARTINÓPOLIS</option>
+              <option value="MATÃO">MATÃO</option>
+              <option value="MAUÁ">MAUÁ</option>
+              <option value="MENDONÇA">MENDONÇA</option>
+              <option value="MERIDIANO">MERIDIANO</option>
+              <option value="MESÓPOLIS">MESÓPOLIS</option>
+              <option value="MIGUELÓPOLIS">MIGUELÓPOLIS</option>
+              <option value="MINEIROS DO TIETÊ">MINEIROS DO TIETÊ</option>
+              <option value="MIRACATU">MIRACATU</option>
+              <option value="MIRA ESTRELA">MIRA ESTRELA</option>
+              <option value="MIRANDÓPOLIS">MIRANDÓPOLIS</option>
+              <option value="MIRANTE DO PARANAPANEMA">MIRANTE DO PARANAPANEMA</option>
+              <option value="MIRASSOL">MIRASSOL</option>
+              <option value="MIRASSOLÂNDIA">MIRASSOLÂNDIA</option>
+              <option value="MOCOCA">MOCOCA</option>
+              <option value="MOGI DAS CRUZES">MOGI DAS CRUZES</option>
+              <option value="MOGI GUAÇU">MOGI GUAÇU</option>
+              <option value="MOGI MIRIM">MOGI MIRIM</option>
+              <option value="MOMBUCA">MOMBUCA</option>
+              <option value="MONÇÕES">MONÇÕES</option>
+              <option value="MONGAGUÁ">MONGAGUÁ</option>
+              <option value="MONTE ALEGRE DO SUL">MONTE ALEGRE DO SUL</option>
+              <option value="MONTE ALTO">MONTE ALTO</option>
+              <option value="MONTE APRAZÍVEL">MONTE APRAZÍVEL</option>
+              <option value="MONTE AZUL PAULISTA">MONTE AZUL PAULISTA</option>
+              <option value="MONTE CASTELO">MONTE CASTELO</option>
+              <option value="MONTE MOR">MONTE MOR</option>
+              <option value="MONTEIRO LOBATO">MONTEIRO LOBATO</option>
+              <option value="MORRO AGUDO">MORRO AGUDO</option>
+              <option value="MORUNGABA">MORUNGABA</option>
+              <option value="MOTUCA">MOTUCA</option>
+              <option value="MURUTINGA DO SUL">MURUTINGA DO SUL</option>
+              <option value="NANTES">NANTES</option>
+              <option value="NARANDIBA">NARANDIBA</option>
+              <option value="NATIVIDADE DA SERRA">NATIVIDADE DA SERRA</option>
+              <option value="NAZARÉ PAULISTA">NAZARÉ PAULISTA</option>
+              <option value="NEVES PAULISTA">NEVES PAULISTA</option>
+              <option value="NHANDEARA">NHANDEARA</option>
+              <option value="NIPOÃ">NIPOÃ</option>
+              <option value="NOVA ALIANÇA">NOVA ALIANÇA</option>
+              <option value="NOVA CAMPINA">NOVA CAMPINA</option>
+              <option value="NOVA CANAÃ PAULISTA">NOVA CANAÃ PAULISTA</option>
+              <option value="NOVA CASTILHO">NOVA CASTILHO</option>
+              <option value="NOVA EUROPA">NOVA EUROPA</option>
+              <option value="NOVA GRANADA">NOVA GRANADA</option>
+              <option value="NOVA GUATAPORANGA">NOVA GUATAPORANGA</option>
+              <option value="NOVA INDEPENDÊNCIA">NOVA INDEPENDÊNCIA</option>
+              <option value="NOVA LUZITÂNIA">NOVA LUZITÂNIA</option>
+              <option value="NOVA ODESSA">NOVA ODESSA</option>
+              <option value="NOVO HORIZONTE">NOVO HORIZONTE</option>
+              <option value="NUPORANGA">NUPORANGA</option>
+              <option value="OCAUÇU">OCAUÇU</option>
+              <option value="ÓLEO">ÓLEO</option>
+              <option value="OLÍMPIA">OLÍMPIA</option>
+              <option value="ONDA VERDE">ONDA VERDE</option>
+              <option value="ORIENTE">ORIENTE</option>
+              <option value="ORINDIÚVA">ORINDIÚVA</option>
+              <option value="ORLÂNDIA">ORLÂNDIA</option>
+              <option value="OSASCO">OSASCO</option>
+              <option value="OSCAR BRESSANE">OSCAR BRESSANE</option>
+              <option value="OSVALDO CRUZ">OSVALDO CRUZ</option>
+              <option value="OURINHOS">OURINHOS</option>
+              <option value="OURO VERDE">OURO VERDE</option>
+              <option value="OUROESTE">OUROESTE</option>
+              <option value="PACAEMBU">PACAEMBU</option>
+              <option value="PALESTINA">PALESTINA</option>
+              <option value="PALMARES PAULISTA">PALMARES PAULISTA</option>
+              <option value="PALMEIRA D'OESTE">PALMEIRA D'OESTE</option>
+              <option value="PALMITAL">PALMITAL</option>
+              <option value="PANORAMA">PANORAMA</option>
+              <option value="PARAGUAÇU PAULISTA">PARAGUAÇU PAULISTA</option>
+              <option value="PARAIBUNA">PARAIBUNA</option>
+              <option value="PARAÍSO">PARAÍSO</option>
+              <option value="PARANAPANEMA">PARANAPANEMA</option>
+              <option value="PARANAPUÃ">PARANAPUÃ</option>
+              <option value="PARAPUÃ">PARAPUÃ</option>
+              <option value="PARDINHO">PARDINHO</option>
+              <option value="PARIQUERA-AÇU">PARIQUERA-AÇU</option>
+              <option value="PARISI">PARISI</option>
+              <option value="PATROCÍNIO PAULISTA">PATROCÍNIO PAULISTA</option>
+              <option value="PAULICÉIA">PAULICÉIA</option>
+              <option value="PAULÍNIA">PAULÍNIA</option>
+              <option value="PAULISTÂNIA">PAULISTÂNIA</option>
+              <option value="PAULO DE FARIA">PAULO DE FARIA</option>
+              <option value="PEDERNEIRAS">PEDERNEIRAS</option>
+              <option value="PEDRA BELA">PEDRA BELA</option>
+              <option value="PEDRANÓPOLIS">PEDRANÓPOLIS</option>
+              <option value="PEDREGULHO">PEDREGULHO</option>
+              <option value="PEDREIRA">PEDREIRA</option>
+              <option value="PEDRINHAS PAULISTA">PEDRINHAS PAULISTA</option>
+              <option value="PEDRO DE TOLEDO">PEDRO DE TOLEDO</option>
+              <option value="PENÁPOLIS">PENÁPOLIS</option>
+              <option value="PEREIRA BARRETO">PEREIRA BARRETO</option>
+              <option value="PEREIRAS">PEREIRAS</option>
+              <option value="PERUÍBE">PERUÍBE</option>
+              <option value="PIACATU">PIACATU</option>
+              <option value="PIEDADE">PIEDADE</option>
+              <option value="PILAR DO SUL">PILAR DO SUL</option>
+              <option value="PINDAMONHANGABA">PINDAMONHANGABA</option>
+              <option value="PINDORAMA">PINDORAMA</option>
+              <option value="PINHALZINHO">PINHALZINHO</option>
+              <option value="PIQUEROBI">PIQUEROBI</option>
+              <option value="PIQUETE">PIQUETE</option>
+              <option value="PIRACAIA">PIRACAIA</option>
+              <option value="PIRACICABA">PIRACICABA</option>
+              <option value="PIRAJU">PIRAJU</option>
+              <option value="PIRAJUÍ">PIRAJUÍ</option>
+              <option value="PIRANGI">PIRANGI</option>
+              <option value="PIRAPORA DO BOM JESUS">PIRAPORA DO BOM JESUS</option>
+              <option value="PIRAPOZINHO">PIRAPOZINHO</option>
+              <option value="PIRASSUNUNGA">PIRASSUNUNGA</option>
+              <option value="PIRATININGA">PIRATININGA</option>
+              <option value="PITANGUEIRAS">PITANGUEIRAS</option>
+              <option value="PLANALTO">PLANALTO</option>
+              <option value="PLATINA">PLATINA</option>
+              <option value="POÁ">POÁ</option>
+              <option value="POLONI">POLONI</option>
+              <option value="POMPÉIA">POMPÉIA</option>
+              <option value="PONGAÍ">PONGAÍ</option>
+              <option value="PONTAL">PONTAL</option>
+              <option value="PONTALINDA">PONTALINDA</option>
+              <option value="PONTES GESTAL">PONTES GESTAL</option>
+              <option value="POPULINA">POPULINA</option>
+              <option value="PORANGABA">PORANGABA</option>
+              <option value="PORTO FELIZ">PORTO FELIZ</option>
+              <option value="PORTO FERREIRA">PORTO FERREIRA</option>
+              <option value="POTIM">POTIM</option>
+              <option value="POTIRENDABA">POTIRENDABA</option>
+              <option value="PRACINHA">PRACINHA</option>
+              <option value="PRADÓPOLIS">PRADÓPOLIS</option>
+              <option value="PRAIA GRANDE">PRAIA GRANDE</option>
+              <option value="PRATÂNIA">PRATÂNIA</option>
+              <option value="PRESIDENTE ALVES">PRESIDENTE ALVES</option>
+              <option value="PRESIDENTE BERNARDES">PRESIDENTE BERNARDES</option>
+              <option value="PRESIDENTE EPITÁCIO">PRESIDENTE EPITÁCIO</option>
+              <option value="PRESIDENTE PRUDENTE">PRESIDENTE PRUDENTE</option>
+              <option value="PRESIDENTE VENCESLAU">PRESIDENTE VENCESLAU</option>
+              <option value="PROMISSÃO">PROMISSÃO</option>
+              <option value="QUADRA">QUADRA</option>
+              <option value="QUATÁ">QUATÁ</option>
+              <option value="QUEIROZ">QUEIROZ</option>
+              <option value="QUELUZ">QUELUZ</option>
+              <option value="QUINTANA">QUINTANA</option>
+              <option value="RAFARD">RAFARD</option>
+              <option value="RANCHARIA">RANCHARIA</option>
+              <option value="REDENÇÃO DA SERRA">REDENÇÃO DA SERRA</option>
+              <option value="REGENTE FEIJÓ">REGENTE FEIJÓ</option>
+              <option value="REGINÓPOLIS">REGINÓPOLIS</option>
+              <option value="REGISTRO">REGISTRO</option>
+              <option value="RESTINGA">RESTINGA</option>
+              <option value="RIBEIRA">RIBEIRA</option>
+              <option value="RIBEIRÃO BONITO">RIBEIRÃO BONITO</option>
+              <option value="RIBEIRÃO BRANCO">RIBEIRÃO BRANCO</option>
+              <option value="RIBEIRÃO CORRENTE">RIBEIRÃO CORRENTE</option>
+              <option value="RIBEIRÃO DO SUL">RIBEIRÃO DO SUL</option>
+              <option value="RIBEIRÃO DOS ÍNDIOS">RIBEIRÃO DOS ÍNDIOS</option>
+              <option value="RIBEIRÃO GRANDE">RIBEIRÃO GRANDE</option>
+              <option value="RIBEIRÃO PIRES">RIBEIRÃO PIRES</option>
+              <option value="RIBEIRÃO PRETO">RIBEIRÃO PRETO</option>
+              <option value="RIFAINA">RIFAINA</option>
+              <option value="RINÓPOLIS">RINÓPOLIS</option>
+              <option value="RIO CLARO">RIO CLARO</option>
+              <option value="RIO DAS PEDRAS">RIO DAS PEDRAS</option>
+              <option value="RIO GRANDE DA SERRA">RIO GRANDE DA SERRA</option>
+              <option value="RIOLÂNDIA">RIOLÂNDIA</option>
+              <option value="RIVERSUL">RIVERSUL</option>
+              <option value="ROSANA">ROSANA</option>
+              <option value="ROSEIRA">ROSEIRA</option>
+              <option value="RUBIÁCEA">RUBIÁCEA</option>
+              <option value="RUBINÉIA">RUBINÉIA</option>
+              <option value="SABINO">SABINO</option>
+              <option value="SAGRES">SAGRES</option>
+              <option value="SALES">SALES</option>
+              <option value="SALES OLIVEIRA">SALES OLIVEIRA</option>
+              <option value="SALESÓPOLIS">SALESÓPOLIS</option>
+              <option value="SALMOURÃO">SALMOURÃO</option>
+              <option value="SALTINHO">SALTINHO</option>
+              <option value="SALTO">SALTO</option>
+              <option value="SALTO DE PIRAPORA">SALTO DE PIRAPORA</option>
+              <option value="SALTO GRANDE">SALTO GRANDE</option>
+              <option value="SANDOVALINA">SANDOVALINA</option>
+              <option value="SANTA ADÉLIA">SANTA ADÉLIA</option>
+              <option value="SANTA ALBERTINA">SANTA ALBERTINA</option>
+              <option value="SANTA BÁRBARA D'OESTE">SANTA BÁRBARA D'OESTE</option>
+              <option value="SANTA BRANCA">SANTA BRANCA</option>
+              <option value="SANTA CLARA D'OESTE">SANTA CLARA D'OESTE</option>
+              <option value="SANTA CRUZ DA CONCEIÇÃO">SANTA CRUZ DA CONCEIÇÃO</option>
+              <option value="SANTA CRUZ DA ESPERANÇA">SANTA CRUZ DA ESPERANÇA</option>
+              <option value="SANTA CRUZ DAS PALMEIRAS">SANTA CRUZ DAS PALMEIRAS</option>
+              <option value="SANTA CRUZ DO RIO PARDO">SANTA CRUZ DO RIO PARDO</option>
+              <option value="SANTA ERNESTINA">SANTA ERNESTINA</option>
+              <option value="SANTA FÉ DO SUL">SANTA FÉ DO SUL</option>
+              <option value="SANTA GERTRUDES">SANTA GERTRUDES</option>
+              <option value="SANTA ISABEL">SANTA ISABEL</option>
+              <option value="SANTA LÚCIA">SANTA LÚCIA</option>
+              <option value="SANTA MARIA DA SERRA">SANTA MARIA DA SERRA</option>
+              <option value="SANTA MERCEDES">SANTA MERCEDES</option>
+              <option value="SANTA RITA D'OESTE">SANTA RITA D'OESTE</option>
+              <option value="SANTA RITA DO PASSA QUATRO">SANTA RITA DO PASSA QUATRO</option>
+              <option value="SANTA ROSA DE VITERBO">SANTA ROSA DE VITERBO</option>
+              <option value="SANTA SALETE">SANTA SALETE</option>
+              <option value="SANTANA DA PONTE PENSA">SANTANA DA PONTE PENSA</option>
+              <option value="SANTANA DE PARNAÍBA">SANTANA DE PARNAÍBA</option>
+              <option value="SANTO ANASTÁCIO">SANTO ANASTÁCIO</option>
+              <option value="SANTO ANDRÉ">SANTO ANDRÉ</option>
+              <option value="SANTO ANTÔNIO DA ALEGRIA">SANTO ANTÔNIO DA ALEGRIA</option>
+              <option value="SANTO ANTÔNIO DE POSSE">SANTO ANTÔNIO DE POSSE</option>
+              <option value="SANTO ANTÔNIO DO ARACANGUÁ">SANTO ANTÔNIO DO ARACANGUÁ</option>
+              <option value="SANTO ANTÔNIO DO JARDIM">SANTO ANTÔNIO DO JARDIM</option>
+              <option value="SANTO ANTÔNIO DO PINHAL">SANTO ANTÔNIO DO PINHAL</option>
+              <option value="SANTO EXPEDITO">SANTO EXPEDITO</option>
+              <option value="SANTÓPOLIS DO AGUAPEÍ">SANTÓPOLIS DO AGUAPEÍ</option>
+              <option value="SANTOS">SANTOS</option>
+              <option value="SÃO BENTO DO SAPUCAÍ">SÃO BENTO DO SAPUCAÍ</option>
+              <option value="SÃO BERNARDO DO CAMPO">SÃO BERNARDO DO CAMPO</option>
+              <option value="SÃO CAETANO DO SUL">SÃO CAETANO DO SUL</option>
+              <option value="SÃO CARLOS">SÃO CARLOS</option>
+              <option value="SÃO FRANCISCO">SÃO FRANCISCO</option>
+              <option value="SÃO JOÃO DA BOA VISTA">SÃO JOÃO DA BOA VISTA</option>
+              <option value="SÃO JOÃO DAS DUAS PONTES">SÃO JOÃO DAS DUAS PONTES</option>
+              <option value="SÃO JOÃO DE IRACEMA">SÃO JOÃO DE IRACEMA</option>
+              <option value="SÃO JOÃO DO PAU D'ALHO">SÃO JOÃO DO PAU D'ALHO</option>
+              <option value="SÃO JOAQUIM DA BARRA">SÃO JOAQUIM DA BARRA</option>
+              <option value="SÃO JOSÉ DA BELA VISTA">SÃO JOSÉ DA BELA VISTA</option>
+              <option value="SÃO JOSÉ DO BARREIRO">SÃO JOSÉ DO BARREIRO</option>
+              <option value="SÃO JOSÉ DO RIO PARDO">SÃO JOSÉ DO RIO PARDO</option>
+              <option value="SÃO JOSÉ DO RIO PRETO">SÃO JOSÉ DO RIO PRETO</option>
+              <option value="SÃO JOSÉ DOS CAMPOS">SÃO JOSÉ DOS CAMPOS</option>
+              <option value="SÃO LOURENÇO DA SERRA">SÃO LOURENÇO DA SERRA</option>
+              <option value="SÃO LUÍS DO PARAITINGA">SÃO LUÍS DO PARAITINGA</option>
+              <option value="SÃO MANUEL">SÃO MANUEL</option>
+              <option value="SÃO MIGUEL ARCANJO">SÃO MIGUEL ARCANJO</option>
+              <option value="SÃO PAULO">SÃO PAULO</option>
+              <option value="SÃO PEDRO">SÃO PEDRO</option>
+              <option value="SÃO PEDRO DO TURVO">SÃO PEDRO DO TURVO</option>
+              <option value="SÃO ROQUE">SÃO ROQUE</option>
+              <option value="SÃO SEBASTIÃO">SÃO SEBASTIÃO</option>
+              <option value="SÃO SEBASTIÃO DA GRAMA">SÃO SEBASTIÃO DA GRAMA</option>
+              <option value="SÃO SIMÃO">SÃO SIMÃO</option>
+              <option value="SÃO VICENTE">SÃO VICENTE</option>
+              <option value="SARAPUÍ">SARAPUÍ</option>
+              <option value="SARUTAIÁ">SARUTAIÁ</option>
+              <option value="SEBASTIANÓPOLIS DO SUL">SEBASTIANÓPOLIS DO SUL</option>
+              <option value="SERRA AZUL">SERRA AZUL</option>
+              <option value="SERRA NEGRA">SERRA NEGRA</option>
+              <option value="SERRANA">SERRANA</option>
+              <option value="SERTÃOZINHO">SERTÃOZINHO</option>
+              <option value="SETE BARRAS">SETE BARRAS</option>
+              <option value="SEVERÍNIA">SEVERÍNIA</option>
+              <option value="SILVEIRAS">SILVEIRAS</option>
+              <option value="SOCORRO">SOCORRO</option>
+              <option value="SOROCABA">SOROCABA</option>
+              <option value="SUD MENNUCCI">SUD MENNUCCI</option>
+              <option value="SUMARÉ">SUMARÉ</option>
+              <option value="SUZANÁPOLIS">SUZANÁPOLIS</option>
+              <option value="SUZANO">SUZANO</option>
+              <option value="TABAPUÃ">TABAPUÃ</option>
+              <option value="TABATINGA">TABATINGA</option>
+              <option value="TABOÃO DA SERRA">TABOÃO DA SERRA</option>
+              <option value="TACIBA">TACIBA</option>
+              <option value="TAGUAÍ">TAGUAÍ</option>
+              <option value="TAIAÇU">TAIAÇU</option>
+              <option value="TAIÚVA">TAIÚVA</option>
+              <option value="TAMBAÚ">TAMBAÚ</option>
+              <option value="TANABI">TANABI</option>
+              <option value="TAPIRAÍ">TAPIRAÍ</option>
+              <option value="TAPIRATIBA">TAPIRATIBA</option>
+              <option value="TAQUARAL">TAQUARAL</option>
+              <option value="TAQUARITINGA">TAQUARITINGA</option>
+              <option value="TAQUARITUBA">TAQUARITUBA</option>
+              <option value="TAQUARIVAÍ">TAQUARIVAÍ</option>
+              <option value="TARABAI">TARABAI</option>
+              <option value="TARUMÃ">TARUMÃ</option>
+              <option value="TAUBATÉ">TAUBATÉ</option>
+              <option value="TEJUPÁ">TEJUPÁ</option>
+              <option value="TEODORO SAMPAIO">TEODORO SAMPAIO</option>
+              <option value="TERRA ROXA">TERRA ROXA</option>
+              <option value="TIETÊ">TIETÊ</option>
+              <option value="TIMBURI">TIMBURI</option>
+              <option value="TORRE DE PEDRA">TORRE DE PEDRA</option>
+              <option value="TORRINHA">TORRINHA</option>
+              <option value="TRABIJU">TRABIJU</option>
+              <option value="TREMEMBÉ">TREMEMBÉ</option>
+              <option value="TRÊS FRONTEIRAS">TRÊS FRONTEIRAS</option>
+              <option value="TUIUTI">TUIUTI</option>
+              <option value="TUPÃ">TUPÃ</option>
+              <option value="TUPI PAULISTA">TUPI PAULISTA</option>
+              <option value="TURIÚBA">TURIÚBA</option>
+              <option value="TURMALINA">TURMALINA</option>
+              <option value="UBARANA">UBARANA</option>
+              <option value="UBATUBA">UBATUBA</option>
+              <option value="UBIRAJARA">UBIRAJARA</option>
+              <option value="UCHOA">UCHOA</option>
+              <option value="UNIÃO PAULISTA">UNIÃO PAULISTA</option>
+              <option value="URÂNIA">URÂNIA</option>
+              <option value="URU">URU</option>
+              <option value="URUPÊS">URUPÊS</option>
+              <option value="VALENTIM GENTIL">VALENTIM GENTIL</option>
+              <option value="VALINHOS">VALINHOS</option>
+              <option value="VALPARAÍSO">VALPARAÍSO</option>
+              <option value="VARGEM">VARGEM</option>
+              <option value="VARGEM GRANDE DO SUL">VARGEM GRANDE DO SUL</option>
+              <option value="VARGEM GRANDE PAULISTA">VARGEM GRANDE PAULISTA</option>
+              <option value="VÁRZEA PAULISTA">VÁRZEA PAULISTA</option>
+              <option value="VERA CRUZ">VERA CRUZ</option>
+              <option value="VINHEDO">VINHEDO</option>
+              <option value="VIRADOURO">VIRADOURO</option>
+              <option value="VISTA ALEGRE DO ALTO">VISTA ALEGRE DO ALTO</option>
+              <option value="VITÓRIA BRASIL">VITÓRIA BRASIL</option>
+              <option value="VOTORANTIM">VOTORANTIM</option>
+              <option value="VOTUPORANGA">VOTUPORANGA</option>
+              <option value="ZACARIAS">ZACARIAS</option>
+            </select>
+            <div class="feedback-erro" id="cidade-erro"></div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="botao-fad" disabled> Cadastrar </button>
+      <div id="sucessoBox" style="display:none; text-align:center; margin-top:18px;"></div>
+      <div id="erroBox" style="display:none; text-align:center; margin-top:18px;"></div>
+      <div id="okBtnContainer" style="text-align:center; margin-top:10px; display:none;">
+        <button type="button" class="ok-btn" id="okBtn">OK</button>
+      </div>
     </form>
-  </div>
-
-  <!-- Caixa de erro -->
-  <div id="erroBox" class="dialog">
-    <div class="dialog-header">
-      <span id="erroTexto">Erro</span>
-      <button class="close-button" onclick="document.getElementById('erroBox').style.display='none';">&times;</button>
+    <div style="text-align:center; margin-top: 30px;">
+      <a href="/boas-vindas" class="menu-link" style="background:#004080; color:#fff; text-decoration:none; padding:10px 22px; border-radius:6px; font-size:16px; font-weight:500; display:inline-block;">Página inicial</a>
     </div>
-    <div class="dialog-body">
-      <button class="ok-button" onclick="document.getElementById('erroBox').style.display='none';">OK</button>
-    </div>
-  </div>
-
-  <!-- Caixa de sucesso -->
-  <div id="sucessoBox" class="dialog">
-    <div class="dialog-header" style="background: #d0f5d0;">
-      <span style="color: #0b6600;">Cadastro realizado!</span>
-      <button class="close-button" style="background: #0b6600;" onclick="document.getElementById('sucessoBox').style.display='none'; window.location.reload();">&times;</button>
-    </div>
-    <div class="dialog-body">
-      <p>Cadastro salvo com sucesso.</p>
-      <button class="ok-button" onclick="document.getElementById('sucessoBox').style.display='none'; window.location.reload();">OK</button>
-    </div>
-  </div>
-
+  </div>  <script type="module" src="/static/js/cd_pj/formulario_pj.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const cnpjInput = document.getElementById("cnpj");
-      if (cnpjInput) {
-        cnpjInput.addEventListener("input", function () {
-          let value = this.value.replace(/\D/g, '');
-          if (value.length > 14) value = value.slice(0, 14);
-          value = value.replace(/^(\d{2})(\d)/, "$1.$2");
-          value = value.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-          value = value.replace(/\.(\d{3})(\d)/, ".$1/$2");
-          value = value.replace(/(\d{4})(\d)/, "$1-$2");
-          this.value = value;
-        });
+    // Sistema de Validação Centralizado
+    class ValidadorFormulario {
+      constructor() {
+        this.campos = new Map();
+        this.regras = new Map();
+        this.inicializar();
       }
-  
-      const form = document.getElementById("pjForm");
-      const erroBox = document.getElementById("erroBox");
-      const erroTexto = document.getElementById("erroTexto");
-      const sucessoBox = document.getElementById("sucessoBox");
-  
-      if (form) {
-        form.addEventListener("submit", async function(event) {
-          event.preventDefault();
-          if (erroBox) erroBox.style.display = "none";
-          if (sucessoBox) sucessoBox.style.display = "none";
-  
-          const formData = new URLSearchParams(new FormData(form));
-  
-          try {
-            const response = await fetch("/cadastro/interessado/pj", {
-              method: "POST",
-              body: formData
+
+      inicializar() {
+        // Definir regras de validação
+        this.regras.set('razao_social', {
+          obrigatorio: true,
+          minLength: 2,
+          maxLength: 255,
+          validar: (valor) => valor.trim().length >= 2
+        });
+        
+        this.regras.set('cnpj', {
+          obrigatorio: true,
+          validar: (valor) => {
+            const cnpj = valor.replace(/\D/g, '');
+            return cnpj.length === 14 && this.validarCNPJ(cnpj);
+          }
+        });
+        
+        this.regras.set('nome_fantasia', {
+          obrigatorio: true,
+          minLength: 2,
+          maxLength: 255,
+          validar: (valor) => valor.trim().length >= 2
+        });
+        
+        this.regras.set('telefone', {
+          obrigatorio: true,
+          validar: (valor) => /^\(\d{2}\) \d{4,5}-\d{4}$/.test(valor)
+        });
+        
+        this.regras.set('celular', {
+          obrigatorio: true,
+          validar: (valor) => /^\(\d{2}\) \d{5}-\d{4}$/.test(valor)
+        });
+        
+        this.regras.set('email', {
+          obrigatorio: true,
+          validar: (valor) => /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(valor)
+        });
+        
+        this.regras.set('cep', {
+          obrigatorio: true,
+          validar: (valor) => /^\d{5}-?\d{3}$/.test(valor)
+        });
+        
+        this.regras.set('bairro', {
+          obrigatorio: true,
+          minLength: 2,
+          validar: (valor) => valor.trim().length >= 2
+        });
+        
+        this.regras.set('rua', {
+          obrigatorio: true,
+          minLength: 3,
+          validar: (valor) => valor.trim().length >= 3
+        });
+        
+        this.regras.set('numero', {
+          obrigatorio: true,
+          validar: (valor) => valor.trim().length >= 1
+        });
+        
+        this.regras.set('complemento', {
+          obrigatorio: true,
+          minLength: 1,
+          validar: (valor) => valor.trim().length >= 1
+        });
+        
+        this.regras.set('uf', {
+          obrigatorio: true,
+          validar: (valor) => valor !== ""
+        });
+        
+        this.regras.set('cidade', {
+          obrigatorio: true,
+          validar: (valor) => valor !== ""
+        });
+
+        // Configurar listeners para todos os campos
+        this.configurarListeners();
+      }
+
+      validarCNPJ(cnpj) {
+        if (cnpj.length !== 14) return false;
+        
+        // Verificar se todos os dígitos são iguais
+        if (/^(\d)\1+$/.test(cnpj)) return false;
+        
+        // Validar dígitos verificadores
+        let tamanho = cnpj.length - 2;
+        let numeros = cnpj.substring(0, tamanho);
+        let digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let pos = tamanho - 7;
+        
+        for (let i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2) pos = 9;
+        }
+        
+        let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        if (resultado != digitos.charAt(0)) return false;
+        
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        
+        for (let i = tamanho; i >= 1; i--) {
+          soma += numeros.charAt(tamanho - i) * pos--;
+          if (pos < 2) pos = 9;
+        }
+        
+        resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+        return resultado == digitos.charAt(1);
+      }
+
+      configurarListeners() {
+        const campos = ['razao_social', 'cnpj', 'nome_fantasia', 'telefone', 'celular', 'email', 'cep', 'bairro', 'rua', 'numero', 'complemento', 'uf', 'cidade'];
+        
+        campos.forEach(nomeCampo => {
+          const campo = document.getElementById(nomeCampo);
+          if (campo) {
+            // Validação em tempo real
+            campo.addEventListener('input', () => {
+              this.validarCampo(nomeCampo, false);
             });
-  
-            if (response.ok) {
-              if (sucessoBox) sucessoBox.style.display = "block";
-            } else {
-              const data = await response.json();
-              if (erroTexto) erroTexto.innerText = data.detail || "Erro ao salvar.";
-              if (erroBox) erroBox.style.display = "block";
-            }
-  
-          } catch (error) {
-            if (erroTexto) erroTexto.innerText = "Erro de conexão.";
-            if (erroBox) erroBox.style.display = "block";
+            
+            // Validação ao sair do campo
+            campo.addEventListener('blur', () => {
+              this.validarCampo(nomeCampo, true);
+            });
           }
         });
       }
-    });
-</script>
- </body>
- </html>
-  
 
+      validarCampo(nomeCampo, podeExibirErroObrigatorio = true) {
+        const campo = document.getElementById(nomeCampo);
+        const regra = this.regras.get(nomeCampo);
+        const fieldContainer = campo.closest('.form-field');
+        const erroDiv = document.getElementById(`${nomeCampo}-erro`);
+        
+        if (!campo || !regra) return false;
+        
+        const valor = campo.value;
+        let isValido = true;
+        let mensagemErro = '';
+
+        // Verificar se é obrigatório e está vazio
+        if (regra.obrigatorio && !valor.trim()) {
+          isValido = false;
+          // Só mostrar mensagem "obrigatório" se permitido (quando sair do campo)
+          if (podeExibirErroObrigatorio) {
+            mensagemErro = 'Este campo é obrigatório.';
+          }
+        }
+        // Se tem valor, aplicar validação específica
+        else if (valor.trim() && regra.validar && !regra.validar(valor)) {
+          isValido = false;
+          mensagemErro = this.getMensagemErro(nomeCampo);
+        }
+
+        // Aplicar estilo visual
+        this.aplicarEstiloValidacao(fieldContainer, campo, erroDiv, isValido, mensagemErro);
+        
+        // Verificar se formulário pode ser submetido
+        this.verificarFormularioCompleto();
+        
+        return isValido;
+      }
+
+      getMensagemErro(nomeCampo) {
+        const mensagens = {
+          'razao_social': 'Razão social deve ter pelo menos 2 caracteres.',
+          'cnpj': 'CNPJ inválido.',
+          'nome_fantasia': 'Nome fantasia deve ter pelo menos 2 caracteres.',
+          'telefone': 'Telefone inválido. Ex: (11) 1234-5678',
+          'celular': 'Celular inválido. Ex: (11) 91234-5678',
+          'email': 'E-mail inválido.',
+          'cep': 'CEP inválido.',
+          'bairro': 'Bairro deve ter pelo menos 2 caracteres.',
+          'rua': 'Logradouro deve ter pelo menos 3 caracteres.',
+          'numero': 'Número é obrigatório.',
+          'complemento': 'Complemento é obrigatório.',
+          'uf': 'Selecione um estado.',
+          'cidade': 'Selecione um município.'
+        };
+        return mensagens[nomeCampo] || 'Campo inválido.';
+      }
+
+      aplicarEstiloValidacao(fieldContainer, campo, erroDiv, isValido, mensagemErro) {
+        // Remover classes anteriores
+        fieldContainer.classList.remove('campo-validado', 'campo-erro');
+        
+        // Aplicar nova classe baseada na validação
+        if (campo.value.trim()) {
+          if (isValido) {
+            fieldContainer.classList.add('campo-validado');
+          } else {
+            fieldContainer.classList.add('campo-erro');
+          }
+        }
+        
+        // Mostrar/esconder mensagem de erro
+        if (erroDiv) {
+          erroDiv.textContent = isValido ? '' : mensagemErro;
+        }
+      }
+
+      verificarFormularioCompleto() {
+        const campos = Array.from(this.regras.keys());
+        const todosValidos = campos.every(nomeCampo => {
+          const campo = document.getElementById(nomeCampo);
+          const regra = this.regras.get(nomeCampo);
+          if (!campo || !regra) return false;
+          
+          const valor = campo.value;
+          // Verificar se é obrigatório e está vazio
+          if (regra.obrigatorio && !valor.trim()) {
+            return false;
+          }
+          // Se tem valor, aplicar validação específica
+          if (valor.trim() && regra.validar && !regra.validar(valor)) {
+            return false;
+          }
+          return true;
+        });
+        
+        const botaoSubmit = document.querySelector('button[type="submit"]');
+        if (botaoSubmit) {
+          botaoSubmit.disabled = !todosValidos;
+          botaoSubmit.classList.toggle('ativo', todosValidos);
+        }
+      }
+
+      validarFormulario() {
+        const campos = Array.from(this.regras.keys());
+        return campos.every(nomeCampo => {
+          const campo = document.getElementById(nomeCampo);
+          const regra = this.regras.get(nomeCampo);
+          if (!campo || !regra) return false;
+          
+          const valor = campo.value;
+          // Verificar se é obrigatório e está vazio
+          if (regra.obrigatorio && !valor.trim()) {
+            return false;
+          }
+          // Se tem valor, aplicar validação específica
+          if (valor.trim() && regra.validar && !regra.validar(valor)) {
+            return false;
+          }
+          return true;
+        });
+      }
+    }
+
+    // Inicializar validador
+    const validador = new ValidadorFormulario();
+
+    // Máscara e validação para CNPJ    // Máscara para CNPJ
+    const cnpjInput = document.getElementById("cnpj");
+    cnpjInput.addEventListener("input", function () {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 14) value = value.slice(0, 14);
+      value = value.replace(/(\d{2})(\d)/, "$1.$2");
+      value = value.replace(/(\d{3})(\d)/, "$1.$2");
+      value = value.replace(/(\d{3})(\d{4})(\d)/, "$1/$2-$3");
+      this.value = value;
+    });
+
+    // Máscara para telefone
+    const telInput = document.getElementById("telefone");
+    telInput.addEventListener('input', function () {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.slice(0, 11);
+      value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
+      value = value.replace(/(\d{1})?(\d{4,5})(\d{4})$/, "$1 $2-$3");
+      this.value = value;
+    });
+
+    // Máscara para celular
+    const celInput = document.getElementById("celular");
+    celInput.addEventListener('input', function () {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 11) value = value.slice(0, 11);
+      value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
+      value = value.replace(/(\d{1})?(\d{5})(\d{4})$/, "$1 $2-$3");
+      this.value = value;
+    });
+
+    // Máscara para CEP
+    const cepInput = document.getElementById('cep');
+    cepInput.addEventListener('input', function () {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length > 8) value = value.slice(0, 8);
+      value = value.replace(/(\d{5})(\d)/, "$1-$2");
+      this.value = value;
+    });
+
+    // Capitalização de nomes próprios
+    function capitalizarNome(str) {
+      return str.toLowerCase().replace(/(^|\s|\b)([a-záéíóúãõâêîôûç])([a-záéíóúãõâêîôûç]*)/g, function(m, sep, ini, rest) {
+        if (["da","de","do","das","dos","e"].includes(ini+rest)) return sep+ini+rest;
+        return sep+ini.toUpperCase()+rest;
+      });
+    }
+
+    // Aplicar capitalização
+    ['razao_social', 'nome_fantasia', 'cidade', 'bairro', 'rua'].forEach(campo => {
+      const input = document.getElementById(campo);
+      if (input) {
+        input.addEventListener("blur", function() {
+          this.value = capitalizarNome(this.value);
+        });
+      }
+    });
+
+    // Email: converter para minúsculo
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener("blur", function() {
+      this.value = this.value.toLowerCase();
+    });    // CNPJ: Busca automática de dados
+    const cnpjLoading = document.getElementById('cnpj-loading');
+    const cnpjCache = {};
+    let cnpjTimeout;    cnpjInput.addEventListener('input', function () {
+      let raw = this.value.replace(/\D/g, '');
+      
+      // Cancelar busca anterior se houver
+      if (cnpjTimeout) {
+        clearTimeout(cnpjTimeout);
+      }
+      
+      // Buscar após 500ms de inatividade
+      if (raw.length === 14) {
+        cnpjTimeout = setTimeout(async () => {
+          try {
+            const resp = await fetch(`/validar-cnpj/${raw}`);
+            const data = await resp.json();
+            if (!data.valido) {
+              // Erro será mostrado pelo sistema de validação
+            } else {
+              // Buscar dados adicionais da Receita Federal
+              buscarDadosCNPJ(raw);
+            }
+          } catch {
+            console.error('Erro ao validar CNPJ');
+          }
+        }, 500);
+      } else {
+        cnpjLoading.innerHTML = '';
+      }
+    });async function buscarDadosCNPJ(cnpj) {
+      if (cnpjCache[cnpj]) {
+        preencherCNPJ(cnpjCache[cnpj]);
+        cnpjLoading.innerHTML = '<span style="color: #28a745;">✓ Dados preenchidos automaticamente</span>';
+        setTimeout(() => cnpjLoading.innerHTML = '', 3000);
+        return;
+      }
+
+      cnpjLoading.innerHTML = '<div class="spinner"></div> Buscando dados do CNPJ...';
+      try {
+        const res = await fetch(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`);
+        const data = await res.json();
+        if (data.status !== 'ERROR') {
+          cnpjCache[cnpj] = data;
+          preencherCNPJ(data);
+          cnpjLoading.innerHTML = '<span style="color: #28a745;">✓ Dados preenchidos automaticamente</span>';
+        } else {
+          cnpjLoading.innerHTML = '<span style="color: #dc3545;">⚠ CNPJ não encontrado</span>';
+        }
+      } catch {
+        cnpjLoading.innerHTML = '<span style="color: #dc3545;">⚠ Erro ao buscar dados do CNPJ</span>';
+      } finally {
+        setTimeout(() => cnpjLoading.innerHTML = '', 4000);
+      }
+    }
+
+    function preencherCNPJ(data) {
+      document.getElementById('razao_social').value = data.nome || '';
+      document.getElementById('nome_fantasia').value = data.fantasia || '';
+      document.getElementById('email').value = data.email || '';
+      document.getElementById('telefone').value = data.telefone || '';
+      document.getElementById('cep').value = data.cep || '';
+      document.getElementById('rua').value = data.logradouro || '';
+      document.getElementById('numero').value = data.numero || '';
+      document.getElementById('complemento').value = data.complemento || '';
+      document.getElementById('bairro').value = data.bairro || '';
+      document.getElementById('uf').value = data.uf || '';
+        // Revalidar campos preenchidos
+      ['razao_social', 'nome_fantasia', 'email', 'telefone', 'cep', 'rua', 'numero', 'complemento', 'bairro', 'uf'].forEach(campo => {
+        validador.validarCampo(campo, false); // false = não mostrar erro obrigatório ao preencher automaticamente
+      });
+    }    // CEP: Busca automática de endereço
+    const cepLoading = document.getElementById('cep-loading');
+    let cepTimeout;
+
+    cepInput.addEventListener('input', function () {
+      const cep = this.value.replace(/\D/g, '');
+      
+      // Cancelar busca anterior se houver
+      if (cepTimeout) {
+        clearTimeout(cepTimeout);
+      }
+        // Buscar após 800ms de inatividade
+      if (cep.length === 8) {
+        cepTimeout = setTimeout(async () => {
+          cepLoading.innerHTML = '<div class="spinner"></div> Buscando endereço...';
+          try {
+            const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await res.json();
+            if (!data.erro) {
+              document.getElementById('rua').value = data.logradouro || '';
+              document.getElementById('bairro').value = data.bairro || '';
+              document.getElementById('uf').value = data.uf || '';
+              document.getElementById('cidade').innerHTML = `<option selected>${data.localidade}</option>`;
+              
+              // Revalidar campos preenchidos
+              ['rua', 'bairro', 'uf', 'cidade'].forEach(campo => {
+                validador.validarCampo(campo, false); // false = não mostrar erro obrigatório ao preencher automaticamente
+              });
+              
+              cepLoading.innerHTML = '<span style="color: #28a745;">✓ Endereço preenchido automaticamente</span>';
+            } else {
+              cepLoading.innerHTML = '<span style="color: #dc3545;">⚠ CEP não encontrado</span>';
+            }
+          } catch {
+            cepLoading.innerHTML = '<span style="color: #dc3545;">⚠ Erro ao buscar CEP</span>';
+          } finally {
+            setTimeout(() => cepLoading.innerHTML = '', 4000);
+          }
+        }, 800);
+      } else {
+        cepLoading.innerHTML = '';
+      }
+    });// UF/Municípios
+    const ufSelect = document.getElementById('uf');
+    const cidadeSelect = document.getElementById('cidade');
+
+    ufSelect.addEventListener('change', async () => {
+      const uf = ufSelect.value;
+      cidadeSelect.innerHTML = '<option value="">Selecione...</option>';
+      
+      if (uf === 'SP') {
+        try {
+          const resp = await fetch('/static/municipios_sp.json');
+          const municipios = await resp.json();
+          municipios.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.nome;
+            opt.text = m.nome;
+            cidadeSelect.appendChild(opt);
+          });
+        } catch {
+          cidadeSelect.innerHTML = '<option>Erro ao carregar</option>';
+        }
+      } else if (uf) {
+        try {
+          const res = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+          const dados = await res.json();
+          dados.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.nome;
+            opt.text = c.nome;
+            cidadeSelect.appendChild(opt);
+          });
+        } catch {
+          cidadeSelect.innerHTML = '<option>Erro ao carregar</option>';
+        }      }
+      
+      // Revalidar cidade após carregar opções
+      validador.validarCampo('cidade', false); // false = não mostrar erro obrigatório ao carregar opções
+    });
+
+    // Formulário - Envio
+    const form = document.getElementById("pjForm");
+    const sucessoBox = document.getElementById("sucessoBox");
+    const erroBox = document.getElementById("erroBox");
+    const okBtnContainer = document.getElementById("okBtnContainer");
+    const okBtn = document.getElementById("okBtn");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      // Validar formulário antes do envio
+      if (!validador.validarFormulario()) {
+        erroBox.textContent = "Por favor, corrija os erros no formulário antes de continuar.";
+        erroBox.style.display = "block";
+        sucessoBox.style.display = "none";
+        return;
+      }
+      
+      sucessoBox.style.display = "none";
+      erroBox.style.display = "none";
+      
+      const formData = new FormData(form);
+      const dados = {};
+      for (const [key, value] of formData.entries()) {
+        dados[key] = value;
+      }
+      
+      try {
+        const resp = await fetch("/cadastro/pessoa-juridica", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(dados)
+        });
+        
+        if (resp.ok) {
+          sucessoBox.textContent = "Pessoa jurídica cadastrada com sucesso!";
+          sucessoBox.style.display = "block";
+          form.reset();
+          okBtnContainer.style.display = "block";
+          
+          // Resetar validações
+          document.querySelectorAll('.form-field').forEach(field => {
+            field.classList.remove('campo-validado', 'campo-erro');
+          });
+          document.querySelectorAll('.feedback-erro').forEach(erro => {
+            erro.textContent = '';
+          });
+        } else {
+          const data = await resp.json();
+          erroBox.textContent = data.detail || "Erro ao cadastrar pessoa jurídica.";
+          erroBox.style.display = "block";
+        }
+      } catch (e) {
+        erroBox.textContent = "Erro de conexão. Tente novamente.";
+        erroBox.style.display = "block";
+      }
+    });
+
+    okBtn.addEventListener("click", function() {
+      sucessoBox.style.display = "none";
+      okBtnContainer.style.display = "none";
+      window.location.href = "/boas-vindas";
+    });
+
+    // Inicialização final
+    window.addEventListener('load', () => {
+      // Verificar estado inicial do formulário
+      validador.verificarFormularioCompleto();
+    });
+  </script>
+  <script>
+  document.getElementById('cnpj').addEventListener('blur', async function() {
+    const cnpj = this.value.replace(/\D/g, '');
+    if (cnpj.length === 14) {
+      try {
+        const response = await fetch(`/api/cnpj/${cnpj}`);
+        const data = await response.json();
+        if (data.success) {
+          document.getElementById('razao_social').value = data.razao_social || '';
+          document.getElementById('nome_fantasia').value = data.nome_fantasia || '';
+          document.getElementById('email').value = data.email || '';
+          document.getElementById('telefone').value = data.telefone || '';
+          document.getElementById('cep').value = data.cep || '';
+          document.getElementById('rua').value = data.logradouro || '';
+          document.getElementById('bairro').value = data.bairro || '';
+          document.getElementById('cidade').value = data.cidade || '';
+          document.getElementById('uf').value = data.uf || '';
+        } else {
+          alert('CNPJ não encontrado.');
+        }
+      } catch (error) {
+        alert('Erro ao buscar o CNPJ.');
+      }
+    } else {
+      alert('CNPJ inválido.');
+    }
+  });
+</script>
+</body>
+</html>

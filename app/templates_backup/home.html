@@ -14,20 +14,72 @@
     header {
       background-color: #003366;
       color: white;
-      padding: 2rem;
+      padding: 1.2rem 2rem 0.7rem 2rem;
       background-image: url('/static/images/conformidade_ambiental.png');
       background-size: cover;
       background-position: center;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       position: relative;
+      min-height: 120px;
+      justify-content: flex-start;
     }
-    header h1 {
-      margin: 0;
-      font-size: clamp(1.8rem, 5vw, 2.5rem); /* Tamanho dinâmico */
-      max-width: 80%;
-      line-height: 1.2;
+    .header-bg-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: #003366;
+      opacity: 0.45;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .header-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: top;
+      justify-content: center;
+    }
+    .logo-fad-home {
+      width: 170px;
+      max-width: 80vw;
+      height: auto;
+      display: block;
+      margin: 0.1rem auto 0.1rem auto;
+      filter: drop-shadow(0 2px 8px #0002);
+      background: transparent;
+    }
+    .titulo-fad-home {
+      color: #111;
+      font-size: 1.45rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin: 0 0 0.5rem 0;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.85);
+      border-radius: 8px;
+      padding: 0.3em 1.2em;
+      box-shadow: 0 1px 6px #0001;
+      display: inline-block;
+    }
+    .titulo-fad-home-branco {
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin: 0.2rem 0 0.2rem 0;
+      text-transform: uppercase;
+      background: none;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      display: block;
     }
     .intro-button {
       position: absolute;
@@ -36,13 +88,14 @@
       transform: translateY(-50%);
       background-color: #006699;
       color: white;
-      padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem); /* Padding dinâmico */
+      padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
       border: none;
       border-radius: 8px;
-      font-size: clamp(0.9rem, 2vw, 1rem); /* Fonte dinâmica */
+      font-size: clamp(0.9rem, 2vw, 1rem);
       cursor: pointer;
       text-align: center;
       white-space: nowrap;
+      z-index: 3;
     }
     .intro-button:hover {
       background-color: #005080;
@@ -53,78 +106,97 @@
       margin: 0 auto;
     }
     .section-title {
-      font-size: clamp(1.5rem, 4vw, 2rem); /* Título dinâmico */
+      font-size: clamp(1.5rem, 4vw, 2rem);
       margin-bottom: 1rem;
       color: #003366;
     }
     .card-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
+      gap: 2.2rem;
+      justify-items: stretch;
+      align-items: stretch;
     }
     .card {
       background-color: white;
-      border-radius: 10px;
+      border-radius: 22px;
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
       text-align: center;
+      min-height: 440px;
+      max-width: 370px;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      width: 100%;
+      height: 100%;
     }
     .card-img-container {
-      height: 220px;
+      height: 280px;
       overflow: hidden;
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      background: white;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .card img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       object-position: center;
+      background: white;
+      display: block;
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
     }
     .card h3 {
       margin: 1rem 0 0.5rem;
       color: #003366;
-      font-size: clamp(1rem, 2vw, 1.2rem); /* Título do card dinâmico */
+      font-size: clamp(1rem, 2vw, 1.2rem);
     }
     .card p {
       padding: 0 1rem 1rem;
-      font-size: clamp(0.85rem, 1.5vw, 0.95rem); /* Texto do card dinâmico */
+      font-size: clamp(0.85rem, 1.5vw, 0.95rem);
     }
     .background-section {
-  position: relative;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  overflow: hidden;
-  padding: 0;
-  border: none;
-  background: none;
-}
-
-.background-img {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  z-index: 0;
-  opacity: 1;
-}
-
-.background-section .content {
-  position: relative;
-  z-index: 1;
-  padding: 4rem 2rem;
-  color: #000000;
-  
-}
-.background-section .content p { font-weight: bold; text-shadow: 0 0 3px white; font-size: 1.05rem; font-size: 18px; }
-
-
-
-.background-section h2,
-.background-section p {
-  position: relative;
-  z-index: 1;
-}
+      position: relative;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      overflow: hidden;
+      padding: 0;
+      border: none;
+      background: none;
+    }
+    .background-img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    .background-section .content {
+      position: relative;
+      z-index: 1;
+      padding: 4rem 2rem;
+      color: #000000;
+    }
+    .background-section .content p {
+      font-weight: bold;
+      text-shadow: 0 0 3px white;
+      font-size: 18px;
+    }
+    .background-section h2,
+    .background-section p {
+      position: relative;
+      z-index: 1;
+    }
     footer {
       background-color: #003366;
       color: white;
@@ -150,81 +222,63 @@
       .card-grid {
         grid-template-columns: 1fr 1fr;
       }
-      header {
-        padding-bottom: 5rem; /* Espaço para o botão */
-      }
-      .intro-button {
-        position: absolute;
-        bottom: 1.5rem;
-        top: auto;
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%);
-      }
     }
     @media (max-width: 600px) {
       .card-grid {
         grid-template-columns: 1fr;
       }
-      header h1 {
-        max-width: 100%;
-        text-align: center;
-        margin-bottom: 1rem;
-      }
-      .intro-button {
-        position: relative;
-        left: auto;
-        right: auto;
-        top: auto;
-        bottom: auto;
-        transform: none;
-        margin: 1rem auto 0;
-        width: 80%;
-        white-space: normal;
-      }
       .card-img-container {
-        height: 180px;
+        height: 200px;
       }
+      .card {
+        min-height: 340px;
+        max-width: 98vw;
+      }
+    }
+    /* Justifica o texto da seção O que é a FAD? */
+    .descricao-fad {
+      text-align: justify;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>FAD - Ferramenta de Análise Dinamizada</h1>
-    <a href="/login" class="intro-button">Acesse a plataforma</a>
-  </header>
+    <header>
+      <div class="header-bg-overlay"></div>
+      <div class="header-content">
+        <img src="/static/images/FAD_LOGO/fad_logo_banco_HOME.PNG" alt="Logo FAD" class="logo-fad-home">
+        <div class="titulo-fad-home-branco">FERRAMENTA DE ANÁLISE DINAMIZADA</div>
+      </div>
+      <a href="/boas-vindas" class="intro-button">Acesse a plataforma</a>
+    </header>
 
-  <!-- O restante do seu conteúdo permanece igual -->
   <section>
     <h2 class="section-title">O que é a FAD?</h2>
-    <p style="text-align: justify;">A <strong>FAD</strong> Ferramenta de Análise Dinamizada é uma plataforma digital construída com 
+    <p class="descricao-fad">
+      <strong>FAD</strong> Ferramenta de Análise Dinamizada é uma plataforma digital construída com 
       tecnologias 100% open-source, voltada para a análise técnica, ambiental e espacial de dados georreferenciados. 
       Seu principal objetivo é oferecer suporte qualificado à tomada de decisões no planejamento e gestão de 
       infraestrutura viária, com ênfase na realidade do Estado de São Paulo. A plataforma permite importar, 
       validar e processar geometrias de forma automatizada, promovendo agilidade, precisão e rastreabilidade nas 
       avaliações técnicas. Todos os módulos da FAD são independentes e podem ser executados conforme a necessidade 
-      do usuário, garantindo flexibilidade, transparência e eficiência no tratamento de dados geoespaciais.</p>
+      do usuário, garantindo flexibilidade, transparência e eficiência no tratamento de dados geoespaciais.
+    </p>
   </section>
 
   <section class="background-section">
-  <img src="/static/images/arcabouco_teorico.png" class="background-img" alt="Fundo completo">
-  <div class="content">
-    <h2 class="section-title">Arcabouço Teórico-Conceitual</h2>
-    <p style="text-align: justify;">A FAD foi concebida a partir de fundamentos sólidos que alinham inovação tecnológica com boas práticas em gestão
-       pública e ciência aplicada. Baseia-se nos princípios de governança digital, ciência aberta, transparência de 
-       dados, reprodutibilidade científica e análise espacial orientada a banco de dados, garantindo que os processos 
-       executados sejam auditáveis, confiáveis e replicáveis por diferentes instituições.</p>
-
-    <p style="text-align: justify;">Seu desenvolvimento adota uma arquitetura moderna, totalmente sustentada por tecnologias open-source, 
-      como PostGIS, GeoServer, FastAPI, React, QGIS e PostgreSQL. Isso assegura independência tecnológica, 
-      escalabilidade da aplicação, autonomia institucional e redução de custos operacionais, além de fomentar uma 
-      cultura colaborativa de inovação contínua.</p>
-    
-    <p style="text-align: justify;">Ao integrar essas tecnologias de forma modular e interoperável, a FAD consolida um ambiente robusto para 
-      análise técnica e espacial, promovendo a democratização do acesso à informação geográfica de maneira 
-      estruturada, segura e eficiente.</p>
-  </div>
-</section>
+    <img src="/static/images/arcabouco_teorico.png" class="background-img" alt="Fundo completo">
+    <div class="content">
+      <h2 class="section-title">Arcabouço Teórico-Conceitual</h2>
+      <p style="text-align: justify;">
+        A FAD foi concebida a partir de fundamentos sólidos que alinham inovação tecnológica com boas práticas em gestão pública e ciência aplicada. Baseia-se nos princípios de governança digital, ciência aberta, transparência de dados, reprodutibilidade científica e análise espacial orientada a banco de dados, garantindo que os processos executados sejam auditáveis, confiáveis e replicáveis por diferentes instituições.
+      </p>
+      <p style="text-align: justify;"></p>
+        Seu desenvolvimento adota uma arquitetura moderna, totalmente sustentada por tecnologias open-source, como PostGIS, GeoServer, FastAPI, React, QGIS e PostgreSQL. Isso assegura independência tecnológica, escalabilidade da aplicação, autonomia institucional e redução de custos operacionais, além de fomentar uma cultura colaborativa de inovação contínua.
+      </p>
+      <p style="text-align: justify;">
+        Ao integrar essas tecnologias de forma modular e interoperável, a FAD consolida um ambiente robusto para análise técnica e espacial, promovendo a democratização do acesso à informação geográfica de maneira estruturada, segura e eficiente.
+      </p>
+    </div>
+  </section>
 
   <section>
     <h2 class="section-title">Módulos da Plataforma</h2>
@@ -281,7 +335,7 @@
 
   <footer>
     <p>© 2025 - FAD | VPC-GEOSER</p>
-    <a href="/login" class="btn-acesso-final">Acesse a plataforma</a>
+    <a href="/boas-vindas" class="btn-acesso-final">Acesse a plataforma</a>
   </footer>
 </body>
 </html>

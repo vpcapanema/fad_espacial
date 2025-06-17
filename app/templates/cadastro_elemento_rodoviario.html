@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Elemento Rodoviário</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Cadastro de Elemento Rodoviário</h1>
+    <form id="cadastro-form" method="post" action="/cadastro-elementos/rodovia/">
+        <label for="codigo">Código:</label>
+        <input type="text" id="codigo" name="codigo" required><br>
+        <label for="denominacao">Denominação:</label>
+        <input type="text" id="denominacao" name="denominacao" required><br>
+        <label for="tipo">Tipo:</label>
+        <input type="text" id="tipo" name="tipo" required><br>
+        <label for="municipio">Município:</label>
+        <input type="text" id="municipio" name="municipio" required><br>
+        <label for="extensao_km">Extensão (km):</label>
+        <input type="number" step="0.01" id="extensao_km" name="extensao_km" required><br>
+        <label for="criado_em">Criado em:</label>
+        <input type="datetime-local" id="criado_em" name="criado_em"><br>
+        <button type="submit">Cadastrar Rodovia</button>
+    </form>
+    <!-- Repita o formulário para trecho, obra de arte e dispositivo, mudando o action para o endpoint correto -->
+</body>
+</html>

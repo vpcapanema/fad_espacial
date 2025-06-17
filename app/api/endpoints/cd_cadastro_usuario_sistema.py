@@ -46,7 +46,7 @@ router = APIRouter(
 # ===============================
 # Endpoint JSON para cadastro via JavaScript
 # ===============================
-@router.post("/cadastro-usuario-sistema")
+@router.post("/cadastrar-usuario")
 async def cadastrar_usuario_json(request: Request, usuario_data: UsuarioCreate, db: Session = Depends(get_db)):
     """
     Endpoint para cadastro de usuário via JSON (usado pelo JavaScript do frontend)

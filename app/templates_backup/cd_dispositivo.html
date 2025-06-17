@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Dispositivo Rodoviário</title>
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <link rel="stylesheet" href="/static/css/formulario_elemento.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef5f9;
+    }
+    .form-container {
+      max-width: 720px;
+      margin: 30px auto;
+      padding: 2rem 2.5%;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .form-section {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid #cce0f5;
+      border-radius: 8px;
+      background-color: #f7fbff;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+    .required::after {
+      content: " *";
+      color: #dc3545;
+      font-weight: bold;
+    }
+    input, select {
+      padding: 0.7rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      background-color: #009933;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 2rem;
+    }
+    button:hover {
+      background-color: #007a29;
+    }
+    #sucessoBox {
+      display: none;
+      color: #0b6600;
+      background: #e6ffe6;
+      border: 1px solid #0b6600;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+    #erroBox {
+      display: none;
+      color: #a80000;
+      background: #ffeaea;
+      border: 1px solid #a80000;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+    @media (max-width: 768px) {
+      .form-container { margin: 15px; padding: 1.5rem; }
+      .form-section { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  {% include 'componentes/fad_header.html' %}
+  <div class="form-container">
+    <h3 style="text-align:center; font-size: 24px;">Cadastro de Elemento Rodoviário</h3>
+    <h4 style="text-align:left; color:#003366; margin-bottom: 1.5rem; margin-top:0;">Dispositivo Rodoviário</h4>
+    <form id="dispositivoForm" method="post" action="/cadastro-elementos/dispositivo/">
+      <div class="form-section">
+        <div class="form-group">
+          <div class="form-field">
+            <label for="codigo" class="required">Código do dispositivo:</label>
+            <input name="codigo" id="codigo" required maxlength="100" pattern="[A-Z]{2,}-\d{3,}" title="Ex: AB-123 (duas letras maiúsculas, hífen, três números)">
+            <div id="codigo-erro" style="color: red; font-size: 13px; margin-top: 2px;"></div>
+          </div>
+          <div class="form-field">
+            <label for="denominacao" class="required">Denominação:</label>
+            <input name="denominacao" id="denominacao" required maxlength="255">
+          </div>
+          <div class="form-field">
+            <label for="tipo" class="required">Tipo do dispositivo:</label>
+            <input name="tipo" id="tipo" required maxlength="100">
+          </div>
+          <div class="form-field">
+            <label for="municipio">Município:</label>
+            <select name="municipio" id="municipio">
+              <option value="">Selecione...</option>
+            </select>
+            <div id="municipio-erro" style="color: red; font-size: 13px; margin-top: 2px;"></div>
+          </div>
+          <div class="form-field">
+            <label for="extensao_km">Extensão (km):</label>
+            <input name="extensao_km" id="extensao_km" type="number" step="0.01" min="0">
+          </div>
+        </div>
+      </div>
+      <button type="submit">Cadastrar Dispositivo</button>
+    </form>
+    <div id="sucessoBox">Cadastro realizado com sucesso!</div>
+    <div id="erroBox"></div>
+    <div style="text-align:center; margin-top: 30px;">
+      <a href="/boas-vindas" class="menu-link" style="background:#004080; color:#fff; text-decoration:none; padding:10px 22px; border-radius:6px; font-size:16px; font-weight:500; display:inline-block;">Página inicial</a>
+    </div>
+  </div>
+  <script src="/static/js/cd_dispositivo/formulario_dispositivo.js"></script>
+</body>
+</html>

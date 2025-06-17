@@ -1,558 +1,807 @@
+<!-- ✅ Template atualizado para usar fad_header.html padronizado -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Cadastrar Projeto - FAD</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #eef5f9;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="utf-8" />
+    <title>FAD-GEO - Cadastro de Projeto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/modulos/01.Cadastro_Projeto/01.Cadastrar_projeto.css" />    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-    .form-container {
-      max-width: 700px;
-      margin: 60px auto;
-      padding: 2rem;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-
-    h2 {
-      text-align: center;
-      color: #003366;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.7rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      width: 100%;
-      background-color: #006633;
-      color: white;
-      padding: 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .resumo {
-      background-color: #e6f5e6;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-    }
-
-    .resumo p {
-      margin: 5px 0;
-    }
-
-    .resumo button {
-      background-color: #004080;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      width: auto;
-    }
-
-    .file-label {
-      display: inline-block;
-      padding: 8px 15px;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    #fileName {
-      border: 1px solid #ccc;
-      padding: 8px;
-      width: 100%;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    #uploadButton, #validateButton {
-      background-color: #006699;
-      margin-top: 10px;
-    }
-
-    #uploadProgress {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="form-container">
-    <h2>Cadastrar Projeto</h2>
-    <form id="formProjeto" method="POST" action="/projeto/salvar">
-      <fieldset style="border: 1px solid #ccc; padding: 1rem; border-radius: 8px;">
-        <legend><strong>Informações do Projeto</strong></legend>
-
-        <label for="nome">Nome do Projeto:</label>
-        <input type="text" name="nome" required>
-
-        <!-- Pessoa Jurídica -->
-        <label>Interessado (Pessoa Jurídica):</label>
-        <select id="opcaoPJ" required>
-          <option value="">Selecione...</option>
-          <option value="associar">Associar PJ já cadastrada</option>
-          <option value="cadastrar">Cadastrar nova PJ</option>
-        </select>
-
-        <div id="boxPJ" class="hidden">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <select id="pjSelect" required>
-              <option value="">Selecione uma PJ</option>
-              {% for pj in pjs %}
-                <option value="{{ pj.id }}">{{ pj.razao_social }} ({{ pj.cnpj }})</option>
-              {% endfor %}
-            </select>
-            <button type="button" id="atualizarPJBtn" class="btn-pequeno" title="Atualizar lista">🔄</button>
-          </div>
-          <button type="button" onclick="confirmarPJ()">Confirmar</button>
-        </div>
-
-        <div id="resumoPJ" class="resumo hidden">
-          <p><strong>✅</strong> <span id="pjResumoTexto"></span></p>
-          <button type="button" onclick="editarPJ()">✏️ Editar</button>
-          <input type="hidden" name="interessado_id" id="pjInputFinal">
-        </div>
-
-        <!-- Pessoa Física -->
-        <label>Representante Legal (Pessoa Física):</label>
-        <select id="opcaoPF" required>
-          <option value="">Selecione...</option>
-          <option value="associar">Associar PF já cadastrada</option>
-          <option value="cadastrar">Cadastrar nova PF</option>
-        </select>
-
-        <div id="boxPF" class="hidden">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <select id="pfSelect" required>
-              <option value="">Selecione uma PF</option>
-              {% for pf in pfs %}
-                <option value="{{ pf.id }}">{{ pf.nome }} ({{ pf.cpf }})</option>
-              {% endfor %}
-            </select>
-            <button type="button" id="atualizarTrechoBtn" class="btn-pequeno" title="Atualizar lista">🔄</button>
-          </div>
-          <button type="button" onclick="confirmarPF()">Confirmar</button>
-        </div>
-
-        <div id="resumoPF" class="resumo hidden">
-          <p><strong>✅</strong> <span id="pfResumoTexto"></span></p>
-          <button type="button" onclick="editarPF()">✏️ Editar</button>
-          <input type="hidden" name="representante_id" id="pfInputFinal">
-        </div>
-
-        <!-- Trecho -->
-        <label>Trecho:</label>
-        <select id="opcaoTrecho" required>
-          <option value="">Selecione...</option>
-          <option value="associar">Associar trecho já cadastrado</option>
-          <option value="cadastrar">Cadastrar novo trecho</option>
-        </select>
-
-        <div id="boxTrecho" class="hidden">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <select id="trechoSelect" required>
-              <option value="">Selecione um trecho</option>
-              {% for t in trechos %}
-                <option value="{{ t.id }}">{{ t.codigo }} - {{ t.denominacao }} ({{ t.municipio }})</option>
-              {% endfor %}
-            </select>
-            <button type="button" id="atualizarPFBtn" class="btn-pequeno" title="Atualizar lista">🔄</button>
-          </div>
-          <button type="button" onclick="confirmarTrecho()">Confirmar</button>
-        </div>
-
-        <div id="resumoTrecho" class="resumo hidden">
-          <p><strong>✅</strong> <span id="trechoResumoTexto"></span></p>
-          <button type="button" onclick="editarTrecho()">✏️ Editar</button>
-          <input type="hidden" name="trecho_id" id="trechoInputFinal">
-        </div>
-
-        <!-- Botão GRAVAR -->
-        <button type="submit" id="btnGravarProjeto" disabled>Gravar Projeto</button>
-      </fieldset>
-    </form>
-  </div>
-
-  <!-- UPLOAD E VALIDAÇÃO -->
-<!-- SEÇÃO DE UPLOAD E VALIDAÇÃO -->
-  <div class="form-container" style="margin-top: 30px;">
-    <h2>Importar Geometria</h2>
-    <p>Selecione um arquivo .zip contendo o shapefile.</p>
-
-    <input type="file" id="fileInput" hidden>
-    <div style="display: flex; gap: 10px; align-items: center;">
-      <label for="fileInput" class="file-label">Escolher Arquivo</label>
-      <input type="text" id="fileName" value="Selecionar arquivo" readonly style="flex: 1;">
-    </div>
-    <button id="uploadButton" style="width: auto;">Enviar</button>
-
-    <div id="progressContainer" style="display: none; margin-top: 10px;">
-      <progress id="uploadProgress" value="0" max="100"></progress>
-    </div>
-
-    <div id="resultMessage" class="hidden" style="margin-top: 15px; color: green;">
-      ✔️ Arquivo enviado com sucesso!
-    </div>
-
-    <div id="errorMessage" class="hidden" style="margin-top: 15px; color: red;">
-      ❌ Erro ao importar o arquivo.
-      <br>
-      <a id="btnRelatorioUpload" href="#" download style="display: none; color: #004080; font-weight: bold;">📄 Baixar relatório</a>
-    </div>
-
-    <button id="validateButton" class="hidden" style="margin-top: 20px;">Validar Geometria</button>
-    <div id="validationResult" class="hidden" style="margin-top: 15px;"></div>
-
-    <!-- Botão para baixar relatório de validação -->
-    <a id="btnRelatorioValidacao" href="#" class="hidden" target="_blank">
-      <button type="button" style="margin-top: 10px; background-color: #004080;">Baixar relatório de validação</button>
-    </a>
-  </div>
-
-      <!-- Módulos -->
-  <!-- Módulos -->
-  <div class="form-container">
-    <h2 style="margin-bottom: 20px;">Quais análises deseja executar?</h2>
-
-    <div class="modulo" style="display: flex; align-items: center; margin-bottom: 12px;">
-      <input type="checkbox" id="todos" style="margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;">
-      <label for="todos" style="font-size: 1rem; font-weight: normal;">Todas</label>
-    </div>
-
-    <div class="modulo" style="display: flex; align-items: center; margin-bottom: 12px;">
-      <input type="checkbox" name="modulos" value="1" class="mod" style="margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;">
-      <label style="font-size: 1rem; font-weight: normal;">Conformidade Ambiental</label>
-    </div>
-
-    <div class="modulo" style="display: flex; align-items: center; margin-bottom: 12px;">
-      <input type="checkbox" name="modulos" value="2" class="mod" style="margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;">
-      <label style="font-size: 1rem; font-weight: normal;">Favorabilidade Multicritério</label>
-    </div>
-
-    <div class="modulo" style="display: flex; align-items: center; margin-bottom: 12px;">
-      <input type="checkbox" name="modulos" value="3" class="mod" style="margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;">
-      <label style="font-size: 1rem; font-weight: normal;">Favorabilidade Socioeconômica</label>
-    </div>
-
-    <div class="modulo" style="display: flex; align-items: center; margin-bottom: 12px;">
-      <input type="checkbox" name="modulos" value="4" class="mod" style="margin-right: 10px; width: 18px; height: 18px; vertical-align: middle;">
-      <label style="font-size: 1rem; font-weight: normal;">Favorabilidade Infraestrutural</label>
-    </div>
-  </div>
-
-
-
-    
-  <div class="form-container">
-    <button id="btnSalvarContinuar" disabled style="background-color: #ccc;">Salvar e continuar</button>
-  </div>
-  
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    // =============================================
-    // Configurações Gerais
-    // =============================================
-    const API_BASE_URL = "http://127.0.0.1:8000";
-    let uploadInProgress = false;
-
-    // =============================================
-    // Funções de Controle do Formulário Principal
-    // =============================================
-    // (Mantido todo o código anterior de PJ/PF/Trecho e validação)
-
-    // =============================================
-    // Sistema de Upload Aprimorado
-    // =============================================
-    const fileInput = document.getElementById("fileInput");
-    const fileNameField = document.getElementById("fileName");
-    const uploadButton = document.getElementById("uploadButton");
-    const progressContainer = document.getElementById("progressContainer");
-    const uploadProgress = document.getElementById("uploadProgress");
-    const resultMessage = document.getElementById("resultMessage");
-    const errorMessage = document.getElementById("errorMessage");
-    const validateButton = document.getElementById("validateButton");
-    const validationResult = document.getElementById("validationResult");
-
-    const handleFileInput = () => {
-      fileNameField.value = fileInput.files.length ? 
-        fileInput.files[0].name : 
-        "Selecionar arquivo";
-      toggleUploadButton();
+    var baseLayers = {
+        'osm': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap contributors'}),
+        'sat': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: '© Esri'}),
+        'opaco': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {opacity:0.5, attribution: '© OpenStreetMap contributors'})
     };
+    if (map) baseLayers['osm'].addTo(map);
 
-    const toggleUploadButton = () => {
-      uploadButton.disabled = !fileInput.files.length || uploadInProgress;
-    };
+    var basemapSelect = document.getElementById('basemapSelect');
+    if (basemapSelect) {
+        basemapSelect.addEventListener('change', function() {
+            if (!map) return;
+            for (var key in baseLayers) {
+                if (baseLayers.hasOwnProperty(key) && map.hasLayer(baseLayers[key])) {
+                    map.removeLayer(baseLayers[key]);
+                }
+            }
+            var val = this.value;
+            baseLayers[val].addTo(map);
+            var mapMask = document.getElementById('mapMask');
+            if (mapMask) mapMask.style.display = (val === 'opaco') ? '' : 'none';
+        });
+    }
 
-    fileInput.addEventListener("change", handleFileInput);
+    var graticule = null;
+    function updateGraticule() {
+        if (!map) return;
+        if (typeof L.graticule !== 'function') {
+            // console.warn("Leaflet Graticule plugin (L.graticule) não está carregado.");
+            return;
+        }
+        if (graticule && map.hasLayer(graticule)) {
+            map.removeLayer(graticule);
+            graticule = null;
+        }
+        if (map.getZoom() >= 6) {
+            graticule = L.graticule({
+                interval: 0.5, 
+                style: {color: '#b0b0b0', weight: 0.7, opacity: 0.7}
+            }).addTo(map);
+        }
+    }
 
-    uploadButton.addEventListener("click", async () => {
-      if (!fileInput.files.length) return;
+    var scaleControl = null;
+    if (map) {
+       scaleControl = L.control.scale({imperial: false, position: 'bottomright'});
+    }
 
-      const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append("arquivo", file);
+    function moveLeafletScaleBar() {
+        if (!map) return;
+        var scaleBarElement = document.querySelector('.leaflet-control-scale');
+        var targetContainer = document.getElementById('leafletScaleBar');
+        if (scaleBarElement && targetContainer) {
+            if (targetContainer.childElementCount === 0) { 
+                targetContainer.appendChild(scaleBarElement);
+            }
+            scaleBarElement.style.display = 'block'; 
+        } 
+    }
 
-      uploadInProgress = true;
-      toggleUploadButton();
-      progressContainer.style.display = "block";
-      uploadProgress.value = 0;
+    function updateEscalaNumerica() {
+        if (!map) return;
+        var center = map.getCenter();
+        var zoom = map.getZoom();
+        var mapContainer = document.getElementById('mapCroqui');
+        if (!mapContainer) return;
+        var metersPerPixel = 156543.03392 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, zoom);
+        var widthPx = mapContainer.offsetWidth;
+        var escalaAprox = Math.round(metersPerPixel * widthPx) / (widthPx / 1000); 
+        var escalaFinal = escalaAprox;
+        if (escalaAprox > 1000) escalaFinal = Math.round(escalaAprox/1000)*1000;
+        else if (escalaAprox > 100) escalaFinal = Math.round(escalaAprox/100)*100;
+        else if (escalaAprox > 10) escalaFinal = Math.round(escalaAprox/10)*10;
+        else escalaFinal = Math.round(escalaFinal);
+        var escalaNumericaEl = document.getElementById('escalaNumerica');
+        if (escalaNumericaEl) escalaNumericaEl.innerText = 'Escala 1:' + escalaFinal.toLocaleString('pt-BR');
+    }
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/upload/`, {
-          method: "POST",
-          body: formData
+    if (map) {
+        map.whenReady(function() {
+            if (scaleControl) scaleControl.addTo(map);
+            updateGraticule();
+            updateEscalaNumerica();
+            moveLeafletScaleBar();
         });
 
-        const data = await response.json();
-        handleUploadResponse(data);
-      } catch (error) {
-        handleUploadError(error);
-      } finally {
-        uploadInProgress = false;
-        toggleUploadButton();
-      }
+        map.on('zoomend moveend', function() {
+            updateGraticule();
+            updateEscalaNumerica();
+            moveLeafletScaleBar(); 
+        });
+    }
+    
+    window.addEventListener('resize', function(){
+        if (map) updateEscalaNumerica();
     });
 
-    const handleUploadResponse = (data) => {
-      progressContainer.style.display = "none";
-      const nomeRelatorio = `relatorio_upload_${Date.now()}.pdf`;
-      const btnRelatorio = document.getElementById("btnRelatorioUpload");
-
-      if (data.sucesso) {
-        resultMessage.classList.remove("hidden");
-        errorMessage.classList.add("hidden");
-        validateButton.classList.remove("hidden");
-        btnRelatorio.style.display = "none";
-      } else {
-        resultMessage.classList.add("hidden");
-        errorMessage.classList.remove("hidden");
-        errorMessage.innerHTML = data.erros ? 
-          `❌ Erros:<br><ul>${data.erros.map(e => `<li>${e}</li>`).join("")}</ul>` :
-          "❌ Erro desconhecido";
-        btnRelatorio.href = data.relatorio || "#";
-        btnRelatorio.style.display = data.relatorio ? "inline-block" : "none";
-      }
-    };
-
-    const handleUploadError = (error) => {
-      console.error("Erro no upload:", error);
-      progressContainer.style.display = "none";
-      resultMessage.classList.add("hidden");
-      errorMessage.classList.remove("hidden");
-      errorMessage.innerHTML = "❌ Falha na comunicação com o servidor";
-    };
-
-    // =============================================
-    // Validação de Geometria Aprimorada
-    // =============================================
-    const btnRelatorioValidacao = document.getElementById("btnRelatorioValidacao");
-
-    validateButton.addEventListener("click", async () => {
-      validationResult.classList.remove("hidden");
-      validationResult.innerHTML = "Validando...";
-      validationResult.style.color = "inherit";
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/geometria/validar`);
-        const data = await response.json();
+    function atualizarPainelConferencia() {
+        var tipoProjetoEl = document.getElementById('tipo_projeto');
+        if (tipoProjetoEl) document.getElementById('confTipoProjeto').innerText = tipoProjetoEl.value || '-';
         
-        if (data.validado) {
-          validationResult.style.color = "green";
-          validationResult.innerHTML = "✔️ Geometria válida";
+        var interessadoEl = document.getElementById('interessado_id');
+        if (interessadoEl && interessadoEl.selectedOptions[0]) document.getElementById('confInteressado').innerText = interessadoEl.selectedOptions[0].text || '-';
+        else if (document.getElementById('confInteressado')) document.getElementById('confInteressado').innerText = '-';
+
+        var representanteEl = document.getElementById('representante_id');
+        if (representanteEl && representanteEl.selectedOptions[0]) document.getElementById('confRepresentante').innerText = representanteEl.selectedOptions[0].text || '-';
+        else if (document.getElementById('confRepresentante')) document.getElementById('confRepresentante').innerText = '-';        var tipoElementoEl = document.getElementById('tipo_elemento_rodoviario');
+        var elementoEl = document.getElementById('elemento_rodoviario_id');
+        var textoElemento = '';
+        
+        if (tipoElementoEl && tipoElementoEl.value) {
+            textoElemento = tipoElementoEl.selectedOptions[0].text;
+            if (elementoEl && elementoEl.selectedOptions[0] && elementoEl.value) {
+                textoElemento += ' - ' + elementoEl.selectedOptions[0].text;
+            }
+        }
+        
+        if (document.getElementById('confElemento')) {
+            document.getElementById('confElemento').innerText = textoElemento || '-';
+        }
+
+        var arquivoZipEl = document.getElementById('arquivo_zip');
+        if (arquivoZipEl && arquivoZipEl.files.length) document.getElementById('confZip').innerText = arquivoZipEl.files[0].name;
+        else if (document.getElementById('confZip')) document.getElementById('confZip').innerText = '-';
+        
+        var statusValidacaoEl = document.getElementById('statusValidacao');
+        if (statusValidacaoEl) {
+            var statusText = statusValidacaoEl.innerText;
+            if (document.getElementById('confGeom')) document.getElementById('confGeom').innerText = statusText.includes('sucesso') ? 'Sim' : 'Não';
+            if (document.getElementById('confRelatorio')) document.getElementById('confRelatorio').innerText = statusText || '-';
         } else {
-          validationResult.style.color = "red";
-          validationResult.innerHTML = data.erros ?
-            `❌ Problemas:<br><ul>${data.erros.map(e => `<li>${e}</li>`).join("")}</ul>` :
-            "❌ Geometria inválida";
+            if (document.getElementById('confGeom')) document.getElementById('confGeom').innerText = '-';
+            if (document.getElementById('confRelatorio')) document.getElementById('confRelatorio').innerText = '-';
         }
+    }    ['tipo_projeto','interessado_id','representante_id','tipo_elemento_rodoviario','elemento_rodoviario_id','arquivo_zip'].forEach(id => {
+        var element = document.getElementById(id);
+        if (element) element.addEventListener('change', atualizarPainelConferencia);
+    });
+    
+    var btnValidarGeometriaEl = document.getElementById('btnValidarGeometria');
+    if (btnValidarGeometriaEl) {
+        btnValidarGeometriaEl.addEventListener('click', function() { // Função anônima como callback
+            setTimeout(atualizarPainelConferencia, 500);
+        });
+    }
 
-        if (data.relatorio) {
-          btnRelatorioValidacao.href = data.relatorio;
-          btnRelatorioValidacao.classList.remove("hidden");
+    let formEditavel = true;
+    function setFormState(editavel) {
+        const form = document.getElementById('formCadastroProjeto');
+        if (form) {
+            Array.from(form.elements).forEach(el => {
+                if (el.type !== 'button') el.disabled = !editavel;
+            });
         }
-      } catch (error) {
-        console.error("Erro na validação:", error);
-        validationResult.style.color = "red";
-        validationResult.innerHTML = "❌ Falha na validação";
-      }
-    });
+        var btnGravar = document.getElementById('btnGravarProjeto');
+        if (btnGravar) btnGravar.disabled = !editavel;
+        var btnFinalizar = document.getElementById('btnFinalizarProjeto');
+        if (btnFinalizar) btnFinalizar.disabled = editavel;
+        var btnEditar = document.getElementById('btnEditarProjeto');
+        if (btnEditar) btnEditar.disabled = editavel;
+    }
+    setFormState(true);
 
-    // =============================================
-    // Controle de Módulos
-    // =============================================
-    document.getElementById("todos").addEventListener("change", function() {
-      document.querySelectorAll('.mod').forEach(cb => {
-        cb.checked = this.checked;
-        cb.dispatchEvent(new Event('change'));
-      });
-    });
+    var btnGravarProjetoEl = document.getElementById('btnGravarProjeto');
+    if (btnGravarProjetoEl) {
+        btnGravarProjetoEl.onclick = async function() {
+            alert('Projeto gravado com sucesso!');
+            setFormState(false);
+            atualizarPainelConferencia(); 
+        };
+    }
 
-    document.querySelectorAll('.mod').forEach(cb => {
-      cb.addEventListener('change', verificarModulos);
-    });
+    var btnFinalizarProjetoEl = document.getElementById('btnFinalizarProjeto');
+    if (btnFinalizarProjetoEl) {
+        btnFinalizarProjetoEl.onclick = function() {
+            setFormState(false);
+            alert('Formulário finalizado e congelado!');
+        };
+    }
 
-    const verificarModulos = () => {
-      const todosCheckbox = document.getElementById("todos");
-      const modulos = document.querySelectorAll('.mod');
-      todosCheckbox.checked = [...modulos].every(cb => cb.checked);
-    };
+    var btnEditarProjetoEl = document.getElementById('btnEditarProjeto');
+    if (btnEditarProjetoEl) {
+        btnEditarProjetoEl.onclick = function() {
+            setFormState(true);
+            alert('Formulário liberado para edição!');
+        };
+    }
 
-    // =============================================
-    // Submissão do Formulário
-    // =============================================
-    const form = document.getElementById("formProjeto");
-    form.addEventListener("submit", function(e) {
-      const modulos = Array.from(this.querySelectorAll('input[name="modulos"]:checked'))
-                      .map(cb => cb.value);
-
-      if (modulos.length === 0) {
-        e.preventDefault();
-        alert("Selecione pelo menos um módulo");
-        return;
-      }
-
-      if (uploadInProgress) {
-        e.preventDefault();
-        alert("Aguarde o término do upload");
-        return;
-      }
-
-      // Adiciona módulos como parâmetro serializado
-      this.action += `?modulos=${modulos.join(",")}`;
-    });
-
-    document.getElementById("opcaoPJ").addEventListener("change", function() {
-      if (this.value === "cadastrar") {
-        window.location.href = "http://127.0.0.1:8000/cadastro/pessoa-juridica";
-      } else if (this.value === "associar") {
-        document.getElementById("boxPJ").classList.remove("hidden");
-      }
-    });
-
-    document.getElementById("opcaoPF").addEventListener("change", function() {
-      if (this.value === "cadastrar") {
-        window.location.href = "http://127.0.0.1:8000/cadastro/pessoa-fisica";
-      } else if (this.value === "associar") {
-        document.getElementById("boxPF").classList.remove("hidden");
-      }
-    });
-
-    document.getElementById("opcaoTrecho").addEventListener("change", function() {
-      if (this.value === "cadastrar") {
-        window.location.href = "http://127.0.0.1:8000/cadastro/trecho";
-      } else if (this.value === "associar") {
-        document.getElementById("boxTrecho").classList.remove("hidden");
-      }
-    });
-  
+    atualizarPainelConferencia();
 });
-
-// --- Início da lógica PF ---
-function confirmarPF() {
-  const pfSelect = document.getElementById("pfSelect");
-  const selected = pfSelect.options[pfSelect.selectedIndex];
-  const texto = selected.textContent;
-
-  document.getElementById("pfResumoTexto").textContent = texto;
-  document.getElementById("pfInputFinal").value = pfSelect.value;
-
-  document.getElementById("boxPF").classList.add("hidden");
-  document.getElementById("opcaoPF").classList.add("hidden");
-  document.getElementById("resumoPF").classList.remove("hidden");
-}
-
-function editarPF() {
-  document.getElementById("resumoPF").classList.add("hidden");
-  document.getElementById("opcaoPF").classList.remove("hidden");
-  document.getElementById("pfSelect").value = "";
-}
-// --- Fim da lógica PF ---
-
-// --- Início da lógica PJ ---
-function confirmarPJ() {
-  const pjSelect = document.getElementById("pjSelect");
-  const selected = pjSelect.options[pjSelect.selectedIndex];
-  const texto = selected.textContent;
-
-  document.getElementById("pjResumoTexto").textContent = texto;
-  document.getElementById("pjInputFinal").value = pjSelect.value;
-
-  document.getElementById("boxPJ").classList.add("hidden");
-  document.getElementById("opcaoPJ").classList.add("hidden");
-  document.getElementById("resumoPJ").classList.remove("hidden");
-}
-
-function editarPJ() {
-  document.getElementById("resumoPJ").classList.add("hidden");
-  document.getElementById("opcaoPJ").classList.remove("hidden");
-  document.getElementById("pjSelect").value = "";
-}
-// --- Fim da lógica PJ ---
-
-// --- Início da lógica Trecho ---
-function confirmarTrecho() {
-  const trechoSelect = document.getElementById("trechoSelect");
-  const selected = trechoSelect.options[trechoSelect.selectedIndex];
-  const texto = selected.textContent;
-
-  document.getElementById("trechoResumoTexto").textContent = texto;
-  document.getElementById("trechoInputFinal").value = trechoSelect.value;
-
-  document.getElementById("boxTrecho").classList.add("hidden");
-  document.getElementById("opcaoTrecho").classList.add("hidden");
-  document.getElementById("resumoTrecho").classList.remove("hidden");
-}
-
-function editarTrecho() {
-  document.getElementById("resumoTrecho").classList.add("hidden");
-  document.getElementById("opcaoTrecho").classList.remove("hidden");
-  document.getElementById("trechoSelect").value = "";
-}
-// --- Fim da lógica Trecho ---
 </script>
+    <style>
+        .logo-fad {
+            max-width: 90px;
+            height: auto;
+        }
+        .form-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a237e;
+            letter-spacing: 1px;
+            margin-bottom: 0.5em;
+            text-shadow: 1px 1px 2px #e3e3e3;
+        }
+        .card-header.bg-primary, .card-header.bg-secondary, .card-header.bg-success {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        label, .form-control, .btn, select, input {
+            font-size: 1.08rem !important;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #263238;
+        }
+        .btn-primary, .btn-success, .btn-finalizar, .btn-editar {
+            font-size: 1.08rem;
+            font-weight: 600;
+            border-radius: 8px;
+            min-width: 120px;
+            margin: 0 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background: #1976d2;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #125ea7;
+        }
+        .btn-success {
+            background: #185c37;
+            border: none;
+        }
+        .btn-success:hover {
+            background: #144c2e;
+        }
+        .btn-finalizar {
+            background: #333e2e;
+            color: #fff;
+            border: none;
+        }
+        .btn-finalizar:hover {
+            background: #23291f;
+        }
+        .btn-editar {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+        }
+        .btn-editar:hover {
+            background: #495057;
+        }
+        .card {
+            box-shadow: 0 2px 12px rgba(44,62,80,0.07);
+            border-radius: 12px;
+        }
+        .card-body {
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+        }
+        .form-control:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px #1976d233;
+        }
+        .alert-info {
+            font-size: 1.08rem;
+        }
+        .btn-link {
+            font-size: 1rem;
+        }
+        .row.align-top {
+            align-items: flex-start !important;
+        }
+        .card-info-upload {
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+        }
+        /* Estilos para os formulários dinâmicos de elementos rodoviários */
+        #container_formulario_elemento {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        #formulario_elemento_dinamico .card {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #formulario_elemento_dinamico iframe {
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        #btnCadastrarElemento {
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .elemento-tipo-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        @media (max-width: 991px) {
+            .form-title {
+                font-size: 1.5rem;
+            }
+            .row.align-top > [class^='col-'] {
+                margin-bottom: 1.5rem;
+            }
+        }
+        .croqui-dark {
+            background: #1b2b1b !important;
+            border-color: #185c37 !important;
+        }
+    </style>
+</head>
+<body>
+    {% include "componentes/fad_header.html" %}
+    <div class="container-fluid mt-4">
+        <div class="row align-top">
+            <!-- Card de informações do projeto -->
+            <div class="col-md-6">
+                <div class="card mb-4 card-info-upload" style="height:100%">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="fas fa-road mr-2"></i>Cadastro de Projeto</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Status do fluxo -->
+                        <div class="alert alert-info" id="statusFluxo">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span id="statusTexto">Preencha as informações do projeto e siga as etapas abaixo.</span>
+                        </div>
+                        <form id="formCadastroProjeto">
+                            <!-- 1. Tipo de Projeto -->
+                            <div class="form-group">
+                                <label for="tipo_projeto"><b>Tipo de Projeto:</b></label>
+                                <select class="form-control" id="tipo_projeto" name="tipo_projeto" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="estadualizacao">Estadualização de Rodovias</option>
+                                    <option value="geo_obra">GEO de Obra</option>
+                                </select>
+                            </div>
+                            <!-- 2. Interessado (PJ) -->
+                            <div class="form-group">
+                                <label for="interessado_id"><b>Interessado (Pessoa Jurídica):</b></label>
+                                <select class="form-control mb-2" id="interessado_id" name="interessado_id" required>
+                                    <option value="">Selecione a Pessoa Jurídica...</option>
+                                    {% for pj in pjs %}
+                                    <option value="{{ pj.id_pj }}">{{ pj.razao_social }} ({{ pj.cnpj }})</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-link p-0" id="btnNovaPJ">Cadastrar nova PJ</button>
+                            </div>
+                            <!-- 3. Representante Legal (PF) -->
+                            <div class="form-group">
+                                <label for="representante_id"><b>Representante Legal:</b></label>
+                                <select class="form-control mb-2" id="representante_id" name="representante_id" required>
+                                    <option value="">Selecione o Representante Legal...</option>
+                                    {% for pf in pfs %}
+                                    <option value="{{ pf.id_pf }}">{{ pf.nome }} ({{ pf.cpf }})</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-link p-0" id="btnNovoPF">Cadastrar novo Representante</button>
+                            </div>                            <!-- 4. Elemento Rodoviário -->
+                            <div class="form-group">
+                                <label for="tipo_elemento_rodoviario"><b>Tipo de Elemento Rodoviário:</b></label>
+                                <select class="form-control" id="tipo_elemento_rodoviario" name="tipo_elemento_rodoviario" required>
+                                    <option value="">Selecione o tipo de elemento...</option>
+                                    <option value="trecho_rodoviario">Trecho Rodoviário</option>
+                                    <option value="rodovia">Rodovia</option>
+                                    <option value="dispositivo">Dispositivo</option>
+                                    <option value="obra_arte">Obra de Arte</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Container para o formulário do elemento selecionado -->
+                            <div id="container_formulario_elemento" style="display: none;">
+                                <div class="form-group">
+                                    <label for="elemento_rodoviario_id"><b>Elemento Rodoviário:</b></label>
+                                    <select class="form-control" id="elemento_rodoviario_id" name="elemento_rodoviario_id" required>
+                                        <option value="">Selecione o Elemento Rodoviário...</option>
+                                        {% for el in elementos %}
+                                        <option value="{{ el.id }}">{{ el.nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Container dinâmico para formulário específico -->
+                                <div id="formulario_elemento_dinamico"></div>
+                                
+                                <button type="button" class="btn btn-primary" id="btnCadastrarElemento">
+                                    <i class="fas fa-plus"></i> Cadastrar Novo Elemento
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Card de upload de geometria -->
+            <div class="col-md-6">
+                <div class="card my-4 card-info-upload" style="height:100%">
+                    <div class="card-header bg-secondary text-white">
+                        <b><i class="fas fa-upload mr-2"></i>Upload de Geometria</b>
+                    </div>
+                    <div class="card-body">
+                        <input type="file" class="form-control-file" id="arquivo_zip" name="arquivo_zip" accept=".zip" required>
+                        <small class="form-text text-muted">Envie um arquivo ZIP contendo o shapefile (.shp, .shx, .dbf, .prj).</small>
+                        <button type="button" class="btn btn-primary mt-2" id="btnValidarGeometria">Validar Geometria</button>
+                        <div id="statusValidacao" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Croqui de Localização -->
+        <div class="card my-4" id="cardCroqui">
+            <div class="card-header bg-success text-white croqui-dark">
+                <b><i class="fas fa-map-marked-alt mr-2"></i>Croqui de Localização</b>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div style="position:relative; width:100%; aspect-ratio:1/1; min-height:320px;">
+                            <!-- Seletor de basemap no canto superior direito -->
+                            <div style="position:absolute;top:10px;right:10px;z-index:1000;">
+                                <select id="basemapSelect" class="form-control form-control-sm">
+                                    <option value="osm">OpenStreetMap (Padrão)</option>
+                                    <option value="sat">Imagem de Satélite</option>
+                                    <option value="opaco">Mapa Opaco</option>
+                                </select>
+                            </div>
+                            <!-- Mapa -->
+                            <div id="mapCroqui" style="width: 100%; height: 100%; border: 2px solid #185c37; border-radius: 8px;"></div>
+                            <!-- Máscara branca para opacidade -->
+                            <div id="mapMask" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.35);pointer-events:none;z-index:500;display:none;"></div>
+                            <!-- Rosa dos ventos SVG inline -->
+                            <div style="position:absolute;bottom:18px;left:18px;width:48px;height:48px;opacity:0.85;z-index:1001;">
+                                <svg viewBox="0 0 100 100" width="48" height="48">
+                                    <circle cx="50" cy="50" r="48" fill="#fff" stroke="#333" stroke-width="2"/>
+                                    <polygon points="50,10 58,50 50,90 42,50" fill="#1976d2" stroke="#333" stroke-width="2"/>
+                                    <polygon points="50,20 54,50 50,80 46,50" fill="#fff" stroke="#333" stroke-width="1"/>
+                                    <text x="50" y="28" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">N</text>
+                                </svg>
+                            </div>
+                            <!-- Escala gráfica do Leaflet -->
+                            <div id="leafletScaleBar" style="position:absolute;bottom:12px;right:18px;z-index:1001;background:rgba(255,255,255,0.8);padding:2px 16px;border-radius:6px;min-width:140px;min-height:32px;display:flex;align-items:center;justify-content:center;"></div>
+                            <!-- Escala numérica -->
+                            <div id="escalaNumerica" style="position:absolute;bottom:56px;right:18px;background:rgba(255,255,255,0.8);padding:2px 16px;border-radius:6px;min-width:140px;min-height:32px;display:flex;align-items:center;justify-content:center;font-size:0.95em;z-index:1001;">Escala 1:25.000</div>
+                            <!-- Grid de coordenadas dinâmico -->
+                            <div id="mapGrid" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:900;"></div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <div class="card border-info mb-2 d-inline-block" style="min-width:220px;">
+                                <div class="card-header p-2 bg-info text-white"><i class="fas fa-info-circle mr-1"></i>Legenda</div>
+                                <div class="card-body p-2" id="infoCroqui">
+                                    <ul class="mb-1" style="font-size: 0.95em;">
+                                        <li>Elemento rodoviário validado</li>
+                                        <li>Sede municipal</li>
+                                        <li>Pelo menos 2 rodovias estaduais</li>
+                                    </ul>
+                                    <div id="legendaCroqui" class="mt-2">
+                                        <span class="badge badge-success">Elemento</span>
+                                        <span class="badge badge-primary">Município</span>
+                                        <span class="badge badge-warning">Rodovia Estadual</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-success mx-2" id="btnGerarCroqui">Gerar Croqui</button>
+                                <button type="button" class="btn btn-primary mx-2" id="btnGravarProjeto">Gravar</button>
+                            </div>
+                        </div>
+                        <div id="previewCroqui" class="mt-3"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-dark mb-2" style="min-width:220px;">
+                            <div class="card-header p-2 bg-dark text-white"><i class="fas fa-clipboard-check mr-1"></i>Conferência do Projeto</div>
+                            <div class="card-body p-2" id="painelConferencia">
+                                <ul class="mb-2" style="font-size: 1em;">
+                                    <li><b>Tipo de Projeto:</b> <span id="confTipoProjeto">-</span></li>
+                                    <li><b>Interessado:</b> <span id="confInteressado">-</span></li>
+                                    <li><b>Representante Legal:</b> <span id="confRepresentante">-</span></li>
+                                    <li><b>Elemento Rodoviário:</b> <span id="confElemento">-</span></li>
+                                    <li><b>ZIP enviado:</b> <span id="confZip">-</span></li>
+                                    <li><b>Geometria validada:</b> <span id="confGeom">-</span></li>
+                                    <li><b>Relatório de Validação:</b> <span id="confRelatorio">-</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button type="button" class="btn btn-finalizar ml-2" id="btnFinalizarProjeto" disabled>Finalizar</button>
+                            <button type="button" class="btn btn-editar ml-2" id="btnEditarProjeto" disabled>Editar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // 1. Upload e validação do ZIP
+      document.getElementById('btnValidarGeometria').onclick = async function() {
+        const formData = new FormData();
+        formData.append('projeto_id', 123); // Exemplo, pegue do backend
+        formData.append('arquivo_zip', document.getElementById('arquivo_zip').files[0]);
+        const resp = await fetch('/api/upload-geometria', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (data.status === 'recebido') {
+          // Chama validação
+          const valResp = await fetch('/api/validar-geometria', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ upload_id: data.upload_id })
+          });
+          const valData = await valResp.json();
+          document.getElementById('statusValidacao').innerText = valData.mensagem;
+          if (valData.status === 'validado') {
+            document.getElementById('cardCroqui').style.display = '';
+          }
+        }
+      };
+      // 2. Geração do croqui
+      document.getElementById('btnGerarCroqui').onclick = async function() {
+        const geometria_id = 789; // Exemplo, pegue do backend
+        const resp = await fetch('/api/gerar-croqui', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ geometria_id })
+        });
+        const data = await resp.json();
+        if (data.status === 'croqui_gerado') {
+          document.getElementById('previewCroqui').innerHTML = `<img src='${data.caminho_croqui}' class='img-fluid'>`;
+          document.getElementById('btnGravarProjeto').disabled = false;
+        }
+      };
+      // 3. Gravação final do projeto
+      document.getElementById('btnGravarProjeto').onclick = async function() {
+        const payload = {
+          tipo_projeto: document.getElementById('tipo_projeto').value,
+          interessado_id: document.getElementById('interessado_id').value,
+          representante_id: document.getElementById('representante_id').value,
+          elemento_rodoviario_id: document.getElementById('elemento_rodoviario_id').value,
+          geometria_id: 789, // Exemplo, pegue do backend
+          caminho_croqui: '/media/croquis/croqui_789.png'
+        };
+        const resp = await fetch('/api/gravar-projeto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (data.status === 'gravado') {
+          alert('Projeto gravado com sucesso! PDF: ' + data.caminho_formulario_pdf);
+        }
+      };
+      // Inicializa o Leaflet
+      var map = L.map('mapCroqui', {zoomControl: true, attributionControl: false}).setView([-23.5, -46.6], 13);
+      var baseLayers = {
+          'osm': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap contributors'}),
+          'sat': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: '© Esri'}),
+          'opaco': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {opacity:0.5, attribution: '© OpenStreetMap contributors'})
+      };
+      baseLayers['osm'].addTo(map);
 
+      document.getElementById('basemapSelect').addEventListener('change', function() {
+          for (var key in baseLayers) {
+              if (baseLayers.hasOwnProperty(key) && map.hasLayer(baseLayers[key])) {
+                  map.removeLayer(baseLayers[key]);
+              }
+          }
+          var val = this.value;
+          baseLayers[val].addTo(map);
+          document.getElementById('mapMask').style.display = (val === 'opaco') ? '' : 'none';
+      });
+      // Grid dinâmico de coordenadas
+      var graticule = null;
+      function updateGraticule() {
+          if (typeof L.graticule !== 'function') {
+              console.warn("Leaflet Graticule plugin (L.graticule) não está carregado.");
+              return;
+          }
+          if (graticule) {
+              map.removeLayer(graticule);
+              graticule = null;
+          }
+          if (map.getZoom() >= 6) {
+              graticule = L.graticule({
+                  interval: 0.5, // Intervalo de 0.5 graus = 30 minutos
+                  style: {color: '#b0b0b0', weight: 0.7, opacity: 0.7}
+              }).addTo(map);
+          }
+      }
+
+      // Escala gráfica do Leaflet
+      var scaleControl = L.control.scale({imperial: false, position: 'bottomright'});
+
+      function moveLeafletScaleBar() {
+          var scaleBarElement = document.querySelector('.leaflet-control-scale');
+          var targetContainer = document.getElementById('leafletScaleBar');
+          if (scaleBarElement && targetContainer) {
+              if (targetContainer.childElementCount === 0) { // Mover apenas se ainda não foi movido
+                  targetContainer.appendChild(scaleBarElement);
+              }
+              scaleBarElement.style.display = 'block'; // Garantir que está visível
+          } else if (!scaleBarElement && targetContainer) {
+              // console.warn("Elemento da escala gráfica do Leaflet não encontrado para mover.");
+          }
+      }
+
+      // Atualiza escala numérica dinamicamente
+      function updateEscalaNumerica() {
+          var center = map.getCenter();
+          var zoom = map.getZoom();
+          var metersPerPixel = 156543.03392 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, zoom);
+          var widthPx = document.getElementById('mapCroqui').offsetWidth;
+          var escalaAprox = Math.round(metersPerPixel * widthPx) / (widthPx / 1000); // Ajuste para escala mais precisa
+          var escalaFinal = escalaAprox;
+          if (escalaAprox > 1000) escalaFinal = Math.round(escalaAprox/1000)*1000;
+          else if (escalaAprox > 100) escalaFinal = Math.round(escalaAprox/100)*100;
+          else if (escalaAprox > 10) escalaFinal = Math.round(escalaAprox/10)*10;
+          else escalaFinal = Math.round(escalaFinal);
+          document.getElementById('escalaNumerica').innerText = 'Escala 1:' + escalaFinal.toLocaleString('pt-BR');
+      }
+
+      // Inicialização após o mapa estar pronto
+      map.whenReady(function() {
+          scaleControl.addTo(map);
+          updateGraticule();
+          updateEscalaNumerica();
+          moveLeafletScaleBar();
+      });
+
+      // Event listeners
+      map.on('zoomend moveend', function() {
+          updateGraticule();
+          updateEscalaNumerica();
+          moveLeafletScaleBar(); // Re-check para garantir que a escala está no lugar certo
+      });
+      window.addEventListener('resize', function(){
+          updateEscalaNumerica();
+          // Opcional: redesenhar grid se necessário, mas L.graticule geralmente lida com isso
+      });
+      // Lógica dos botões
+      let formEditavel = true;
+      function setFormState(editavel) {
+        const form = document.getElementById('formCadastroProjeto');
+        Array.from(form.elements).forEach(el => {
+            if (el.type !== 'button') el.disabled = !editavel;
+        });
+        document.getElementById('btnGravarProjeto').disabled = !editavel;
+        document.getElementById('btnFinalizarProjeto').disabled = editavel;
+        document.getElementById('btnEditarProjeto').disabled = editavel;
+      }
+      setFormState(true);
+      document.getElementById('btnGravarProjeto').onclick = async function() {
+        // ...gravação...
+        alert('Projeto gravado com sucesso!');
+        setFormState(false);
+      };
+      document.getElementById('btnFinalizarProjeto').onclick = function() {
+        setFormState(false);
+        alert('Formulário finalizado e congelado!');
+      };
+      document.getElementById('btnEditarProjeto').onclick = function() {
+        setFormState(true);
+        alert('Formulário liberado para edição!');
+      };
+      // Atualiza painel de conferência
+      function atualizarPainelConferencia() {
+          document.getElementById('confTipoProjeto').innerText = document.getElementById('tipo_projeto').value || '-';
+          document.getElementById('confInteressado').innerText = document.getElementById('interessado_id').selectedOptions[0]?.text || '-';
+          document.getElementById('confRepresentante').innerText = document.getElementById('representante_id').selectedOptions[0]?.text || '-';
+          document.getElementById('confElemento').innerText = document.getElementById('elemento_rodoviario_id').selectedOptions[0]?.text || '-';
+          document.getElementById('confZip').innerText = document.getElementById('arquivo_zip').files.length ? document.getElementById('arquivo_zip').files[0].name : '-';
+          document.getElementById('confGeom').innerText = document.getElementById('statusValidacao').innerText.includes('sucesso') ? 'Sim' : 'Não';
+          document.getElementById('confRelatorio').innerText = document.getElementById('statusValidacao').innerText || '-';
+      }
+      ['tipo_projeto','interessado_id','representante_id','elemento_rodoviario_id','arquivo_zip'].forEach(id => {
+          document.getElementById(id).addEventListener('change', atualizarPainelConferencia);
+      });
+      document.getElementById('btnValidarGeometria').addEventListener('click', setTimeout(atualizarPainelConferencia, 500));
+      
+      // JavaScript para controle dinâmico dos elementos rodoviários
+      document.getElementById('tipo_elemento_rodoviario').addEventListener('change', function() {
+        const tipoSelecionado = this.value;
+        const containerFormulario = document.getElementById('container_formulario_elemento');
+        const formularioDinamico = document.getElementById('formulario_elemento_dinamico');
+        
+        if (tipoSelecionado) {
+          containerFormulario.style.display = 'block';
+          carregarFormularioElemento(tipoSelecionado);
+        } else {
+          containerFormulario.style.display = 'none';
+          formularioDinamico.innerHTML = '';
+        }
+      });
+      
+      function carregarFormularioElemento(tipo) {
+        const formularioDinamico = document.getElementById('formulario_elemento_dinamico');
+        let formularioHtml = '';
+        
+        switch(tipo) {
+          case 'trecho_rodoviario':
+            formularioHtml = `
+              <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                  <h6><i class="fas fa-road"></i> Formulário: Trecho Rodoviário</h6>
+                </div>
+                <div class="card-body">
+                  <iframe src="/cadastrar-trecho-rodoviario" width="100%" height="600" frameborder="0" id="iframe_trecho"></iframe>
+                </div>
+              </div>
+            `;
+            break;
+            
+          case 'rodovia':
+            formularioHtml = `
+              <div class="card mt-3">
+                <div class="card-header bg-success text-white">
+                  <h6><i class="fas fa-highway"></i> Formulário: Rodovia</h6>
+                </div>
+                <div class="card-body">
+                  <iframe src="/cadastrar-rodovia" width="100%" height="600" frameborder="0" id="iframe_rodovia"></iframe>
+                </div>
+              </div>
+            `;
+            break;
+            
+          case 'dispositivo':
+            formularioHtml = `
+              <div class="card mt-3">
+                <div class="card-header bg-warning text-white">
+                  <h6><i class="fas fa-cogs"></i> Formulário: Dispositivo</h6>
+                </div>
+                <div class="card-body">
+                  <iframe src="/cadastrar-dispositivo" width="100%" height="600" frameborder="0" id="iframe_dispositivo"></iframe>
+                </div>
+              </div>
+            `;
+            break;
+            
+          case 'obra_arte':
+            formularioHtml = `
+              <div class="card mt-3">
+                <div class="card-header bg-danger text-white">
+                  <h6><i class="fas fa-bridge-water"></i> Formulário: Obra de Arte</h6>
+                </div>
+                <div class="card-body">
+                  <iframe src="/cadastrar-obra-arte" width="100%" height="600" frameborder="0" id="iframe_obra_arte"></iframe>
+                </div>
+              </div>
+            `;
+            break;
+            
+          default:
+            formularioHtml = '<p class="text-muted">Selecione um tipo de elemento para ver o formulário.</p>';
+        }
+        
+        formularioDinamico.innerHTML = formularioHtml;
+      }
+      
+      // Botão para cadastrar novo elemento
+      document.getElementById('btnCadastrarElemento').addEventListener('click', function() {
+        const tipoSelecionado = document.getElementById('tipo_elemento_rodoviario').value;
+        if (tipoSelecionado) {
+          // Abrir formulário em nova aba
+          const urls = {
+            'trecho_rodoviario': '/cadastrar-trecho-rodoviario',
+            'rodovia': '/cadastrar-rodovia', 
+            'dispositivo': '/cadastrar-dispositivo',
+            'obra_arte': '/cadastrar-obra-arte'
+          };
+          
+          if (urls[tipoSelecionado]) {
+            window.open(urls[tipoSelecionado], '_blank');
+          }
+        } else {
+          alert('Selecione primeiro o tipo de elemento rodoviário!');
+        }
+      });
+    </script>
 </body>
 </html>
-
-
-
-
 
 
 

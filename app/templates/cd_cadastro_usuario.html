@@ -762,13 +762,18 @@ document.getElementById('btnCadastrar').addEventListener('click', async function
     
     // NÃO remove campos vazios - deixa o backend decidir
     // Object.keys(dados).forEach(key => { if (dados[key] === '') delete dados[key]; });
-    
-    console.log('📊 Dados que serão enviados ao PostgreSQL:', dados);
+      console.log('📊 Dados que serão enviados ao PostgreSQL:', dados);
     console.log(`📈 Total de campos: ${Object.keys(dados).length}`);
+    
+    // Log detalhado de cada campo
+    console.log('📋 Campos detalhados:');
+    Object.keys(dados).forEach(key => {
+      console.log(`  ${key}: "${dados[key]}"`);
+    });
 
     document.getElementById('progressBarFill').style.width = '50%';
     document.getElementById('progressBarPercent').textContent = '50%';
-    document.getElementById('progressBarStatus').textContent = 'Enviando ao servidor...';        const resp = await fetch('/api/cd/cadastro-usuario-sistema', {
+    document.getElementById('progressBarStatus').textContent = 'Enviando ao servidor...';        const resp = await fetch('/cadastro-usuario-sistema', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados)

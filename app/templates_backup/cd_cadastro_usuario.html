@@ -1,370 +1,975 @@
+<!-- BACKUP GERADO AUTOMATICAMENTE EM 05/06/2025 -->
 <!DOCTYPE html>
-<html lang="pt">
-<head>
-  <meta charset="UTF-8">
-  <title>FAD - Cadastrar Usuário</title>
+<html lang="pt-br">
+<head>  <meta charset="UTF-8">
+  <title>Cadastro - Usuário</title>
+  <link rel="stylesheet" href="/static/css/componentes/fad_header.css">
+  <link rel="stylesheet" href="/static/css/cd_usuario/cd_cadastro_usuario.css">
+  <link rel="stylesheet" href="/static/css/cd_usuario/cd_cadastro_usuario_botoes.css">
+  <link rel="stylesheet" href="/static/css/cd_usuario/cd_cadastro_usuario_componentes.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/formatacao_valores_campos/formatacao_telefone.css">
+  <link rel="stylesheet" href="/static/css/formatacao_valores_campos/formatacao_email.css">
+  <link rel="stylesheet" href="/static/css/formatacao_valores_campos/formatacao_email_institucional.css">
+  <link rel="stylesheet" href="/static/css/formatacao_valores_campos/formatacao_ramal.css">
+  <link rel="stylesheet" href="/static/css/formatacao_valores_campos/formatacao_tipo_usuario.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      padding: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef5f9;
     }
 
-    h1 {
+    header.fad-header {
       text-align: center;
-      color: #007bff;
-      margin-bottom: 30px;
+      background-color: #003366;
+      padding: 10px;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
+    header.fad-header h1 {
+      font-size: 40px;
+      margin: 0;
+      text-shadow: 1px 1px 2px #00000060;
+    }
+
+    header.fad-header h2 {
+      font-size: 22px;
+      margin-top: 4px;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #00000050;
+    } 
 
     .form-container {
-      width: 95%;
-      background-color: #ffffff;
-      border-radius: 15px;
-      padding: 25px;
-      max-width: 700px;
-      margin: 0 auto;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      max-width: 720px;
+      margin: 30px auto;
+      padding: 2rem;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .form-container > h3 {
+      font-size: 22px;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .form-section {
+      margin: 2rem 0;
+      padding: 1rem 2.5%;
+      border: 1px solid #cce0f5;
+      border-radius: 8px;
+      background-color: #f7fbff;
+    }
+
+    .form-section h3 {
+      margin: 0 0 1rem 0;
+      color: #003366;
+      border-bottom: 1px solid #00336633;
+      padding-bottom: .5rem;
+      font-size: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .form-row {
+      display: flex;
+      width: 100%;
+      gap: 2.5%;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
     }
 
     label {
-      display: block;
       font-weight: bold;
-      margin-top: 15px;
+      margin-bottom: 0.3rem;
     }
 
     input, select {
-      width: 95%;
-      padding: 10px;
-      margin-top: 5px;
-      font-size: 14px;
-      border-radius: 5px;
+      padding: 0.7rem;
       border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .half       { width: 48.75%; }
+    .full       { width: 100%; }    button:not(.btn-editar):not(.btn-atualizar-lista):not(.btn-confirmar-selecao):not(.btn-icone):not(.btn-pequeno):not(.confirmar-btn):not(.botao-fad) {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      background-color: #009933;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 2rem;
+    }
+
+    button:not(.btn-editar):not(.btn-atualizar-lista):not(.btn-confirmar-selecao):not(.btn-icone):not(.btn-pequeno):not(.confirmar-btn):not(.botao-fad):hover {
+      background-color: #007a29;
+    }
+
+    .loading-msg {
+      font-size: 13px;
+      color: #555;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    #sucessoBox {
+      display: none;
+      color: #0b6600;
+      background: #e6ffe6;
+      border: 1px solid #0b6600;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    #erroBox {
+      display: none;
+      color: #a80000;
+      background: #ffeaea;
+      border: 1px solid #a80000;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Estilo botão conforme Pessoa Jurídica */
+    .botao-fad {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      background-color: #009933;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 2rem;
+      text-align: center;
+      transition: background-color 0.3s;
+    }
+
+    .botao-fad:hover:not(:disabled) {
+      background-color: #007a29;
+    }
+
+    .botao-fad:disabled {
+      background-color: #b0b7c3;
+      cursor: not-allowed;
+    }
+
+    /* Estilos específicos para seleção de PF */
+    .hidden { display: none; }
+    .resumo-box {
+      background: #e8f4f8;
+      border: 1px solid #b3d9e8;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+    }    .btn-icone {
+      background-color: transparent;
+      color: #003366;
+      border: 1px solid #003366;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      margin: 0 2px;
+      cursor: pointer;
+      min-width: 32px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icone:hover {
+      background-color: #e3f2fd;
+      color: #001a33;
+      border-color: #001a33;
+    }
+
+    .btn-pequeno {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      background-color: #666;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-pequeno:hover {
+      background-color: #555;
+    }
+
+    .btn-icone-fad {
+      background: transparent;
+      border: 1px solid #003366;
+      color: #003366;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-icone-fad:hover {
+      background-color: #e3f2fd;
+      color: #001a33;
+      border-color: #001a33;
+    }
+
+    .confirmar-btn {
+      background-color: #28a745;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+
+    .confirmar-btn:hover {
+      background-color: #218838;
+    }
+
+    /* Campo de resumo estilizado como campo comum */
+    .campo-resumo {
+      position: relative;
+      width: 100%;
+    }
+
+    .campo-resumo input {
+      width: 100%;
+      padding: 0.7rem;
+      padding-right: 45px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #f8f9fa;
+      color: #495057;
+      font-size: 1rem;
+    }
+
+    .campo-resumo .btn-editar {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: transparent;
+      color: #003366;
+      border: 1px solid #003366;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .campo-resumo .btn-editar:hover {
+      background-color: #e3f2fd;
+      color: #001a33;
+      border-color: #001a33;
+    }
+
+    /* Estilos para validação de senha */
+    .senha-regras {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 10px;
+      margin-top: 8px;
+      color: #666;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
+
+    .senha-regras div {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .regra-ok {
+      color: #28a745 !important;
+      font-weight: bold;
     }
 
     .senha-msg {
       font-size: 13px;
-      font-weight: bold;
       margin-top: 5px;
     }
 
-    .senha-erro { color: darkred; }
-    .senha-sucesso { color: darkgreen; }
-    .regra-ok { color: #004d00; font-weight: bold; }
-
-    .resumo-box {
-      width: 95%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #e7f3e7;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-top: 15px;
+    .senha-erro {
+      color: #dc3545;
     }
 
-    .resumo-box p { margin: 0; font-weight: bold; }
-
-    .btn-pequeno {
-      padding: 4px 8px;
-      font-size: 12px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .senha-sucesso {
+      color: #28a745;
     }
 
-    .btn-pequeno:hover { background-color: #0056b3; }
-
-    .confirmar-btn {
-      width: 95%;
-      margin-top: 10px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .confirmar-btn:hover { background-color: #218838; }
-
-    .botao-fad {
-      width: 95%;
-      margin-top: 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 16px;
+    /* Estilos para indicação de campos obrigatórios */
+    .required::after {
+      content: " *";
+      color: #dc3545;
       font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
-    .botao-fad:hover { background-color: #0056b3; }
+    .obrigatorio-icone {
+      color: #dc3545;
+      font-weight: bold;
+      margin-left: 3px;
+      font-size: 1.1em;
+      transition: color 0.2s;
+    }
+    .check-icone {
+      color: #145a32;
+      font-weight: bold;
+      margin-left: 3px;
+      font-size: 1.1em;
+      display: none;
+      transition: color 0.2s;
+    }
+    .campo-validado .obrigatorio-icone {
+      display: none;
+    }
+    .campo-validado .check-icone {
+      display: inline;
+    }
 
-    .hidden { display: none; }
+    /* Responsividade para dispositivos móveis */
+    @media (max-width: 768px) {
+      .form-container {
+        margin: 15px;
+        padding: 1.5rem;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .half {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+      
+      .form-section {
+        padding: 1rem;
+      }
+    }
 
-    .mensagem-erro {
-      margin-top: 20px;
-      padding: 15px;
-      border: 2px solid darkred;
-      background-color: #f8d7da;
-      color: darkred;
-      border-radius: 8px;
+    .senha-input {
+      width: 100%;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    #senha, #confirmar_senha {
+      width: 100%;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    #tipo_usuario {
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      .senha-regras { flex-direction: column; gap: 2px; font-size: 10px; }
+    }
+
+    .erro-campo {
+      border: 2px solid #dc3545 !important;
+      background: #fff0f0 !important;
     }
   </style>
 </head>
-<body>
-
-  <h1>FAD - Cadastrar Usuário</h1>
-
+<body>  {% include 'componentes/fad_header.html' %}
   <div class="form-container">
-    <form method="post" action="/usuario">
-      <fieldset style="border: 1px solid #ccc; padding: 1rem; border-radius: 8px;">
-        <legend><strong>Dados do Usuário</strong></legend>
-
-        <label>Nome completo:</label>
-        <select id="opcaoPF" required>
-          <option value="">Selecione...</option>
-          <option value="associar">Associar PF já cadastrada</option>
-          <option value="cadastrar">Cadastrar nova PF</option>
-        </select>
-
-        <div id="boxPF" class="hidden">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <select id="pfSelect">
-              <option value="">Selecione uma PF</option>
-              {% for pf in pfs %}
-                <option value="{{ pf.id }}"
-                        data-cpf="{{ pf.cpf }}"
-                        data-email="{{ pf.email }}"
-                        data-telefone="{{ pf.telefone }}"
-                        data-nome="{{ pf.nome }}">
-                  {{ pf.nome }} ({{ pf.cpf }})
-                </option>
-              {% endfor %}
+    <h3>Cadastro de Usuário</h3>
+    <!-- 🎯 FORMULÁRIO DE INTERFACE - APENAS PARA UX (NÃO ENVIA DADOS) -->
+    <!-- Este formulário é usado apenas para exibição, validação e experiência do usuário -->
+    <!-- Os dados são copiados para o formulário oculto quando o usuário clica em "Gravar" -->
+    <form method="post" action="#" id="usuarioForm" novalidate>      <!-- INFORMAÇÕES PESSOAIS -->
+      <div class="form-section">
+        <h3>Informações Pessoais</h3>
+        <div class="form-group">
+          <div class="form-field full">
+            <label for="opcaoPF">Nome Completo:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <select id="opcaoPF" required>
+              <option value="">Selecione...</option>
+              <option value="associar">Vincular PF já cadastrada</option>
+              <option value="cadastrar">Cadastrar nova PF</option>
             </select>
-            <button type="button" id="atualizarPFBtn" class="btn-pequeno" title="Atualizar lista">🔄</button>
           </div>
-          <button type="button" id="confirmarPFBtn" class="confirmar-btn hidden">Confirmar</button>
+          <div id="boxPF" class="hidden">
+            <div class="form-field full">
+              <label for="pfSelect">Selecionar PF:</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <select id="pfSelect" style="width: 100%; padding-right: 45px;">
+                  <option value="">Selecione uma PF</option>
+                  <!-- Opções serão carregadas via JS -->
+                </select>
+                <button type="button" class="btn-icone" id="atualizarPFBtn" title="Atualizar lista" style="order:3;"><i class="fas fa-sync"></i></button>
+                <button type="button" class="btn-icone editar-btn" title="Editar Seleção" style="order:2;"><i class="fas fa-pen"></i></button>
+                <button type="button" class="btn-icone" id="confirmarPFBtn" title="Confirmar Seleção" style="order:1;"><i class="fas fa-check"></i></button>
+              </div>
+              <div id="pf-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
+            </div>
+          </div>
+          <div id="resumoPF" class="form-field full hidden">
+            <div class="campo-resumo" style="display: flex; align-items: center; gap: 8px;">
+              <input type="text" id="pfResumoTexto" readonly style="background-color: #f8f9fa; width: calc(100% - 45px);">
+              <button type="button" class="btn-icone" id="editarPFBtn" title="Editar Seleção"><i class="fas fa-pen"></i></button>
+            </div>
+            <input type="hidden" name="pessoa_fisica_id" id="pfInputFinal">
+            <input type="hidden" name="nome" id="pfNomeFinal">
+          </div>
+          <div class="form-row">
+            <div class="form-field half">
+              <label for="cpf">CPF:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="text" id="cpf" name="cpf" required maxlength="14" style="width: 100%; box-sizing: border-box;" />
+              <div id="cpf-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
+            </div>
+            <div class="form-field half">
+              <label for="telefone">Telefone:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="text" id="telefone" name="telefone" required maxlength="16" style="width: 100%; box-sizing: border-box;" />
+              <div id="telefone-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
+            </div>          </div>          <div class="form-row">
+            <div class="form-field half">
+              <label for="email">E-mail:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="email" id="email" name="email" required style="width: 100%; box-sizing: border-box;" />
+              <div id="email-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
+            </div>
+            <div class="form-field half">
+              <label for="pessoa_fisica_id">ID Pessoa Física:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+              <input type="number" id="pessoa_fisica_id" name="pessoa_fisica_id" required style="width: 100%; box-sizing: border-box;" readonly />
+              <div id="pessoa_fisica_id-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
+            </div>
+          </div>
         </div>
-
-        <div id="resumoPF" class="resumo-box hidden">
-          <p id="pfResumoTexto"></p>
-          <button type="button" class="btn-pequeno" id="editarPFBtn">✏️ Editar</button>
-          <input type="hidden" name="pessoa_fisica_id" id="pfInputFinal">
-          <input type="hidden" name="nome" id="pfNomeFinal">
+        <div class="form-field full">
+          <label for="tipo_usuario">
+            Tipo de Usuário:
+            <span class="obrigatorio-icone">*</span>
+            <span class="check-icone">&#10003;</span>
+          </label>
+          <select id="tipo_usuario" name="tipo" required style="width: 100%; box-sizing: border-box;">
+            <option value="">Selecione o tipo de usuário</option>
+            <option value="analista">Analista</option>
+            <option value="coordenador">Coordenador</option>
+          </select>
+          <div id="tipo-feedback" style="color: #a80000; font-size: 13px; margin-top: 2px;"></div>
         </div>
-
-        <label for="cpf">CPF:</label>
-        <input type="text" id="cpf" name="cpf" required maxlength="14">
-
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="telefone">Telefone:</label>
-        <input type="text" id="telefone" name="telefone" required maxlength="16">
-
-        <label for="senha">Senha:</label>
-        <div style="position: relative; width: 95%;">
-          <input type="password" id="senha" name="senha" required style="padding-right: 40px;">
+      </div>
+      <!-- INFORMAÇÕES PROFISSIONAIS -->
+      <div class="form-section">
+      <h3>Informações Profissionais</h3>
+      <div class="form-group">
+        <!-- 1. Instituição -->
+        <div class="form-field full" id="instituicao-container">
+        <label for="instituicao">Instituição:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="instituicao" name="instituicao" required>
+          <option value="">Selecione...</option>
+          <option value="DER/SP">DER/SP</option>
+        </select>
+        </div>
+        <!-- 2. Tipo de Lotação -->
+        <div class="form-field full hidden" id="tipo-lotacao-container">
+        <label for="tipo_lotacao">Tipo de Lotação:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="tipo_lotacao" name="tipo_lotacao" required>
+          <option value="">Selecione...</option>
+          <option value="sede">Sede</option>
+          <option value="regional">Regional</option>
+        </select>
+        </div>
+        <!-- 3. Hierarquia Sede -->
+        <div class="form-field full hidden" id="sede-hierarquia-container">
+        <label for="sede_hierarquia">Hierarquia:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="sede_hierarquia" name="sede_hierarquia" required></select>
+        </div>
+        <!-- Assistência Direta (aparece ao selecionar Órgãos de Assistência Direta) -->
+        <div class="form-field full hidden" id="sede-assistencia-direta-container">
+        <label for="sede_assistencia_direta">Assistência Direta:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="sede_assistencia_direta" name="sede_assistencia_direta" required></select>
+        </div>
+        <!-- Diretoria (aparece ao selecionar Diretorias em Hierarquia) -->
+        <div class="form-field full hidden" id="sede-diretoria-container">
+        <label for="sede_diretoria">Diretoria:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="sede_diretoria" name="sede_diretoria" required></select>
+        </div>
+        <!-- Coordenadoria Geral (aparece ao selecionar Diretoria) -->
+        <div class="form-field full hidden" id="sede-coordenadoria-geral-container">
+        <label for="sede_coordenadoria_geral">Coordenadoria Geral:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="sede_coordenadoria_geral" name="sede_coordenadoria_geral" required></select>
+        </div>
+        <!-- Coordenadoria (aparece ao selecionar Coordenadoria Geral) -->
+        <div class="form-field full hidden" id="sede-coordenadoria-container">
+        <label for="sede_coordenadoria">Coordenadoria:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+        <select id="sede_coordenadoria" name="sede_coordenadoria" required></select>
+        </div>
+        <!-- 4. Assistência (aparece ao selecionar Setor) -->
+        <div class="form-field full hidden" id="sede-assistencia-container">
+          <label for="sede_assistencia">Assistência:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+          <select id="sede_assistencia" name="sede_assistencia" required></select>
+        </div>
+        <!-- Tipo regional selecionado -->
+        <div class="form-field full hidden" id="regional-nome-container">
+          <label for="regional_nome">Coordenadoria Regional:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+          <select id="regional_nome" name="regional_nome" required></select>
+        </div>
+        <div class="form-field full hidden" id="regional-coordenadoria-container">
+          <label for="regional_coordenadoria">Coordenadoria:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+          <select id="regional_coordenadoria" name="regional_coordenadoria" required></select>
+        </div>        <div class="form-field full hidden" id="regional-setor-container">
+          <label for="regional_setor">Setor Serviço Regional:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+          <select id="regional_setor" name="regional_setor" required></select>
+        </div>
+        <!-- Adicionar campos institucionais na seção profissional -->
+        <div class="form-row">
+          <div class="form-field full">
+            <label for="email_institucional">E-mail Institucional:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input type="email" id="email_institucional" name="email_institucional" required placeholder="exemplo@fad.gov.br" style="width: 100%; box-sizing: border-box;" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label for="telefone_institucional">Telefone Institucional:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input type="text" id="telefone_institucional" name="telefone_institucional" required maxlength="16" placeholder="(21) 99999-9999" style="width: 100%; box-sizing: border-box;" />
+          </div>
+          <div class="form-field">
+            <label for="ramal">Ramal:<span class="obrigatorio-icone">*</span><span class="check-icone">&#10003;</span></label>
+            <input type="text" id="ramal" name="ramal" required maxlength="10" placeholder="1234" style="width: 100%; box-sizing: border-box;" />
+          </div>
+        </div>
+      </div>
+    </div><!-- INFORMAÇÕES DE ACESSO AO SISTEMA -->
+  <div class="form-section">
+    <h3>Informações de Acesso ao Sistema</h3>
+    <div class="form-group">
+      <div class="form-field full">
+        <label for="senha" class="required">Senha:</label>
+        <div style="position: relative;">
+          <input type="password" id="senha" name="senha" required class="senha-input" style="padding-right: 40px;" />
           <span onclick="toggleSenha('senha')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
         </div>
-        <div id="regrasSenha">
-          <span id="regra1">• No mínimo 5 caracteres</span>
-          <span id="regra2">• Letras maiúsculas</span>
-          <span id="regra3">• Letras minúsculas</span>
-          <span id="regra4">• Números</span>
-          <span id="regra5">• Caracteres especiais</span>
+        <div id="regrasSenha" class="senha-regras">
+          <div id="regra1">• No mínimo 5 caracteres</div>
+          <div id="regra2">• Letras maiúsculas</div>
+          <div id="regra3">• Letras minúsculas</div>
+          <div id="regra4">• Números</div>
+          <div id="regra5">• Caracteres especiais</div>
         </div>
-
-        <label for="confirmar_senha">Confirmar Senha:</label>
-        <div style="position: relative; width: 95%;">
-          <input type="password" id="confirmar_senha" name="confirmar_senha" required style="padding-right: 40px;">
+      </div>
+      
+      <div class="form-field full">
+        <label for="confirmar_senha" class="required">Confirmar Senha:</label>
+        <div style="position: relative;">
+          <input type="password" id="confirmar_senha" name="confirmar_senha" required class="senha-input" style="padding-right: 40px;" />
           <span onclick="toggleSenha('confirmar_senha')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">👁️</span>
         </div>
         <div id="mensagemSenha" class="senha-msg"></div>
-
-        <label for="tipo_usuario">Tipo de Usuário:</label>
-        <select id="tipo_usuario" name="tipo" required>
-          <option value="">Selecione o tipo de usuário</option>
-          <option value="comum">Comum</option>
-          <option value="administrador">Administrador</option>
-        </select>
-
-        <button type="submit" class="botao-fad">Cadastrar</button>
-      </fieldset>
-    </form>
-
-    {% if mensagem_erro %}
-      <div class="mensagem-erro">
-        <strong>{{ mensagem_erro }}</strong>
       </div>
-    {% endif %}
+    </div>
+  </div>
+  <!-- Botão Gravar: copia valores para o form de envio -->
+  <button type="button" class="botao-fad" id="btnGravar">Gravar</button>
+  <!-- Botão Cadastrar: envia ao back-end após gravar -->
+  <button type="button" class="botao-fad" id="btnCadastrar" disabled>Cadastrar</button>
 
-    {% if mensagem_sucesso %}
-      <div id="caixaSucesso" style="margin-top: 20px; padding: 15px; border: 2px solid darkgreen; background-color: #d4edda; color: darkgreen; border-radius: 8px;">
-        <strong>{{ mensagem_sucesso }}</strong>
-      </div>
-    {% endif %}
-
-    {% if mostrar_botao_voltar %}
-      <div style="text-align: center; margin-top: 20px;">
-        <a href="/login">
-          <button type="button" class="botao-fad" style="background-color: gray;">Voltar para o login</button>
-        </a>
-      </div>
-    {% endif %}
+  <!-- Barra de progresso -->
+  <div id="progressBarContainer" style="display: none; margin-top: 20px;">
+    <div style="background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+      <div id="progressBarFill" style="background: #4caf50; height: 20px; width: 0%; transition: width 0.3s;"></div>
+    </div>
+    <div style="text-align: center; margin-top: 5px;">
+      <span id="progressBarPercent">0%</span> - <span id="progressBarStatus">Preparando...</span>
+    </div>
   </div>
 
+  <!-- Console de mensagens em tempo real -->
+  <div id="realTimeConsole" style="display: none; margin-top: 15px; max-height: 300px; overflow-y: auto; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;">
+    <div style="font-weight: bold; color: #495057; margin-bottom: 10px; border-bottom: 1px solid #dee2e6; padding-bottom: 5px;">📋 Log do Processo:</div>
+    <div id="consoleMessages" style="font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4;"></div>
+  </div>  <!-- Script de ações dos botões Gravar e Cadastrar -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const opcaoPF = document.getElementById("opcaoPF");
-      const boxPF = document.getElementById("boxPF");
-      const pfSelect = document.getElementById("pfSelect");
-      const confirmarBtn = document.getElementById("confirmarPFBtn");
-      const atualizarBtn = document.getElementById("atualizarPFBtn");
-      const resumoPF = document.getElementById("resumoPF");
-      const pfResumoTexto = document.getElementById("pfResumoTexto");
-      const pfInputFinal = document.getElementById("pfInputFinal");
-      const pfNomeFinal = document.getElementById("pfNomeFinal");
-
-      opcaoPF.addEventListener("change", function () {
-        if (this.value === "associar") {
-          boxPF.classList.remove("hidden");
-          resumoPF.classList.add("hidden");
-        } else if (this.value === "cadastrar") {
-          window.open("/cadastro/interessado/pf", "_blank");
-          this.value = "";
-          boxPF.classList.add("hidden");
-          confirmarBtn.classList.add("hidden");
-          resumoPF.classList.add("hidden");
-        } else {
-          boxPF.classList.add("hidden");
-          confirmarBtn.classList.add("hidden");
-          resumoPF.classList.add("hidden");
-        }
-      });
-
-      pfSelect.addEventListener("change", function () {
-        confirmarBtn.classList.toggle("hidden", !this.value);
-      });
-
-      confirmarBtn.addEventListener("click", function () {
-        const selected = pfSelect.options[pfSelect.selectedIndex];
-        const nome = selected.getAttribute("data-nome");
-        const cpf = selected.getAttribute("data-cpf");
-        const email = selected.getAttribute("data-email");
-        const telefone = selected.getAttribute("data-telefone");
-
-        pfResumoTexto.textContent = nome;
-        pfInputFinal.value = pfSelect.value;
-        pfNomeFinal.value = nome;
-
-        document.getElementById("cpf").value = cpf;
-        document.getElementById("email").value = email;
-        document.getElementById("telefone").value = telefone;
-
-        boxPF.classList.add("hidden");
-        opcaoPF.classList.add("hidden");
-        resumoPF.classList.remove("hidden");
-      });
-
-      document.getElementById("editarPFBtn").addEventListener("click", function () {
-        resumoPF.classList.add("hidden");
-        opcaoPF.classList.remove("hidden");
-        pfSelect.value = "";
-        confirmarBtn.classList.add("hidden");
-        document.getElementById("cpf").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("telefone").value = "";
-      });
-
-      atualizarBtn.addEventListener("click", async function () {
+    // ============================================================================
+    // FLUXO DO SISTEMA DE CADASTRO:
+    // 1. INTERFACE → Apenas UX (exibição, validação, dropdowns hierárquicos)
+    // 2. GRAVAR → Copia dados da interface para formulário separado via iframe
+    // 3. CADASTRAR → Envia formulário separado via AJAX para PostgreSQL
+    // ============================================================================
+    
+    // 🔄 ETAPA 1: Copia dados da INTERFACE para FORMULÁRIO SEPARADO
+    document.getElementById('btnGravar').addEventListener('click', function() {
+      console.log('🔄 GRAVAR: Carregando formulário separado e copiando dados...');
+      addRealTimeMessage('🔄 GRAVAR: Carregando formulário separado e copiando dados...');
+      
+      const campos = [
+        'nome','cpf','telefone','email','email_institucional','telefone_institucional','ramal','pessoa_fisica_id',
+        'instituicao','tipo_lotacao','sede_hierarquia','sede_assistencia_direta','sede_diretoria',
+        'sede_coordenadoria_geral','sede_coordenadoria','sede_assistencia',
+        'regional_nome','regional_coordenadoria','regional_setor','tipo','senha'
+      ];
+      
+      // Cria iframe oculto para carregar o formulário de envio separado
+      let iframe = document.getElementById('envioIframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'envioIframe';
+        iframe.src = '/cadastro-usuario-sistema-envio';
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        document.body.appendChild(iframe);
+        console.log('📤 Iframe criado e carregando formulário separado...');
+        addRealTimeMessage('📤 Iframe criado e carregando formulário separado...');
+      }
+      
+      // Aguarda o iframe carregar completamente
+      iframe.onload = function() {
         try {
-          const response = await fetch("/cadastro/pfs/json");
-          const data = await response.json();
-          pfSelect.innerHTML = '<option value="">Selecione uma PF</option>';
-          data.forEach(pf => {
-            const option = document.createElement("option");
-            option.value = pf.id;
-            option.textContent = `${pf.nome} (${pf.cpf})`;
-            option.setAttribute("data-cpf", pf.cpf);
-            option.setAttribute("data-email", pf.email);
-            option.setAttribute("data-telefone", pf.telefone);
-            option.setAttribute("data-nome", pf.nome);
-            pfSelect.appendChild(option);
+          console.log('✅ Formulário separado carregado. Copiando dados...');
+          addRealTimeMessage('✅ Formulário separado carregado. Copiando dados...');
+          const envioDoc = iframe.contentDocument || iframe.contentWindow.document;
+          let copiados = 0;
+            campos.forEach(id => {
+            let srcId = id; // Por padrão, o ID na interface é igual ao ID no envio
+            
+            // Mapeamentos especiais para campos com IDs diferentes na interface
+            if (id === 'tipo') srcId = 'tipo_usuario';
+            if (id === 'nome') srcId = 'pfNomeFinal';
+            if (id === 'pessoa_fisica_id') srcId = 'pfInputFinal';
+            
+            const src = document.getElementById(srcId);
+            const dest = envioDoc.getElementById(id);
+            
+            if (src && dest) {
+              dest.value = src.value;
+              if (src.value) copiados++;
+            } else if (!dest) {
+              console.warn(`⚠️ Campo ${id} não encontrado no formulário de envio`);
+              addRealTimeMessage(`⚠️ Campo ${id} não encontrado no formulário de envio`, 'warning');
+            }
           });
-          confirmarBtn.classList.add("hidden");
+          
+          console.log(`✅ ${copiados} campos copiados para formulário separado`);
+          addRealTimeMessage(`✅ ${copiados} campos copiados para formulário separado`);
+          
+          // Armazena referência do iframe para uso posterior
+          window.envioIframe = iframe;
+          
+          // Habilita botão Cadastrar
+          document.getElementById('btnCadastrar').disabled = false;
+          console.log('✅ Botão CADASTRAR habilitado');
+          addRealTimeMessage('✅ Botão CADASTRAR habilitado');
+          
         } catch (error) {
-          alert("Erro ao atualizar a lista de PFs.");
+          console.error('❌ Erro ao copiar dados para formulário separado:', error);
+          addRealTimeMessage('❌ Erro ao copiar dados para formulário separado: ' + error.message, 'error');
+          alert('Erro ao preparar formulário de envio. Verifique se o formulário separado está acessível.');
         }
-      });
-
-      const senha = document.getElementById("senha");
-      const confirmarSenha = document.getElementById("confirmar_senha");
-      const msgSenha = document.getElementById("mensagemSenha");
-
-      confirmarSenha.addEventListener("input", function () {
-        if (confirmarSenha.value && confirmarSenha.value !== senha.value) {
-          msgSenha.textContent = "As senhas não combinam";
-          msgSenha.className = "senha-msg senha-erro";
-        } else if (confirmarSenha.value && confirmarSenha.value === senha.value) {
-          msgSenha.textContent = "As senhas combinam";
-          msgSenha.className = "senha-msg senha-sucesso";
-        } else {
-          msgSenha.textContent = "";
-        }
-      });
-
-      senha.addEventListener("input", function () {
-        const val = senha.value;
-        let todas = 0;
-        if (val.length >= 5) { document.getElementById("regra1").classList.add("regra-ok"); todas++; }
-        else document.getElementById("regra1").classList.remove("regra-ok");
-
-        if (/[A-Z]/.test(val)) { document.getElementById("regra2").classList.add("regra-ok"); todas++; }
-        else document.getElementById("regra2").classList.remove("regra-ok");
-
-        if (/[a-z]/.test(val)) { document.getElementById("regra3").classList.add("regra-ok"); todas++; }
-        else document.getElementById("regra3").classList.remove("regra-ok");
-
-        if (/[0-9]/.test(val)) { document.getElementById("regra4").classList.add("regra-ok"); todas++; }
-        else document.getElementById("regra4").classList.remove("regra-ok");
-
-        if (/[^A-Za-z0-9]/.test(val)) { document.getElementById("regra5").classList.add("regra-ok"); todas++; }
-        else document.getElementById("regra5").classList.remove("regra-ok");
-
-        const regras = document.getElementById("regrasSenha");
-        if (todas === 5) regras.classList.add("regra-ok");
-        else regras.classList.remove("regra-ok");
-      });
-
-      document.getElementById("cpf").addEventListener("input", function (e) {
-        let v = e.target.value.replace(/\D/g, "");
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d)/, "$1.$2");
-        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-        e.target.value = v;
-      });
-
-      document.getElementById("telefone").addEventListener("input", function (e) {
-        let v = e.target.value.replace(/\D/g, "");
-        v = v.replace(/(\d{2})(\d)/, "($1) $2");
-        v = v.replace(/(\d{1})(\d{4})(\d{4})$/, "$1 $2-$3");
-        e.target.value = v;
-      });
+      };
+      
+      // Força reload se já existe
+      if (iframe.src) {
+        iframe.src = iframe.src;
+      }
     });
 
-    function toggleSenha(idCampo) {
-      const campo = document.getElementById(idCampo);
-      campo.type = campo.type === "password" ? "text" : "password";
+    // Função para adicionar mensagens em tempo real na interface
+function addRealTimeMessage(message, type = 'info') {
+  const realTimeConsole = document.getElementById('realTimeConsole');
+  const consoleMessages = document.getElementById('consoleMessages');
+  
+  // Mostra o console se ainda não estiver visível
+  if (realTimeConsole.style.display === 'none') {
+    realTimeConsole.style.display = 'block';
+  }
+  
+  // Define cores baseadas no tipo
+  let color = '#495057'; // default
+  if (type === 'error') color = '#dc3545';
+  else if (type === 'warning') color = '#ffc107';
+  else if (type === 'success') color = '#28a745';
+  
+  // Cria nova linha de mensagem
+  const messageDiv = document.createElement('div');
+  messageDiv.style.color = color;
+  messageDiv.style.marginBottom = '3px';
+  messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  
+  // Adiciona mensagem e scrolla para baixo
+  consoleMessages.appendChild(messageDiv);
+  realTimeConsole.scrollTop = realTimeConsole.scrollHeight;
+}
+
+// 📤 ETAPA 2: Envia dados do FORMULÁRIO SEPARADO via AJAX para PostgreSQL
+document.getElementById('btnCadastrar').addEventListener('click', async function(e) {
+  e.preventDefault();
+  console.log('📤 CADASTRAR: Enviando formulário separado para PostgreSQL...');
+  addRealTimeMessage('📤 CADASTRAR: Enviando formulário separado para PostgreSQL...');
+  
+  const btn = this;
+  btn.disabled = true;
+  
+  // Verifica se o iframe existe
+  const iframe = window.envioIframe || document.getElementById('envioIframe');
+  if (!iframe) {
+    alert('Erro: Formulário de envio não foi preparado. Clique em "Gravar" primeiro.');
+    btn.disabled = false;
+    return;
+  }
+  
+  // Exibe barra de progresso
+  document.getElementById('progressBarContainer').style.display = 'block';
+  document.getElementById('progressBarFill').style.width = '10%';
+  document.getElementById('progressBarPercent').textContent = '10%';
+  document.getElementById('progressBarStatus').textContent = 'Preparando envio...';
+
+  // Exibe console de mensagens
+  const consoleDiv = document.getElementById('realTimeConsole');
+  const messagesDiv = document.getElementById('consoleMessages');
+  consoleDiv.style.display = 'block';
+  messagesDiv.innerHTML = ''; // Limpa mensagens anteriores
+  
+  try {
+    // 📋 Coleta dados do formulário separado via iframe
+    console.log('📋 Coletando dados do formulário separado...');
+    const envioDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const envioForm = envioDoc.getElementById('envioForm');
+    
+    if (!envioForm) {
+      throw new Error('Formulário de envio não encontrado no iframe');
     }
+      const fd = new FormData(envioForm);
+    const dados = {};
+    fd.forEach((v, k) => { dados[k] = v; });
+    
+    // NÃO remove campos vazios - deixa o backend decidir
+    // Object.keys(dados).forEach(key => { if (dados[key] === '') delete dados[key]; });
+      console.log('📊 Dados que serão enviados ao PostgreSQL:', dados);
+    console.log(`📈 Total de campos: ${Object.keys(dados).length}`);
+    
+    // Log detalhado de cada campo
+    console.log('📋 Campos detalhados:');
+    Object.keys(dados).forEach(key => {
+      console.log(`  ${key}: "${dados[key]}"`);
+    });
+
+    document.getElementById('progressBarFill').style.width = '50%';
+    document.getElementById('progressBarPercent').textContent = '50%';
+    document.getElementById('progressBarStatus').textContent = 'Enviando ao servidor...';        const resp = await fetch('/cadastro-usuario-sistema', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    });
+    
+    if (!resp.ok) {
+      const errorData = await resp.text();
+      console.error('❌ Erro do servidor:', errorData);
+      throw new Error(`Status ${resp.status}: ${errorData}`);
+    }
+
+    document.getElementById('progressBarFill').style.width = '80%';
+    document.getElementById('progressBarPercent').textContent = '80%';
+    document.getElementById('progressBarStatus').textContent = 'Processando resposta...';
+    await resp.json();
+
+    document.getElementById('progressBarFill').style.width = '100%';
+    document.getElementById('progressBarPercent').textContent = '100%';
+    document.getElementById('progressBarStatus').textContent = 'Cadastro concluído!';
+    document.getElementById('sucessoBox').style.display = 'block';
+    
+    // Mensagem de sucesso no console
+    const sucessoMsg = document.createElement('div');
+    sucessoMsg.style.color = '#28a745';
+    sucessoMsg.style.fontWeight = 'bold';
+    sucessoMsg.innerHTML = '✅ Cadastro realizado com sucesso!';
+    messagesDiv.appendChild(sucessoMsg);
+    
+    // Reset formulário de interface
+    document.getElementById('usuarioForm').reset();
+    
+    // Remove iframe após sucesso
+    if (iframe && iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
+      window.envioIframe = null;
+    }
+    
+    btn.disabled = true;
+    
+  } catch (err) {
+    document.getElementById('erroBox').style.display = 'block';
+    document.getElementById('erroBox').textContent = 'Erro: ' + err.message;
+    console.error('❌ Erro no cadastro:', err);
+    
+    // Mensagem de erro no console
+    const erroMsg = document.createElement('div');
+    erroMsg.style.color = '#dc3545';
+    erroMsg.style.fontWeight = 'bold';
+    erroMsg.innerHTML = '❌ Erro: ' + err.message;
+    messagesDiv.appendChild(erroMsg);
+    
+    btn.disabled = false;
+  }
+});
   </script>
+  </form>
+
+<div style="text-align:center; margin-top: 30px;">
+  <a href="/boas-vindas" class="menu-link" style="background:#004080; color:#fff; text-decoration:none; padding:10px 22px; border-radius:6px; font-size:16px; font-weight:500; display:inline-block;">Página inicial</a>
+</div>
+
+<div id="sucessoBox">Cadastro realizado com sucesso!</div>
+<div id="erroBox"></div>
+<div id="okBtnContainer" style="display:none; text-align:center; margin-top:16px;">
+  <button id="okBtn" style="padding:10px 32px; font-size:1.1rem; background:#003366; color:#fff; border:none; border-radius:6px; cursor:pointer;">OK</button>
+</div>
+</div>  <script type="module" src="/static/js/formatacao_valores_campos/formatacao_cpf.js"></script>
+<script type="module" src="/static/js/formatacao_valores_campos/formatacao_telefone_movel.js"></script>
+<script type="module" src="/static/js/formatacao_valores_campos/formatacao_email.js"></script>
+<script type="module" src="/static/js/formatacao_valores_campos/formatacao_email_institucional.js"></script>
+<script type="module" src="/static/js/formatacao_valores_campos/formatacao_ramal.js"></script>
+<script type="module" src="/static/js/formatacao_valores_campos/formatacao_pessoa_fisica_id.js"></script>
+<script src="/static/js/cd_usuario/formulario_usuario_unificado.js"></script>
+<script src="/static/js/cd_usuario/logicas_listas_infos_pessoais.js"></script>
+<script src="/static/js/cd_usuario/logicas_listas_infos_profissionais.js"></script>
+<script>
+        // Carregar lista de PFs automaticamente ao selecionar "associar"
+        document.getElementById('opcaoPF').addEventListener('change', function() {
+          if (this.value === 'associar') {
+            document.getElementById('boxPF').classList.remove('hidden');
+            fetch('/cadastro/pfs/json').then(r => r.json()).then(pfs => {
+              const pfSelect = document.getElementById('pfSelect');
+              pfSelect.innerHTML = '<option value="">Selecione uma PF</option>';
+              pfs.forEach(pf => {
+                pfSelect.innerHTML += `<option value="${pf.id}" data-cpf="${pf.cpf}" data-email="${pf.email}" data-telefone="${pf.telefone}" data-nome="${pf.nome}">${pf.nome} (${pf.cpf})</option>`;
+              });
+            });
+          } else {
+            document.getElementById('boxPF').classList.add('hidden');
+          }
+        });
+        
+        // Utilitário para esconder todos os checkpoints e retângulos verdes de validação
+        function limparValidacaoVisualCampos(campos) {
+          campos.forEach(function(id) {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.classList.remove('erro-campo');
+            const field = input.closest('.form-field');
+            if (field) field.classList.remove('campo-validado');
+            // Esconde o check-icone e mostra o asterisco
+            const label = field ? field.querySelector('label') : null;
+            if (label) {
+              const check = label.querySelector('.check-icone');
+              const asterisco = label.querySelector('.obrigatorio-icone');
+              if (check) check.style.display = 'none';
+              if (asterisco) asterisco.style.display = 'inline';
+            }
+          });
+        }
+          // Seleção de PF preenche campos
+        document.getElementById('pfSelect').addEventListener('change', function() {
+          const opt = this.options[this.selectedIndex];
+          const cpf = document.getElementById('cpf');
+          const email = document.getElementById('email');
+          const tel = document.getElementById('telefone');
+          const pfId = document.getElementById('pessoa_fisica_id');
+          cpf.value = opt.getAttribute('data-cpf') || '';
+          email.value = opt.getAttribute('data-email') || '';
+          tel.value = opt.getAttribute('data-telefone') || '';
+          pfId.value = opt.value || '';
+          document.getElementById('pfResumoTexto').value = opt.getAttribute('data-nome') || '';
+          document.getElementById('pfInputFinal').value = opt.value;
+          document.getElementById('pfNomeFinal').value = opt.getAttribute('data-nome') || '';
+          document.getElementById('resumoPF').classList.remove('hidden');
+          // Dispara input para CPF, telefone, e-mail e ID PF aqui!
+          cpf.dispatchEvent(new Event('input', { bubbles: true }));
+          tel.dispatchEvent(new Event('input', { bubbles: true }));
+          email.dispatchEvent(new Event('input', { bubbles: true }));
+          pfId.dispatchEvent(new Event('input', { bubbles: true }));
+          // Garante validação visual e habilitação do botão Gravar
+          if (typeof window.checarTodosCamposValidos === 'function') {
+            window.checarTodosCamposValidos();
+          }
+        });
+        
+        // Botão confirmar: bloqueia seleção, mostra resumo e botão editar
+        document.getElementById('confirmarPFBtn').addEventListener('click', function() {
+          document.getElementById('boxPF').classList.add('hidden');
+          document.getElementById('resumoPF').classList.remove('hidden');
+          document.getElementById('editarPFBtn').style.display = 'inline-block';
+          // Dispara o evento input para garantir máscara/validação SÓ aqui
+          const cpf = document.getElementById('cpf');
+          const tel = document.getElementById('telefone');
+          const email = document.getElementById('email');
+          cpf.dispatchEvent(new Event('input', { bubbles: true }));
+          tel.dispatchEvent(new Event('input', { bubbles: true }));
+          email.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+          // Botão editar: retorna ao estado inicial da seleção de PF e limpa toda validação visual
+        document.getElementById('editarPFBtn').addEventListener('click', function() {
+          document.getElementById('resumoPF').classList.add('hidden');
+          document.getElementById('boxPF').classList.remove('hidden');
+          document.getElementById('opcaoPF').value = 'associar';
+          document.getElementById('pfSelect').selectedIndex = 0;
+          document.getElementById('cpf').value = '';
+          document.getElementById('email').value = '';
+          document.getElementById('telefone').value = '';
+          document.getElementById('pessoa_fisica_id').value = '';
+          document.getElementById('pfResumoTexto').value = '';
+          document.getElementById('pfInputFinal').value = '';
+          document.getElementById('pfNomeFinal').value = '';
+          document.getElementById('cpf-feedback').innerText = '';
+          document.getElementById('telefone-feedback').innerText = '';
+          document.getElementById('email-feedback').innerText = '';
+          // Remove validação visual dos campos e checkpoints/retângulos verdes
+          limparValidacaoVisualCampos(['cpf','telefone','email','opcaoPF','pessoa_fisica_id']);
+        });
+      </script>
+      <script>
+// Garante que o botão Gravar fique sempre habilitado
+window.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('btnGravar');
+  if (btn) btn.disabled = false;
+});
+</script>
+<script>
+function mostrarOkBtn() {
+  document.getElementById('okBtnContainer').style.display = 'block';
+  document.getElementById('okBtn').onclick = function() {
+    document.getElementById('okBtnContainer').style.display = 'none';
+    location.reload();
+  };
+}
+// Exibe botão OK após sucesso ou erro
+function exibirMensagemSucesso() {
+  document.getElementById('sucessoBox').style.display = 'block';
+  mostrarOkBtn();
+}
+function exibirMensagemErro(msg) {
+  document.getElementById('erroBox').style.display = 'block';
+  document.getElementById('erroBox').textContent = msg;
+  mostrarOkBtn();
+}
+// Substitua as chamadas de exibição de mensagem por exibirMensagemSucesso() e exibirMensagemErro(msg)
+</script>
 </body>
 </html>
 
